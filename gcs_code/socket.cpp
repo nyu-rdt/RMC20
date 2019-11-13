@@ -8,22 +8,48 @@
 #include <bits/stdc++.h> 
 #include <string.h>
 #include <net/if.h> 
+#include <pthread.h>
 #define PORT 8080
+#define NUM_THREADS 5
+namespace rdt{
+void *Listen(void *threadid,listenfd) {
+	long tid = (long)thread;
+	cout << "Thread with id : " << tid << endl;
+	//Charles Team calls the class and passes in the data
+	cout << "Thread with id : " << tid << "  ...exiting " << endl;
+}
+
+template <typename variable>
+void *write(void *thread,writefd,vector<char>(variable::* nameoffunctionpointer)(void),void* charlesclass){
+	std::vector<char> data;
+	long tid = (long)thread;
+	cout << "Thread with id : " << tid << endl;
+	data = (((variable*)charlesclass->nameoffunctionpointer)(void);
+	if(data.size()){
+		send(writefd , &data[0] , data.size() , 0 );
+	}
+	cout << "Thread with id : " << tid << "  ...exiting " << endl;
+}
+
+void *Write(void *thread,writefd) {
+	long tid = (long)thread;
+	cout << "Thread with id : " << tid << endl;
+	//Call Charles SDL class
+	cout << "Thread with id : " << tid << "  ...exiting " << endl;
+}
 class Server{
 private:
     int server_fd, new_socket, valread;
 
-    std::vector<unsigned char> data;
-
-    struct sockaddr_in myaddress;
-    struct sockaddr_in address;
+    struct sockaddr_in myaddress; //STRUCT TO HOLD PACKET INFO THIS SERVER
+    struct sockaddr_in address; //STRUCT TO HOLD PACKET INFO THIS ROBOT
 
     int opt = 1;
-    int PORT_NUM = 42069;
+    int PORT_NUM = 42069; // Dummy PORT holder
     int addrlen = sizeof(address);
 
     char str[INET_ADDRSTRLEN];
-    char *ip = "127.0.0.1";
+    char *ip = "127.0.0.1";  // Dummy IP holder
     char buffer[1024] = {0};
     char *hello = "Hello from server";
 public:
@@ -55,14 +81,14 @@ public:
             perror("setsockopt");
             exit(EXIT_FAILURE);
         }
-        myaddress.sin_family = AF_INET;
+        myaddress.sin_family = AF_INET; //TYPE OF PROTCOL
 	if(ip==NULL){
-        	myaddress.sin_addr.s_addr = INADDR_ANY;
+        	myaddress.sin_addr.s_addr = INADDR_ANY; // GET ANY FREE IP
 	}
 	else{
-		inet_pton(AF_INET,ip, &myaddress.sin_addr.s_addr);
+		inet_pton(AF_INET,ip, &myaddress.sin_addr.s_addr); //SET INOUT IP
 	}
-        myaddress.sin_port = htons( PORT_NUM );
+        myaddress.sin_port = htons( PORT_NUM ); //SET PORT
         
         // Forcefully attaching socket to the port 8080
         if (bind(server_fd, (struct sockaddr *)&myaddress,
@@ -71,13 +97,13 @@ public:
             perror("bind failed");
             exit(EXIT_FAILURE);
         }
-	//Listen to the port
+	// Listen to the port
         if (listen(server_fd, 3) < 0)
         {
             perror("listen");
             exit(EXIT_FAILURE);
         }
-	//If correctly connected
+	// If correctly connected
         if ((new_socket = accept(server_fd, (struct sockaddr *)&address,
                         (socklen_t*)&addrlen))<0)
         {
@@ -86,33 +112,63 @@ public:
         }
         printf("The GCC is on IP:%s Port:%d \n",ip,ntohs(myaddress.sin_port));
 	printf("The Robot is on IP:%s Port:%d \n",inet_ntoa(address.sin_addr),ntohs(address.sin_port));
+	int rc;
+	int i;
+	pthread_t threads[NUM_THREADS];
+	pthread_attr_t attr;
+	void *status;
+
+
+	// Initialize and set thread joinable
+	pthread_attr_init(&attr);
+	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+
+
+	// Initialize and set thread joinable
+	pthread_attr_init(&attr);
+	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+	i = 0;
+	cout << "main() : creating thread, " << i << endl;
+	rc = pthread_create(&threads[i], &attr, Listen, (void*) i,new_socket[0] );
+	if (rc) {
+	 cout << "Error:unable to create thread," << rc << endl;
+	 exit(-1);
+	}
+	i=2;
+	cout << "main() : creating thread, " << i << endl;
+	rc = pthread_create(&threads[i], &attr, Write, (void*) i,new_socket[1], //charles method,charles class instance);
+	if (rc) {
+	 cout << "Error:unable to create thread," << rc << endl;
+	 exit(-1);
+	}
+
+	// free attribute and wait for the other threads
+	pthread_attr_destroy(&attr);
+	for( i = 0; i < NUM_THREADS; i++ ) {
+	rc = pthread_join(threads[i], &status);
+		if (rc) {
+		 cout << "Error:unable to join," << rc << endl;
+		 exit(-1);
+		}
+	cout << "Main: completed thread id :" << i ;
+	cout << "  exiting with status :" << status << endl;
+	}
+
         valread = read( new_socket , buffer, 1024);
         printf("%s\n",buffer );
         send(new_socket , hello , strlen(hello) , 0 );
         //recv();
         printf("Hello message sent\n");
-    }
-    void initSocket(){
-        if(this){
-            
-            Server* newServer = new Server( *this);
-            this->destroy();
-
-            
-        }
-    }
-    void destroy(){
-        close(1);
-    }
-    void changeTarget(){
-        
+	cout << "Main: program exiting." << endl;
+	pthread_exit(NULL);
     }
     
 };
-
+}
 int main(int argc, char const *argv[])
 {
 
-    Server(argc,argv);
+    rdt::Server(argc,argv);
     
 }
+
