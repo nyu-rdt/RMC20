@@ -12,13 +12,15 @@
 #define PORT 8080
 #define NUM_THREADS 5
 namespace rdt{
+//listenfd is what we listen to
 void *Listen(void *threadid,listenfd) {
 	long tid = (long)thread;
 	cout << "Thread with id : " << tid << endl;
 	//Charles Team calls the class and passes in the data
 	cout << "Thread with id : " << tid << "  ...exiting " << endl;
 }
-
+//writefd we write to
+//158
 template <typename variable>
 void *write(void *thread,writefd,vector<char>(variable::* nameoffunctionpointer)(void),void* charlesclass){
 	std::vector<char> data;
@@ -31,12 +33,6 @@ void *write(void *thread,writefd,vector<char>(variable::* nameoffunctionpointer)
 	cout << "Thread with id : " << tid << "  ...exiting " << endl;
 }
 
-void *Write(void *thread,writefd) {
-	long tid = (long)thread;
-	cout << "Thread with id : " << tid << endl;
-	//Call Charles SDL class
-	cout << "Thread with id : " << tid << "  ...exiting " << endl;
-}
 class Server{
 private:
     int server_fd, new_socket, valread;
@@ -53,21 +49,7 @@ private:
     char buffer[1024] = {0};
     char *hello = "Hello from server";
 public:
-    Server(int argc, char const *argv[]){
-	
-	if (argc > 3) {
-	fprintf(stderr, "Too much Input\n");
-	exit(1);
-	}
-	else if (argc == 3) {
-	PORT_NUM = atoi(argv[1]);
-	ip = (char*) argv[2];
-	}
-	else if (argc == 2) {
-	PORT_NUM = atoi(argv[1]);
-	}
-        
-        
+    Socket(){
         // Creating socket file descriptor
         if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
         {
@@ -112,6 +94,8 @@ public:
         }
         printf("The GCC is on IP:%s Port:%d \n",ip,ntohs(myaddress.sin_port));
 	printf("The Robot is on IP:%s Port:%d \n",inet_ntoa(address.sin_addr),ntohs(address.sin_port));
+    }
+    threads(){
 	int rc;
 	int i;
 	pthread_t threads[NUM_THREADS];
@@ -161,6 +145,23 @@ public:
         printf("Hello message sent\n");
 	cout << "Main: program exiting." << endl;
 	pthread_exit(NULL);
+    }
+    Server(int argc, char const *argv[]){
+	
+	if (argc > 3) {
+	fprintf(stderr, "Too much Input\n");
+	exit(1);
+	}
+	else if (argc == 3) {
+	PORT_NUM = atoi(argv[1]);
+	ip = (char*) argv[2];
+	}
+	else if (argc == 2) {
+	PORT_NUM = atoi(argv[1]);
+	}
+        
+        socket();
+        threads();
     }
     
 };
