@@ -5,6 +5,8 @@ import cv2
 import apriltag
 import numpy
 import math
+
+# import os
 #import matplotlib.pyplot as plt
 #Can uncomment matplotlib text to plot vectors
 
@@ -57,7 +59,7 @@ def _draw_pose(overlay, camera_params, tag_size, pose, z_sign=1):
 
 
 #Converts rotation matrix into radians and degrees
-def rotationMatrixToEulerAngles(R):
+def rotationMatrixToEulerAngles(R, id):
 
     sy = math.sqrt(R[0, 0] * R[0, 0] + R[1, 0] * R[1, 0])
 
@@ -72,7 +74,16 @@ def rotationMatrixToEulerAngles(R):
         y = math.atan2(-R[2, 0], sy)
         z = 0
 
-    return numpy.array([x, y, z]), numpy.array([math.degrees(x), math.degrees(y), math.degrees(z)])
+    if id == 0:
+        return numpy.array([math.degrees(x), math.degrees(y) + 180, math.degrees(z)])
+    elif id == 1 or id == 2:
+        return numpy.array([math.degrees(x), math.degrees(y) + 90, math.degrees(z)])
+    elif id == 3:
+        return numpy.array([math.degrees(x), math.degrees(y), math.degrees(z)])
+    elif id == 5 or id == 6:
+        return numpy.array([math.degrees(x), math.degrees(y) + 270, math.degrees(z)])
+
+
 
 
 def findAngularRotation(position):
@@ -82,7 +93,8 @@ def findAngularRotation(position):
 
 def main():
     #Values come from running camera calibration file (fx, fy, cx,cy)
-    camera_params = [1.01446618 * 10 ** 3, 1.02086461 * 10 ** 3, 6.09583146 * 10 ** 2, 3.66171174 * 10 ** 2]
+    #camera_params = [1.01446618 * 10 ** 3, 1.02086461 * 10 ** 3, 6.09583146 * 10 ** 2, 3.66171174 * 10 ** 2]
+    camera_params = [1.31239907 * 10 ** 3,1.31169637 * 10 ** 3, 9.23293617 * 10 ** 2, 5.49707267 * 10 ** 2]
 
     parser = ArgumentParser(
         description='test apriltag Python bindings')
@@ -115,21 +127,20 @@ def main():
 
         detections, dimg = detector.detect(gray, return_image=True)
         print()
-
         num_detections = len(detections)
         print('Detected {} tags.\n'.format(num_detections))
 
-        for i, detection in enumerate(detections):
 
+        for i, detection in enumerate(detections):
             print('Detection {} of {}:'.format(i + 1, num_detections))
-            print()
+            #print()
             print(detection.tostring(indent=2))
-            print()
+            #print()
             #Returns pose matrix
-            M, init_error, final_error = detector.detection_pose(detection, camera_params, tag_size=0.215, z_sign=1)
-            print(M)
-            print(init_error, final_error)
-            print()
+            M, init_error, final_error = detector.detection_pose(detection, camera_params, tag_size=0.17, z_sign=1)
+            #print(M)
+            #print(init_error, final_error)
+            #print()
             rotation_matrix = numpy.array([M[0][:3],
                                        M[1][:3],
                                        M[2][:3]])
@@ -137,7 +148,8 @@ def main():
             position = numpy.array([M[0][3:], M[1][3:], M[2][3:]])
 
             #Converts rotation matrix into degrees and radians
-            print('Rotation in Radians then Degrees (pitch,yaw,roll)', rotationMatrixToEulerAngles(rotation_matrix))
+            # os.system("clear")
+            print('Rotation in Radians then Degrees (pitch,yaw,roll)', rotationMatrixToEulerAngles(rotation_matrix, detection.tag_id))
             print('Position:\n', position)
             print('Angular Rotation:', findAngularRotation(position))
             #print('rotation matrix\n', rotation_matrix)
@@ -145,8 +157,10 @@ def main():
             overlay = frame // 2 + dimg[:, :, None] // 2
 
             #Draws all overlays before going to next frame
+
             for det in range(num_detections):
-                _draw_pose(overlay, camera_params, 0.215, M, z_sign=1)
+                _draw_pose(overlay, camera_params, 0.17, M, z_sign=1)
+
             cv2.imshow(window, overlay)
             k = cv2.waitKey(1)
 
