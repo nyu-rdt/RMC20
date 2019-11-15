@@ -13,22 +13,34 @@
 #define NUM_THREADS 5
 namespace rdt{
 //listenfd is what we listen to
-void *Listen(void *threadid,listenfd) {
+template <typename variable>
+void *Listen(void *threadid,listenfd,void(variable::* nameoffunctionpointer)(vector<unsigned char>),void* charlesclass) {
 	long tid = (long)thread;
+	unsigned char buffer[1024];
 	cout << "Thread with id : " << tid << endl;
-	//Charles Team calls the class and passes in the data
+	while(1){
+	if(listenfd>0){
+		int size = recv(listenfd,buffer,size(buffer)); //get buffer thing
+		vector<unsigned char> data;
+		for(i=0;i<size;i++){
+			data.push_back(buffer[i]);	
+		}
+		((variable*)charlesclass)->*nameoffunctionpointer)(data);
+	}
 	cout << "Thread with id : " << tid << "  ...exiting " << endl;
 }
 //writefd we write to
 //158
 template <typename variable>
-void *write(void *thread,writefd,vector<char>(variable::* nameoffunctionpointer)(void),void* charlesclass){
+void *write(void *thread,writefd,vector<unsigned char>(variable::* nameoffunctionpointer)(void),void* charlesclass){
 	std::vector<char> data;
 	long tid = (long)thread;
 	cout << "Thread with id : " << tid << endl;
-	data = (((variable*)charlesclass->nameoffunctionpointer)(void);
-	if(data.size()){
-		send(writefd , &data[0] , data.size() , 0 );
+	while(1){
+		data = (((variable*)charlesclass->*nameoffunctionpointer)(void);
+		if(data.size()){
+			send(writefd , &data[0] , data.size() , 0 );
+		}
 	}
 	cout << "Thread with id : " << tid << "  ...exiting " << endl;
 }
