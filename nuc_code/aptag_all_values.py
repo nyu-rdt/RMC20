@@ -5,8 +5,8 @@ import cv2
 import apriltag
 import numpy
 import math
+import time
 
-# import os
 #import matplotlib.pyplot as plt
 #Can uncomment matplotlib text to plot vectors
 
@@ -78,23 +78,55 @@ def rotationMatrixToEulerAngles(R, id):
         return numpy.array([math.degrees(x), math.degrees(y) + 180, math.degrees(z)])
     elif id == 1 or id == 2:
         return numpy.array([math.degrees(x), math.degrees(y) + 90, math.degrees(z)])
-    elif id == 3:
+    elif id == 3 or id == 4:
         return numpy.array([math.degrees(x), math.degrees(y), math.degrees(z)])
     elif id == 5 or id == 6:
         return numpy.array([math.degrees(x), math.degrees(y) + 270, math.degrees(z)])
 
-
-
-
+#Angular rotation of each apriltag
 def findAngularRotation(position):
     angle = math.atan(position[0] / position[2])
     return math.degrees(angle)
 
+#From 0 - 180 degrees
+def findAbsoluteAngularRotation(position):
+    relangle = math.degrees(math.atan(position[0] / position[2]))
+    if relangle == 0:
+        absangle = 90
+
+    elif relangle < 0:
+        absangle = 90 - math.fabs(relangle)
+
+    elif relangle > 0:
+        absangle = 90 + math.fabs(relangle)
+    return absangle
+
+#Average angle of 2 border apriltags
+def adjustedAngluarRotation(storedangles):
+    length = len(storedangles)
+
+    if length > 2:
+        ang1 = max(storedangles)
+        ang2 = min(storedangles)
+    else:
+        ang1 = storedangles[0]
+        ang2 = storedangles[1]
+
+    adjusted_rotation_angle = math.fabs(ang1 - ang2) / 2
+
+    if (ang1 + ang2) / 2 < 90:
+        return -1 * adjusted_rotation_angle
+    else:
+        return adjusted_rotation_angle
+
+
+#def centerPosition(position, id):
+
 
 def main():
     #Values come from running camera calibration file (fx, fy, cx,cy)
-    #camera_params = [1.01446618 * 10 ** 3, 1.02086461 * 10 ** 3, 6.09583146 * 10 ** 2, 3.66171174 * 10 ** 2]
-    camera_params = [1.31239907 * 10 ** 3,1.31169637 * 10 ** 3, 9.23293617 * 10 ** 2, 5.49707267 * 10 ** 2]
+    camera_params = [1.01446618 * 10 ** 3, 1.02086461 * 10 ** 3, 6.09583146 * 10 ** 2, 3.66171174 * 10 ** 2]
+    #camera_params = [1.31239907 * 10 ** 3,1.31169637 * 10 ** 3, 9.23293617 * 10 ** 2, 5.49707267 * 10 ** 2]
 
     parser = ArgumentParser(
         description='test apriltag Python bindings')
@@ -119,6 +151,9 @@ def main():
                                  searchpath=apriltag._get_demo_searchpath())
 
     while True:
+        storedangles = []
+
+        
         success, frame = cap.read()
         if not success:
             break
@@ -131,10 +166,11 @@ def main():
         print('Detected {} tags.\n'.format(num_detections))
 
 
+
         for i, detection in enumerate(detections):
             print('Detection {} of {}:'.format(i + 1, num_detections))
             #print()
-            print(detection.tostring(indent=2))
+            #print(detection.tostring(indent=2))
             #print()
             #Returns pose matrix
             M, init_error, final_error = detector.detection_pose(detection, camera_params, tag_size=0.17, z_sign=1)
@@ -148,11 +184,14 @@ def main():
             position = numpy.array([M[0][3:], M[1][3:], M[2][3:]])
 
             #Converts rotation matrix into degrees and radians
-            # os.system("clear")
-            print('Rotation in Radians then Degrees (pitch,yaw,roll)', rotationMatrixToEulerAngles(rotation_matrix, detection.tag_id))
+            print('Rotation in Degrees (pitch,yaw,roll)', rotationMatrixToEulerAngles(rotation_matrix, detection.tag_id))
             print('Position:\n', position)
             print('Angular Rotation:', findAngularRotation(position))
             #print('rotation matrix\n', rotation_matrix)
+
+            if num_detections > 1:
+                storedangles.append(findAbsoluteAngularRotation(position))
+
 
             overlay = frame // 2 + dimg[:, :, None] // 2
 
@@ -170,9 +209,11 @@ def main():
             plot = plt.quiver(*origin, M[:, 0], M[:, 1], color=['r', 'b', 'g'], scale=5)
             plot.show(plot)
             '''
-            if k == 27:
-                break
-
+            time.sleep(1)
+            
+        if num_detections > 1:
+            print('storedangles', storedangles)
+            print('Adjusted Rotation Angle: ', adjustedAngluarRotation(storedangles))
 
 if __name__ == '__main__':
     main()
