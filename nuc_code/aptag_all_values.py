@@ -82,6 +82,8 @@ def rotationMatrixToEulerAngles(R, id):
         return numpy.array([math.degrees(x), math.degrees(y), math.degrees(z)])
     elif id == 5 or id == 6:
         return numpy.array([math.degrees(x), math.degrees(y) + 270, math.degrees(z)])
+    elif id == -1:
+        return y
 
 #Angular rotation of each apriltag
 def findAngularRotation(position):
@@ -120,13 +122,54 @@ def adjustedAngluarRotation(storedangles):
         return adjusted_rotation_angle
 
 
-#def centerPosition(position, id):
+def centerPosition(position, rotation_matrix, id):
+    relative_orientation = rotationMatrixToEulerAngles(rotation_matrix, -1)
 
+    if id == 0 or id == 3:
+        diag_length = 0.50
+        relative_orientation = math.fabs(relative_orientation)
+        x_add = diag_length * math.sin(relative_orientation)
+        y_add = diag_length * math.cos(relative_orientation)
+        if relative_orientation < 0:
+            x_add *= -1
+
+    elif id == 2 or id == 6 or id == 5 or id == 1:
+        diag_length = 0.35
+
+        relative_orientation = math.fabs(relative_orientation)
+        if id == 2 or id == 6:
+            needed_angle = -0.698132
+            new_angle = needed_angle + relative_orientation
+            x_add = diag_length * math.cos(new_angle)
+            y_add = diag_length * math.sin(new_angle)
+        elif id == 5 or id == 1:
+            needed_angle = -0.698132
+            new_angle = needed_angle - relative_orientation
+            x_add = -1 * diag_length * math.cos(new_angle)
+            y_add = diag_length * math.sin(new_angle)
+            #x_add = -1 * diag_length * math.sin(new_angle) + 0.2
+            #y_add = diag_length * math.cos(new_angle)
+
+    centered_x = position[0] + x_add
+    centered_y = position[2] + y_add
+
+    return numpy.array([centered_x, centered_y])
+
+
+def avgposition(length):
+    total = 0
+    count = 0
+    print(length)
+    for measurement in length:
+        total += measurement
+        count += 1
+    average = total / count
+    return average
 
 def main():
     #Values come from running camera calibration file (fx, fy, cx,cy)
-    camera_params = [1.01446618 * 10 ** 3, 1.02086461 * 10 ** 3, 6.09583146 * 10 ** 2, 3.66171174 * 10 ** 2]
-    #camera_params = [1.31239907 * 10 ** 3,1.31169637 * 10 ** 3, 9.23293617 * 10 ** 2, 5.49707267 * 10 ** 2]
+    #camera_params = [1.01446618 * 10 ** 3, 1.02086461 * 10 ** 3, 6.09583146 * 10 ** 2, 3.66171174 * 10 ** 2]
+    camera_params = [1.31239907 * 10 ** 3,1.31169637 * 10 ** 3, 9.23293617 * 10 ** 2, 5.49707267 * 10 ** 2]
 
     parser = ArgumentParser(
         description='test apriltag Python bindings')
@@ -152,8 +195,9 @@ def main():
 
     while True:
         storedangles = []
+        stored_x_values = []
+        stored_y_values = []
 
-        
         success, frame = cap.read()
         if not success:
             break
@@ -185,14 +229,17 @@ def main():
 
             #Converts rotation matrix into degrees and radians
             print('Rotation in Degrees (pitch,yaw,roll)', rotationMatrixToEulerAngles(rotation_matrix, detection.tag_id))
-            print('Position:\n', position)
-            print('Angular Rotation:', findAngularRotation(position))
+            print()
+            #print('Position:\n', position)
+            #print('Angular Rotation of each tag:', findAngularRotation(position))
             #print('rotation matrix\n', rotation_matrix)
-
+            print('Center Position: \n', centerPosition(position, rotation_matrix, detection.tag_id))
             if num_detections > 1:
                 storedangles.append(findAbsoluteAngularRotation(position))
-
-
+                #print('A', centerPosition(position, rotation_matrix, detection.tag_id)[0])
+                stored_x_values.append(centerPosition(position, rotation_matrix, detection.tag_id)[0])
+                #print('B', centerPosition(position, rotation_matrix, detection.tag_id)[1])
+                stored_y_values.append(centerPosition(position, rotation_matrix, detection.tag_id)[1])
             overlay = frame // 2 + dimg[:, :, None] // 2
 
             #Draws all overlays before going to next frame
@@ -209,11 +256,13 @@ def main():
             plot = plt.quiver(*origin, M[:, 0], M[:, 1], color=['r', 'b', 'g'], scale=5)
             plot.show(plot)
             '''
-            time.sleep(1)
-            
+
+
+
         if num_detections > 1:
-            print('storedangles', storedangles)
+            #print('storedangles', storedangles)
             print('Adjusted Rotation Angle: ', adjustedAngluarRotation(storedangles))
+            #print('X:', avgposition(stored_x_values), '\nY: ', avgposition(stored_y_values))
 
 if __name__ == '__main__':
     main()
