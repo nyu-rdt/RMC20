@@ -186,7 +186,7 @@ def avgposition(length):
 def main():
     #Values come from running camera calibration file (fx, fy, cx,cy)
     #camera_params = [1.01446618 * 10 ** 3, 1.02086461 * 10 ** 3, 6.09583146 * 10 ** 2, 3.66171174 * 10 ** 2]
-    camera_params = [1.31239907 * 10 ** 3,1.31169637 * 10 ** 3, 9.23293617 * 10 ** 2, 5.49707267 * 10 ** 2]
+    camera_params = [1.31239907 * 10 ** 3, 1.31169637 * 10 ** 3, 9.23293617 * 10 ** 2, 5.49707267 * 10 ** 2]
 
     parser = ArgumentParser(
         description='test apriltag Python bindings')
@@ -250,7 +250,7 @@ def main():
             #print()
             #print('Position:\n', position)
             #print('Angular Rotation of each tag:', findAngularRotation(position))
-            #print('rotation matrix\n', rotation_matrix)
+            #print('Rotation matrix\n', rotation_matrix)
             #print('Center Position: \n', centerPosition(position, rotation_matrix, detection.tag_id))
 
             if num_detections > 1:
@@ -287,11 +287,12 @@ def main():
 
         if num_detections > 1:
             print('Adjusted Rotation Angle: ', adjustedAngluarRotation(storedangles))
-
+        elif num_detections == 1:
+            print('Angular Rotation: ', storedangles[tag_count])
         if num_detections > 0:
-            print('Angular Position: ', storedangles)
             print('Center Position', stored_x_values[tag_count], stored_y_values[tag_count])
             print('Orientation', stored_orientation[tag_count])
+
 
             #print('X:', avgposition(stored_x_values), '\nY: ', avgposition(stored_y_values))
 
