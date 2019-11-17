@@ -138,17 +138,34 @@ def centerPosition(position, rotation_matrix, id):
 
         relative_orientation = math.fabs(relative_orientation)
         if id == 2 or id == 6:
-            needed_angle = -0.698132
-            new_angle = needed_angle + relative_orientation
-            x_add = diag_length * math.cos(new_angle)
-            y_add = diag_length * math.sin(new_angle)
+            needed_angle = 0.785398
+            if relative_orientation > math.radians(45):
+                new_angle = relative_orientation - needed_angle
+                x_add = -1 *  diag_length * math.cos(new_angle)
+                y_add = diag_length * math.sin(new_angle)
+            elif relative_orientation < math.radians(45) and relative_orientation > math.radians(-45):
+                new_angle = needed_angle - relative_orientation
+                x_add = diag_length * math.cos(new_angle)
+                y_add = diag_length * math.sin(new_angle)
+            elif relative_orientation < math.radians(-45):
+                new_angle = relative_orientation - needed_angle
+                x_add = diag_length * math.cos(new_angle)
+                y_add = -1 * diag_length * math.sin(new_angle)
+
         elif id == 5 or id == 1:
-            needed_angle = -0.698132
-            new_angle = needed_angle - relative_orientation
-            x_add = -1 * diag_length * math.cos(new_angle)
-            y_add = diag_length * math.sin(new_angle)
-            #x_add = -1 * diag_length * math.sin(new_angle) + 0.2
-            #y_add = diag_length * math.cos(new_angle)
+            needed_angle = 0.785398
+            if relative_orientation > math.radians(45):
+                new_angle = relative_orientation - needed_angle
+                x_add = -1 * diag_length * math.cos(new_angle)
+                y_add = 1 * diag_length * math.sin(new_angle)
+            elif relative_orientation < math.radians(45) and relative_orientation > math.radians(-45):
+                new_angle = needed_angle - relative_orientation
+                x_add = diag_length * math.cos(new_angle)
+                y_add = diag_length * math.sin(new_angle)
+            elif relative_orientation < math.radians(-45):
+                new_angle = relative_orientation - needed_angle
+                x_add = diag_length * math.cos(new_angle)
+                y_add = -1 * diag_length * math.sin(new_angle)
 
     centered_x = position[0] + x_add
     centered_y = position[2] + y_add
@@ -197,6 +214,7 @@ def main():
         storedangles = []
         stored_x_values = []
         stored_y_values = []
+        stored_orientation = []
 
         success, frame = cap.read()
         if not success:
@@ -210,9 +228,9 @@ def main():
         print('Detected {} tags.\n'.format(num_detections))
 
 
-
+        tag_count = -1
         for i, detection in enumerate(detections):
-            print('Detection {} of {}:'.format(i + 1, num_detections))
+            #print('Detection {} of {}:'.format(i + 1, num_detections))
             #print()
             #print(detection.tostring(indent=2))
             #print()
@@ -228,18 +246,26 @@ def main():
             position = numpy.array([M[0][3:], M[1][3:], M[2][3:]])
 
             #Converts rotation matrix into degrees and radians
-            print('Rotation in Degrees (pitch,yaw,roll)', rotationMatrixToEulerAngles(rotation_matrix, detection.tag_id))
-            print()
+            #print('Rotation in Degrees (pitch,yaw,roll)', rotationMatrixToEulerAngles(rotation_matrix, detection.tag_id))
+            #print()
             #print('Position:\n', position)
             #print('Angular Rotation of each tag:', findAngularRotation(position))
             #print('rotation matrix\n', rotation_matrix)
-            print('Center Position: \n', centerPosition(position, rotation_matrix, detection.tag_id))
+            #print('Center Position: \n', centerPosition(position, rotation_matrix, detection.tag_id))
+
             if num_detections > 1:
                 storedangles.append(findAbsoluteAngularRotation(position))
                 #print('A', centerPosition(position, rotation_matrix, detection.tag_id)[0])
                 stored_x_values.append(centerPosition(position, rotation_matrix, detection.tag_id)[0])
                 #print('B', centerPosition(position, rotation_matrix, detection.tag_id)[1])
                 stored_y_values.append(centerPosition(position, rotation_matrix, detection.tag_id)[1])
+                stored_orientation.append(rotationMatrixToEulerAngles(rotation_matrix, detection.tag_id))
+                tag_count += 1
+            elif num_detections == 1:
+                storedangles.append(findAngularRotation(position))
+                stored_x_values.append(centerPosition(position, rotation_matrix, detection.tag_id)[0])
+                stored_y_values.append(centerPosition(position, rotation_matrix, detection.tag_id)[1])
+                stored_orientation.append(rotationMatrixToEulerAngles(rotation_matrix, detection.tag_id))
             overlay = frame // 2 + dimg[:, :, None] // 2
 
             #Draws all overlays before going to next frame
@@ -257,11 +283,16 @@ def main():
             plot.show(plot)
             '''
 
-
+        #print('storedangles', storedangles)
 
         if num_detections > 1:
-            #print('storedangles', storedangles)
             print('Adjusted Rotation Angle: ', adjustedAngluarRotation(storedangles))
+
+        if num_detections > 0:
+            print('Angular Position: ', storedangles)
+            print('Center Position', stored_x_values[tag_count], stored_y_values[tag_count])
+            print('Orientation', stored_orientation[tag_count])
+
             #print('X:', avgposition(stored_x_values), '\nY: ', avgposition(stored_y_values))
 
 if __name__ == '__main__':
