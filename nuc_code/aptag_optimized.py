@@ -96,10 +96,10 @@ def center_position(position, rotation_matrix, id):
     relative_orientation = rotation_matrix_to_euler_angles(rotation_matrix, -1)
     diagonal_length = 0.33234
     default_angle = math.radians(45)
-    meter_length_adjustment = 1
+    meter_length_adjustment = 1.01
 
     # Right Tag
-    if id == 5 or id == 2 or id == 6:
+    if id == 5 or id == 2:
         total_angle = math.pi - default_angle - relative_orientation
         print(diagonal_length * math.cos(total_angle))
         print(math.degrees(total_angle))
@@ -118,14 +118,15 @@ def center_position(position, rotation_matrix, id):
         total_angle = default_angle + relative_orientation * -1
 
     # Only one Tag
-    elif id == 0 or id == 3:
-        meter_length_adjustment = 1.02
+    elif id == 0 or id == 3 or id == 6:
+        meter_length_adjustment = 1.03
         diagonal_length = .50
-        total_angle = relative_orientation + 90
+        total_angle = -1 * relative_orientation + math.radians(90)
 
     if math.degrees(total_angle) > 90:
         x_position = position[0] - diagonal_length * math.cos(total_angle)
         y_position = position[2] + diagonal_length * math.sin(total_angle)
+
     else:
         x_position = position[0] + diagonal_length * math.cos(total_angle)
         y_position = position[2] + diagonal_length * math.sin(total_angle)
@@ -208,7 +209,7 @@ def turtle_draw(coordinates, orientation):
     turtle.goto(round(coordinates[0], 2) * scale, round(coordinates[1], 2) * scale)
 
     turtle.write([round(coordinates[0], 2), round(coordinates[1], 2)],
-                 False, align='left', font=('Arial', 20, 'normal'))
+                 False, align='left', font=('Arial', 40, 'normal'))
 
 
 def main():
