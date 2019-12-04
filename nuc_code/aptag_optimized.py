@@ -101,8 +101,6 @@ def center_position(position, rotation_matrix, id):
     # Right Tag
     if id == 5 or id == 2:
         total_angle = math.pi - default_angle - relative_orientation
-        print(diagonal_length * math.cos(total_angle))
-        print(math.degrees(total_angle))
 
         if math.degrees(total_angle) > 90:
             x_position = position[0] + diagonal_length * math.cos(total_angle)
@@ -119,9 +117,11 @@ def center_position(position, rotation_matrix, id):
 
     # Only one Tag
     elif id == 0 or id == 3 or id == 6:
-        meter_length_adjustment = 1.03
+        meter_length_adjustment = 1.02
         diagonal_length = .50
         total_angle = -1 * relative_orientation + math.radians(90)
+        print(diagonal_length * math.cos(total_angle))
+        print(math.degrees(total_angle))
 
     if math.degrees(total_angle) > 90:
         x_position = position[0] - diagonal_length * math.cos(total_angle)
@@ -202,14 +202,15 @@ def calc_values(stored_pose, stored_id):
 
 # Maps coordinates and rotation of robot to turtle.
 # scale adjusted to set distance over travelled pixel ratio
-def turtle_draw(coordinates, orientation):
+def turtle_draw(coordinates, orientation, angular_rotation):
     scale = 100
     turtle.clear()
     turtle.setheading(orientation * -1 + 90)
     turtle.goto(round(coordinates[0], 2) * scale, round(coordinates[1], 2) * scale)
 
-    turtle.write([round(coordinates[0], 2), round(coordinates[1], 2)],
-                 False, align='left', font=('Arial', 40, 'normal'))
+    turtle.write(['CP', [round(coordinates[0], 2), round(coordinates[1], 2)], 'O:',
+                  round(orientation, 2), 'AR', round(angular_rotation, 2)],
+                 False, align='center', font=('Arial', 25, 'normal'))
 
 
 def main():
@@ -290,7 +291,7 @@ def main():
             print('Orientation\n', orientation)
             print()
             print('Angular Rotation:\n', angular_rotation)
-            turtle_draw(center_coords, orientation)
+            turtle_draw(center_coords, orientation, angular_rotation)
 
 
 if __name__ == '__main__':
