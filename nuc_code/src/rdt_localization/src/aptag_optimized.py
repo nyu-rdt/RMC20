@@ -1,5 +1,7 @@
 from __future__ import division
 from __future__ import print_function
+from advanced_ros_demo.msg import Pose
+import rospy
 import cv2
 import apriltag
 import numpy
@@ -214,6 +216,11 @@ def turtle_draw(coordinates, orientation, angular_rotation):
 
 
 def main():
+    # Setup ROS Node
+    pub = rospy.Publisher('robotData/Pose', Pose, queue_size=10)
+    rospy.init_node('aptag_optimized')
+    rate = rospy.Rate(1)
+
     # Setup turtle
     turtle.clear()
     turtle.setworldcoordinates(-500, 0, 500, 1000)
@@ -242,7 +249,7 @@ def main():
     detector = apriltag.Detector()
 
     # Apriltag detection loop
-    while True:
+    while not rospy.is_shutdown():
         # Stores values of each detected tag for final output
         stored_pose = []
         stored_id = []
@@ -286,12 +293,22 @@ def main():
             #time.sleep(1)
             rotation_matrix, orientation, center_coords, angular_rotation = calc_values(stored_pose, stored_id)
 
-            print('Center Position:\n', center_coords)
-            print()
-            print('Orientation\n', orientation)
-            print()
-            print('Angular Rotation:\n', angular_rotation)
+            # print('Center Position:\n', center_coords)
+            # print()
+            # print('Orientation\n', orientation)
+            # print()
+            # print('Angular Rotation:\n', angular_rotation)
+
+            outmsg = Pose()
+            outmsg.x = center_coords[0]
+            outmsg.y = center_coords[1]
+            outmsg.orientation = orientation
+
+            pub.publish(outmsg)
+
             turtle_draw(center_coords, orientation, angular_rotation)
+
+            rate.sleep()
 
 
 if __name__ == '__main__':
