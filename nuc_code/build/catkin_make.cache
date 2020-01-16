@@ -1,2 +1,0 @@
-rdt_localization
--DCATKIN_DEVEL_PREFIX=/home/rdt/RMC20/nuc_code/devel -DCMAKE_INSTALL_PREFIX=/home/rdt/RMC20/nuc_code/install -G Unix Makefiles
