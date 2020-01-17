@@ -38,6 +38,11 @@ def main():
             # More setup code?
             robot_state = 4
 
+        # STATE 4: Nuc localizes robot
+        elif robot_state == 4:
+            # Make sure the apriltags are being detected
+            robot_state = 5
+
         # And so on...
         # In most of the states, the state will not simply be set to the next number
         # at the end of the 'elif.' Rather, it will be set to the next number once some
