@@ -5,20 +5,27 @@
 #include <stdlib.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <bits/stdc++.h> 
+#include <iostream>
+//#include <bits/stdc++.h> 
 #include <string.h>
+#include <pthread.h>
 #include <net/if.h> 
 #include <pthread.h>
 #define PORT 8080
 #define NUM_THREADS 8
 
-void *Connection(void *threadid, int fd) {
-	long tid = (long)thread;
-	cout << "Thread with id : " << tid << "  ...created for connection trasnlate " << endl;
+using namespace std;
 
+void *Connection(void* thing) {
+	char *hello = "Hello from server";
+	cout<<"Connection Established" << endl;
+	int new_socket = (int)((size_t)thing);
+	cout<<"Connection Established" << endl;
+	cout << "Thread with id : " << new_socket << "  ...created for connection trasnlate " << endl;
+	send(new_socket , hello , strlen(hello) , 0 );
 }
 
-class Server{
+class Server1{
 private:
     int server_fd, new_socket, valread;
 
@@ -26,7 +33,7 @@ private:
     struct sockaddr_in address; //STRUCT TO HOLD PACKET INFO THIS ROBOT
 
     int opt = 1;
-    int PORT_NUM = 42069; // Dummy PORT holder
+    int PORT_NUM = 8080; // Dummy PORT holder
     int addrlen = sizeof(address);
 
     char str[INET_ADDRSTRLEN];
@@ -37,7 +44,7 @@ private:
     pthread_t threads[NUM_THREADS];
 	pthread_attr_t attr;
 public:
-    Socket(){
+    void Socket(){
         // Creating socket file descriptor
         if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
         {
@@ -76,7 +83,8 @@ public:
         }
 	// If correctly connected
         int i = 0;
-        while(TRUE){
+        printf("The Server is on IP:%s Port:%d \n",ip,ntohs(myaddress.sin_port));
+        while(true){
 	        if ((new_socket = accept(server_fd, (struct sockaddr *)&address,
 	                        (socklen_t*)&addrlen))<0)
 	        {
@@ -85,75 +93,76 @@ public:
 	        }
 	        else{
 				cout << "Socket() : creating thread, " << i << endl;
-				rc = pthread_create(&threads[i], &attr, Connection, (void*) i++,new_socket[0]);
+				cout << "Socket() : creating socketid, " << new_socket << endl;
+				int rc = pthread_create(&threads[i], &attr, Connection,(void*)new_socket);
 				if (rc) {
 				 cout << "Error:unable to create thread," << rc << endl;
 				 exit(-1);
 				}
-				while(TRUE){
-						//write
-						send(new_socket , hello , strlen(hello) , 0 );
-					}
-	        }
+				valread = read( new_socket , buffer, 1024);
+				while(valread>0){
+					valread = read( new_socket , buffer, 1024);
+	    			printf("%s\n",buffer );
+				}
+	   //      }
 	        printf("The Server is on IP:%s Port:%d \n",ip,ntohs(myaddress.sin_port));
 			printf("The Client is on IP:%s Port:%d \n",inet_ntoa(address.sin_addr),ntohs(address.sin_port));
 	        }
+	    }
     }
 
-    threads_end(){
-	int rc;
-	int i = 0;
-	void *status;
+ //    void threads_end(void){
+	// int rc;
+	// int i = 0;
+	// void *status;
 
-	// free attribute and wait for the other threads
-	pthread_attr_destroy(&attr);
-	for( i = 0; i < NUM_THREADS; i++ ) {
-	rc = pthread_join(threads[i], &status);
-	if (rc) {
-		cout << "Error:unable to join," << rc << endl;
-		exit(-1);
-	}
-	cout << "Main: completed thread id :" << i ;
-	cout << "  exiting with status :" << status << endl;
-	}
+	// // free attribute and wait for the other threads
+	// pthread_attr_destroy(&attr);
+	// for( i = 0; i < NUM_THREADS; i++ ) {
+	// rc = pthread_join(threads[i], &status);
+	// if (rc) {
+	// 	cout << "Error:unable to join," << rc << endl;
+	// 	exit(-1);
+	// }
+	// cout << "Main: completed thread id :" << i ;
+	// cout << "  exiting with status :" << status << endl;
+	// }
 
-        valread = read( new_socket , buffer, 1024);
-        printf("%s\n",buffer );
-        send(new_socket , hello , strlen(hello) , 0 );
-        //recv();
-        printf("Hello message sent\n");
-		cout << "Main: program exiting." << endl;
-		pthread_exit(NULL);
-    }
+ //        valread = read( new_socket , buffer, 1024);
+ //        printf("%s\n",buffer );
+ //        send(new_socket , hello , strlen(hello) , 0 );
+ //        //recv();
+ //        printf("Hello message sent\n");
+	// 	cout << "Main: program exiting." << endl;
+	// 	pthread_exit(NULL);
+ //    }
 
-    Server(int argc, char const *argv[]){
-	
-	if (argc > 3) {
-		fprintf(stderr, "Too much Input\n");
-		exit(1);
-	}
-	else if (argc == 3) {
-		PORT_NUM = atoi(argv[1]);
-		ip = (char*) argv[2];
-	}
-	else if (argc == 2) {
-	PORT_NUM = atoi(argv[1]);
-	}
+    Server1(char* ip1, int port){
+    ip = ip1;
+    PORT_NUM = port;
 
 	// Initialize and set thread joinable
 	pthread_attr_init(&attr);
 	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
     
-    socket();
-    threads_end();
-    }
-    
+    Socket();
+    //threads_end();
+    }   
 };
 
-int main(int argc, char const *argv[])
-{
-
-    rdt::Server(argc,argv);
-    
+int main(int argc, char const *argv[]){
+	char* ip1 = "127.0.0.1";
+	int port1 = 8008;
+	if (argc > 3) {
+		fprintf(stderr, "Too much Input\n");
+		exit(1);
+	}
+	else if (argc == 3) {
+		port1 = atoi(argv[1]);
+		ip1 = (char*) argv[2];
+	}
+	else if (argc == 2) {
+		port1 = atoi(argv[1]);
+	}
+    Server1 RDT(ip1,port1);   
 }
-
