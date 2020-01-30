@@ -14,15 +14,30 @@
 #define PORT 8080
 #define NUM_THREADS 8
 
+
 using namespace std;
+ros::NodeHandle pointer;
+int global_socket;
+
+void Ros2Socket(std_msgs::String msg){
+	send(global_socket,msg.data.c_str(),msg.data.size());
+}
 
 void *Connection(void* thing) {
-	char *hello = "Hello from server";
-	cout<<"Connection Established" << endl;
-	int new_socket = (int)((size_t)thing);
-	cout<<"Connection Established" << endl;
-	cout << "Thread with id : " << new_socket << "  ...created for connection trasnlate " << endl;
-	send(new_socket , hello , strlen(hello) , 0 );
+	int new_socket = (int)(size_t)thing;
+	char buffer[1024];
+	while(ros::ok()){
+	valread = read( new_socket , buffer, 1024);
+	printf("%s\n",buffer );
+	ros::Publisher chatter_pub = pointer.advertise<std_msgs::String>("Recieve msg transfer into ros", 1000);
+	//ros::Rate loop_rate(10);
+	std_msgs::String msg;
+	std::stringstream ss;
+	ss << buffer << count;
+	msg.data = ss.str();
+
+	chatter_pub.publish(msg);
+	}
 }
 
 class Server1{
@@ -99,11 +114,11 @@ public:
 				 cout << "Error:unable to create thread," << rc << endl;
 				 exit(-1);
 				}
-				valread = read( new_socket , buffer, 1024);
-				while(valread>0){
-					valread = read( new_socket , buffer, 1024);
-	    			printf("%s\n",buffer );
-				}
+				global_socket = new_socket;
+				ros::Subscriber sub = pointer.subscribe("Send Topic", 1000, Ros2Socket);
+				ros::spin();
+				break;
+
 	   //      }
 	        printf("The Server is on IP:%s Port:%d \n",ip,ntohs(myaddress.sin_port));
 			printf("The Client is on IP:%s Port:%d \n",inet_ntoa(address.sin_addr),ntohs(address.sin_port));
@@ -164,5 +179,6 @@ int main(int argc, char const *argv[]){
 	else if (argc == 2) {
 		port1 = atoi(argv[1]);
 	}
+	ros::init(argc, argv, "talker");
     Server1 RDT(ip1,port1);   
 }
