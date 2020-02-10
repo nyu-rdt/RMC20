@@ -3,18 +3,19 @@
 NYU Robotic Design Team's full robot code
 
 ## Table of Contents
-1)[Communications](#communications)\
-1A)[Server ⟺ Robot](#server-robot)
+[1  Communications](#communications)\
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[1.1  Server ⟺ Robot](#server-robot)
 
 
 
 <a name="communications"></a>
 
-## 1) Communications
+## 1    Communications
 
 <a name="server-robot"></a>
 
-### 1A) Server ⟺ Robot
+### 1.1    Server ⟺ Robot
 
 One Teensy/ESP pair does not have enough power to handle all the functionality of the robot at once, due to the Teensy's limited output capability and processing power. As such, the the robot functionality is handled over three Teensy/ESP pairs, each representing one subset of the robot's functionality. Specifically, this means there is a Teensy/ESP pair for:
 
