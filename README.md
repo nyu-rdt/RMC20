@@ -1,9 +1,9 @@
-
+﻿
 # NASA Lunabotics 2020
 NYU Robotic Design Team's full robot code
 
 ## Table of Contents
-1) Communications
+1) Communications</b>
 1A) Server ⟺ Robot
 
 ## 1) Communications
@@ -12,8 +12,8 @@ NYU Robotic Design Team's full robot code
 
 One Teensy/ESP pair does not have enough power to handle all the functionality of the robot at once, due to the Teensy's limited output capability and processing power. As such, the the robot functionality is handled over three Teensy/ESP pairs, each representing one subset of the robot's functionality. Specifically, this means there is a Teensy/ESP pair for:
 
- **1. Writing commands to the drivetrain
- 2. Writing commands to the rest of the robot's limbs
+ **1. Writing commands to the drivetrain</b>
+ 2. Writing commands to the rest of the robot's limbs</b>
  3. Reading sensor data and sending it back to the server**
 
 In this section, ESP #1 will be referred to as the **Drivetrain ESP**, #2 will be referred to as the **Limb ESP**, and #3 will be referred to as the **Sensor ESP**. These communicate with the server nodes `send_drive_vector`, `send_limb_controls`, and `read_robot_state`, respectively. A diagram of this can be found at the bottom of this section.
