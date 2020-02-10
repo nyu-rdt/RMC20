@@ -3,7 +3,7 @@
 NYU Robotic Design Team's full robot code
 
 ## Table of Contents
-[1  Communications](#communications)\
+[1  Communications](#communications)
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[1.1  Server ⟺ Robot](#server-robot)
 
