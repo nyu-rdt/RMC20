@@ -1,0 +1,5 @@
+<launch>
+  <node name="framework_node_sender" pkg="framework" type="framework_node">
+    <param name="type" value="sender" type="str"/>
+  </node>
+</launch>

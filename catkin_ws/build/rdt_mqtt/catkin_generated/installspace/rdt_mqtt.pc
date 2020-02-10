@@ -1,0 +1,8 @@
+prefix=/home/rdt/catkin_ws/install
+
+Name: rdt_mqtt
+Description: Description of rdt_mqtt
+Version: 0.0.1
+Cflags: -I/home/rdt/catkin_ws/install/include
+Libs: -L/home/rdt/catkin_ws/install/lib 
+Requires: 

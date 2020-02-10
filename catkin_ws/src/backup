@@ -1,0 +1,32 @@
+//#include "ros/ros.h"
+//#include "std_msgs/String.h"
+
+void Ros2Socket(std_msgs::String msg){
+	send(global_socket,msg.data.c_str(),msg.data.size());
+}
+
+void *Connection(void* thing) {
+	int new_socket = (int)(size_t)thing;
+	char buffer[1024];
+	while(ros::ok()){
+	valread = read( new_socket , buffer, 1024);
+	printf("%s\n",buffer );
+	ros::Publisher chatter_pub = pointer.advertise<std_msgs::String>("Recieve msg transfer into ros", 1000);
+	//ros::Rate loop_rate(10);
+	std_msgs::String msg;
+	std::stringstream ss;
+	ss << buffer << count;
+	msg.data = ss.str();
+
+	chatter_pub.publish(msg);
+	}
+}
+
+
+
+void *Sender(void* thing) {
+	cout << "Mad Tiddies" <<endl;
+	char buffer[1024];
+	ros::Subscriber sub = pointer.subscribe("Send Topic", 1000, Ros2Socket);
+	ros::spin();
+}

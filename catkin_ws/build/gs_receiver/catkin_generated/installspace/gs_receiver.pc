@@ -1,0 +1,8 @@
+prefix=/home/rdt/catkin_ws/install
+
+Name: gs_receiver
+Description: Description of gs_receiver
+Version: 0.0.1
+Cflags: 
+Libs: -L/home/rdt/catkin_ws/install/lib 
+Requires: 

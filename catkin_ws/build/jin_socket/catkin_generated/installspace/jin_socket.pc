@@ -1,0 +1,8 @@
+prefix=/home/rdt/catkin_ws/install
+
+Name: jin_socket
+Description: Description of jin_socket
+Version: 0.0.0
+Cflags: 
+Libs: -L/home/rdt/catkin_ws/install/lib 
+Requires: 

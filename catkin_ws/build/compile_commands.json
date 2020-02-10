@@ -1,0 +1,12 @@
+[
+{
+  "directory": "/home/rdt/catkin_ws/build/rdt_mqtt",
+  "command": "/usr/bin/c++  -DROSCONSOLE_BACKEND_LOG4CXX -DROS_BUILD_SHARED_LIBS=1 -DROS_PACKAGE_NAME=\\\"rdt_mqtt\\\" -I/home/rdt/catkin_ws/devel/include -I/home/rdt/catkin_ws/src/rdt_mqtt/include -I/opt/ros/melodic/include -I/opt/ros/melodic/share/xmlrpcpp/cmake/../../../include/xmlrpcpp    -std=c++11 -o CMakeFiles/sender.dir/src/sender.cpp.o -c /home/rdt/catkin_ws/src/rdt_mqtt/src/sender.cpp",
+  "file": "/home/rdt/catkin_ws/src/rdt_mqtt/src/sender.cpp"
+},
+{
+  "directory": "/home/rdt/catkin_ws/build/rdt_mqtt",
+  "command": "/usr/bin/c++  -DROSCONSOLE_BACKEND_LOG4CXX -DROS_BUILD_SHARED_LIBS=1 -DROS_PACKAGE_NAME=\\\"rdt_mqtt\\\" -I/home/rdt/catkin_ws/devel/include -I/home/rdt/catkin_ws/src/rdt_mqtt/include -I/opt/ros/melodic/include -I/opt/ros/melodic/share/xmlrpcpp/cmake/../../../include/xmlrpcpp    -std=c++11 -o CMakeFiles/tester.dir/src/test_talker.cpp.o -c /home/rdt/catkin_ws/src/rdt_mqtt/src/test_talker.cpp",
+  "file": "/home/rdt/catkin_ws/src/rdt_mqtt/src/test_talker.cpp"
+}
+]

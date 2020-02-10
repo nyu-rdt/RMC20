@@ -1,0 +1,8 @@
+prefix=/home/rdt/catkin_ws/devel
+
+Name: framework_test
+Description: Description of framework_test
+Version: 0.0.0
+Cflags: 
+Libs: -L/home/rdt/catkin_ws/devel/lib -lframework
+Requires: framework
