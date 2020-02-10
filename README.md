@@ -3,8 +3,8 @@
 NYU Robotic Design Team's full robot code
 
 ## Table of Contents
-1) [Communications](https://github.com/nyu-rdt/RMC20#1-communications)\
-1A) Server ⟺ Robot
+[1) Communications](https://github.com/nyu-rdt/RMC20#1-communications)\
+[1A) Server ⟺ Robot](https://github.com/nyu-rdt/RMC20#1a-server--robot)
 
 ## 1) Communications
 
