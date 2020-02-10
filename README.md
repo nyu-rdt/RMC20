@@ -3,14 +3,12 @@
 NYU Robotic Design Team's full robot code
 
 ## Table of Contents
-[1) Communications](#communications)\
-[&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1A) Server ⟺ Robot](#server-robot)
+1)[Communications](#communications)\
+1A)[Server ⟺ Robot](#server-robot)
 
 
 
-```html
 <a name="communications"></a>
-```
 
 ## 1) Communications
 
