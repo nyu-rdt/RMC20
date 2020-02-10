@@ -1,12 +1,20 @@
-﻿
 # NASA Lunabotics 2020
+
 NYU Robotic Design Team's full robot code
 
 ## Table of Contents
-[1) Communications](https://github.com/nyu-rdt/RMC20#1-communications)\
-[&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1A) Server ⟺ Robot](https://github.com/nyu-rdt/RMC20#1a-server--robot)
+[1) Communications](#communications)\
+[&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1A) Server ⟺ Robot](#server-robot)
+
+
+
+```html
+<a name="communications"></a>
+```
 
 ## 1) Communications
+
+<a name="server-robot"></a>
 
 ### 1A) Server ⟺ Robot
 
