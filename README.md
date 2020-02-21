@@ -1,6 +1,4 @@
-```
 ![Lunabotics Logo](/docs/luna_logo.jpg?raw=true)
-```
 
 # NYU Robotic Design Team - 2020
 
