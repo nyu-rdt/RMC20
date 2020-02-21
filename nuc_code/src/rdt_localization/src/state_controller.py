@@ -3,7 +3,52 @@
 import rospy
 
 from std_msgs.msg import String
-from advanced_ros_demo.msg import Pose
+from rdt_localization.msg import Pose
+
+# Topics that are inputs from other nodes
+HEARTBEAT_NODE = "robotCmds/Drive"
+ROSPY_LOOP_RATE = 50
+
+# Most variables are open to being replaced
+    # (I mean this in the sense that we can replace these variables with tangible conditions)
+    # i.e. instead of if (robot_cannot_move), we might use something like if (motor_speed == 0)
+
+# Robot variables
+robot_state = 1
+robot_localized = False
+robot_cannot_move = False # If the robot cannot move
+robot_exited_hole = False  # If the robot is out of the hole that it just dug
+robot_face_depo = False # If the robot is facing the deposition zone
+robot_in_depo_dist = False # If the robot is in distance to deposit
+robot_depo_fail = False # If the robot crashes into the deposition bin or wall, or if the robot fails alignment
+robot_unstable = False # If the robot becomes unstable while raising its frame
+robot_face_dig_zone = False # If the robot is facing the digging zone
+
+# Arm variables
+arm_deployed = False # If the arms have been initially deployed
+arm_stuck = False # If the arms are not being deployed despite being told to do so
+arm_hit_surface = False  # If arms have contacted a surface
+arm_min_extend = False # If the arms have reached their minimum extension
+arm_gears_slip = False # If the arm gears have slipped
+arm_rot_reached = False # If the preset arm rotation in preparation to continue moving
+arm_drive_config = False # If the arm has extended to the driving configuration
+arm_depo_ready = False # If the arms are in position to deposit
+
+# Linear Actuator variables
+lin_act_stuck = False # If the linear actuators are stuck
+lin_act_ext = False # If the linear actuators are fully extended
+lin_act_depo_ready = False # If the linear actuators are in position to deposit
+lin_act_drive_config = False # If the linear actuators are in drive configuration
+
+# Rest of the variables
+autonomous = True # If the robot is acting autonomously
+e_stop = False # If the robot needs to emergency stop
+inc_obstacle = False # If there are incoming obstacle
+artag_seen = False # If April Tags can be located
+drum_turning = False # If drums are turning
+door_closed = False # If the door is closed
+bin_full = False # If the storage bin is full
+bin_empty = False # If the storage bin is empty
 
 def main():
     #VERY TEMPORARY VARIABLE
@@ -11,73 +56,33 @@ def main():
 
     # Setup ROS Node
     rospy.init_node('controller')
-    rate = rospy.Rate(50)
-
-    # Most variables are open to being replaced
-        # (I mean this in the sense that we can replace these variables with tangible conditions)
-        # i.e. instead of if (robot_cannot_move), we might use something like if (motor_speed == 0)
-
-    # Robot variables
-    robot_state = 1
-    robot_localized = False
-    robot_cannot_move = False # If the robot cannot move
-    robot_exited_hole = False  # If the robot is out of the hole that it just dug
-    robot_face_depo = False # If the robot is facing the deposition zone
-    robot_in_depo_dist = False # If the robot is in distance to deposit
-    robot_depo_fail = False # If the robot crashes into the deposition bin or wall, or if the robot fails alignment
-    robot_unstable = False # If the robot becomes unstable while raising its frame
-    robot_face_dig_zone = False # If the robot is facing the digging zone
-
-    # Arm variables
-    arm_deployed = False # If the arms have been initially deployed
-    arm_stuck = False # If the arms are not being deployed despite being told to do so
-    arm_hit_surface = False  # If arms have contacted a surface
-    arm_min_extend = False # If the arms have reached their minimum extension
-    arm_gears_slip = False # If the arm gears have slipped
-    arm_rot_reached = False # If the preset arm rotation in preparation to continue moving
-    arm_drive_config = False # If the arm has extended to the driving configuration
-    arm_depo_ready = False # If the arms are in position to deposit
-
-    # Linear Actuator variables
-    lin_act_stuck = False # If the linear actuators are stuck
-    lin_act_ext = False # If the linear actuators are fully extended
-    lin_act_depo_ready = False # If the linear actuators are in position to deposit
-    lin_act_drive_config = False # If the linear actuators are in drive configuration
-
-    # Rest of the variables
-    autonomous = True # If the robot is acting autonomously
-    e_stop = False # If the robot needs to emergency stop
-    inc_obstacle = False # If there are incoming obstacle
-    artag_seen = False # If April Tags can be located
-    drum_turning = False # If drums are turning
-    door_closed = False # If the door is closed
-    bin_full = False # If the storage bin is full
-    bin_empty = False # If the storage bin is empty
+    rate = rospy.Rate(ROSPY_LOOP_RATE)
 
     # Timers
-    max_manual_timer =  rate * 5 # If the robot doesn't fix itself in 5 seconds, it will be switched to manual
+    max_manual_timer =  ROSPY_LOOP_RATE * 5 # If the robot doesn't fix itself in 5 seconds, it will be switched to manual
     manual_timer = max_manual_timer
 
 
 
     # Subscribers
     # Subscirbe to robot localization
-    robot_x, robot_y, robot_orientation = None
+    robot_x, robot_y, robot_orientation = None, None, None
     def get_pose (data):
         robot_x = data.x
         robot_y = data.y
         robot_orientation = data.orientation
     rospy.Subscriber('robotData/Pose', Pose, get_pose)
 
-    #Subscribe to manual commands from GCS
+    # Handle input robot commands from GCS
+    def parse_manual_commands (data):
+        pass
 
-    rospy.Subscriber('robot/', , )
+    rospy.Subscriber(HEARTBEAT_NODE, String, parse_manual_commands)
 
-    rospy.Subscriber()
 
     # Publishers
-    pub_drive_cmd = rospy.Publisher('robotCmds/Drive', tuple, queue_size=10) # Drive commands
-    pub_limb_cmd = rospy.Publisher('robotCmds/limbs', tuple, queue_size=10) # Limb commands
+    pub_drive_cmd = rospy.Publisher('robotCmds/Drive', Pose, queue_size=10) # Drive commands
+    pub_limb_cmd = rospy.Publisher('robotCmds/Limbs', Pose, queue_size=10) # Limb commands
 
 
 
