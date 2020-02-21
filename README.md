@@ -1,6 +1,6 @@
-# NASA Lunabotics 2020
+# NYU Robotic Design Team - 2020
 
-For any clarifications, suggested changes, etc. please contact:
+Full robot code for NASA Lunabotics 2020 competition. For any clarifications, suggested changes, etc. please contact:
 
 **Current maintainer:** Dan Shafman (@danshafman on Slack)
 
@@ -11,7 +11,9 @@ For any clarifications, suggested changes, etc. please contact:
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[1.2&nbsp;&nbsp;GCS ⟺ Server](#gcs-server)
 
-[2&nbsp;&nbsp;Coming soon](#todo)
+[2&nbsp;&nbsp;Additional Resources](#additional-resources)
+
+[3&nbsp;&nbsp;Coming soon](#todo)
 
 <br />
 
@@ -36,7 +38,7 @@ One Teensy/ESP pair does not have enough power to handle all the functionality o
 
 In this section, Teensy/ESP pair #1 will be referred to as the **Drivetrain ESP**, #2 will be referred to as the **Limb ESP**, #3 will be referred to as the **Sensor ESP**, and #4 will be referred to as the **LIDAR ESP**. These communicate with the server nodes `send_drive_vector` (#1), `send_limb_controls` (#2), and `read_robot_state` (#3,4). A diagram of this can be found at the bottom of this section.
 
-This communication done using the [MQTT](https://www.youtube.com/watch?v=2aHV2Fn0I60) communication protocol, a method of wireless data transfer based on the [publisher/subscriber pattern](https://docs.microsoft.com/en-us/azure/architecture/patterns/publisher-subscriber) (the same pattern that ROS follows). This is implemented with the [Paho MQTT ](https://pypi.org/project/paho-mqtt/) Python library on the server and the [Adafruit MQTT Library](https://learn.adafruit.com/mqtt-adafruit-io-and-you/overview) for Arduino. An example of this can be found on the [TestBot20 repository under "MQTTCommsExample"](https://github.com/nyu-rdt/TestBot20.git).
+This communication is done using the [MQTT](https://www.youtube.com/watch?v=2aHV2Fn0I60) communication protocol, a method of wireless data transfer based on the [publisher/subscriber pattern](https://docs.microsoft.com/en-us/azure/architecture/patterns/publisher-subscriber) (the same pattern that ROS follows). This is implemented with the [Paho MQTT ](https://pypi.org/project/paho-mqtt/) Python library on the server and the [Adafruit MQTT Library](https://learn.adafruit.com/mqtt-adafruit-io-and-you/overview) for Arduino. An example of this can be found on the [TestBot20 repository under "MQTTCommsExample"](https://github.com/nyu-rdt/TestBot20.git).
 
 This protocol is used in autonomy and teleoperated mode identically, since the server is always required to send (or relay) commands to the robot. 
 
@@ -65,7 +67,16 @@ int driveMode }
 
 ___
 #### `robotCmds/limbs`
-Used to send limb-controlling commands from the server, specifically from the `send_limb_controls` node on the server, to the Limb ESP. These commands control  The data is sent in the following format: 
+Used to send limb-controlling commands from the server, specifically from the `send_limb_controls` node on the server, to the Limb ESP. These commands control ALL of the robot's limbs, except the drivetrain. The data is sent in the following format: 
+
+```
+{ int drum
+int arms
+int linActs
+bool door }
+```
+
+
 
 ___
 #### `robotCmds/door`
@@ -92,9 +103,21 @@ ___
 
 <br />
 
+<a name="additional-resources"></a>
+
+## 2&nbsp;&nbsp;&nbsp;&nbsp;Additional Resources
+
+All of the Academic Year 2020 software trainings can be found [here on Drive](). You can also find many other resources on most of the topics used in our code (like Python programming, control theory, MQTT, etc.) [in this sheet](https://docs.google.com/document/d/1CRIx5FonDIs1Xs_TqEQANZTEb21N-sBxE2AgeskZIi8/edit?usp=sharing). These resources include blogs, YouTube tutorials, and textbooks. 
+
+<br />
+
+<br />
+
+<br />
+
 <a name="todo"></a>
 
-## 2&nbsp;&nbsp;&nbsp;&nbsp;ADD TO README (WIP)
+## 3&nbsp;&nbsp;&nbsp;&nbsp;ADD TO README (WIP)
 
 - Description of the robot
 - Code structure (NUC, robot, GCS)
