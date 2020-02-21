@@ -76,14 +76,17 @@ int linActs
 bool door }
 ```
 
-
+- `int drum` can take on a value from **-100 to 100**, representing a percentage of the digging drum's potential speed to write to its motor controller.
+- `int arms` can take on a value from **-100 to 100**, representing a percentage of the arms' potential speed to write to their motor controllers. During the lowering and lifting drum autonomy states, such as **ConOps states 8 and 11**, the arms need to synchronize their speed with the front and back wheels for a smooth digging motion; **this calculation is performed in the** `state_controller` **node on the server, NOT on the Limb ESP!**
+- `int linActs` can take on a value from **-100 to 100**, representing a percentage of the linear actuators' potential speed to write to their motor controllers.
+- `bool door` can have the value **True or False** since the deposition door only has 2 potential states, "open" or "closed." In this case, True means an open door and False means a closed door.
 
 ___
-#### `robotCmds/door`
-Used to send drive commands from the server, specifically from the `send_limb_controls` node on the server, to the Limb ESP, to actuate the deposition door. The data is sent in the following format: **work in progress**
+#### `robotState/sensorData`
+Used to send sensor data from the robot's Sensor ESP to the `read_robot_state` node on the server. The LIDAR sensor data is **NOT included in this!** This sensor data will give the `state_controller` node on the server infomation about the state of all the robot's limbs so that it can plan the next command accordingly. The data is sent in the following format: **work in progress** 
 
 ___
-#### `robotCmds/drum`
+#### `robotState/obstacleData`
 Used to send drive commands from the server, specifically from the `send_limb_controls` node on the server, to the Limb ESP, to rotate the digging drum. The data is sent in the following format: **work in progress**
 
 ___
@@ -107,7 +110,7 @@ ___
 
 ## 2&nbsp;&nbsp;&nbsp;&nbsp;Additional Resources
 
-All of the Academic Year 2020 software trainings can be found [here on Drive](). You can also find many other resources on most of the topics used in our code (like Python programming, control theory, MQTT, etc.) [in this sheet](https://docs.google.com/document/d/1CRIx5FonDIs1Xs_TqEQANZTEb21N-sBxE2AgeskZIi8/edit?usp=sharing). These resources include blogs, YouTube tutorials, and textbooks. 
+All of the Academic Year 2020 software trainings can be found [here on Drive](https://drive.google.com/drive/folders/1dmQQXun6l71bd5Ws7cGFXm-T3bJ-IMG3?usp=sharing). You can also find many other resources on most of the topics used in our code (like Python programming, control theory, MQTT, etc.) [in this sheet](https://docs.google.com/document/d/1CRIx5FonDIs1Xs_TqEQANZTEb21N-sBxE2AgeskZIi8/edit?usp=sharing). These resources include blogs, YouTube tutorials, and textbooks. 
 
 <br />
 
