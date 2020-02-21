@@ -9,9 +9,15 @@ For any clarifications, suggested changes, etc. please contact:
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[1.1&nbsp;&nbsp;Server ⟺ Robot](#server-robot)
 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[1.2&nbsp;&nbsp;GCS ⟺ Server](#gcs-server)
+
 [2&nbsp;&nbsp;Coming soon](#todo)
 
+<br />
 
+<br />
+
+<br />
 
 <a name="communications"></a>
 
@@ -70,6 +76,16 @@ ___
 Used to send drive commands from the server, specifically from the `send_limb_controls` node on the server, to the Limb ESP, to rotate the digging drum. The data is sent in the following format: **work in progress**
 
 ___
+<br />
+
+<a name="gcs-server"></a>
+
+### 1.2&nbsp;&nbsp;&nbsp;&nbsp;GCS ⟺ Server
+
+Work in progress
+
+___
+
 <br />
 
 <br />
