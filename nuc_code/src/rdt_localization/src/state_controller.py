@@ -6,6 +6,9 @@ from std_msgs.msg import String
 from advanced_ros_demo.msg import Pose
 
 def main():
+    #VERY TEMPORARY VARIABLE
+    dig_zone_y_coord = 4.6
+
     # Setup ROS Node
     rospy.init_node('controller')
     rate = rospy.Rate(50)
@@ -156,7 +159,7 @@ def main():
                 manual_timer -= 1;
                 pass
 
-            if (robot_y > 4.6):
+            if (robot_y > dig_zone_y_coord):
                 robot_state = 7
             else:
                 # Continue moving towards the digging area
