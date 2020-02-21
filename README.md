@@ -1,3 +1,7 @@
+```
+![Lunabotics Logo](/docs/luna_logo.jpg?raw=true)
+```
+
 # NYU Robotic Design Team - 2020
 
 Full robot code for NASA Lunabotics 2020 competition. For any clarifications, suggested changes, etc. please contact:
@@ -5,15 +9,29 @@ Full robot code for NASA Lunabotics 2020 competition. For any clarifications, su
 **Current maintainer:** Dan Shafman (@danshafman on Slack)
 
 ## Table of Contents
-[1&nbsp;&nbsp;Communications](#communications)
+[2&nbsp;&nbsp;Communications](#communications)
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[1.1&nbsp;&nbsp;Server ⟺ Robot](#server-robot)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[2.1&nbsp;&nbsp;Server ⟺ Robot](#server-robot)
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[1.2&nbsp;&nbsp;GCS ⟺ Server](#gcs-server)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[2.2&nbsp;&nbsp;GCS ⟺ Server](#gcs-server)
 
-[2&nbsp;&nbsp;Additional Resources](#additional-resources)
+[3&nbsp;&nbsp;Additional Resources](#additional-resources)
 
-[3&nbsp;&nbsp;Coming soon](#todo)
+[4&nbsp;&nbsp;Coming soon](#todo)
+
+<br />
+
+<br />
+
+<br />
+
+<a name="introduction"></a>
+
+## 1&nbsp;&nbsp;&nbsp;&nbsp;Introduction
+
+In this section we will be introducing the NASA Lunabotics 2020 competition and the purpose, design, and operation of our robot. We will also be introducing some technical terms and vocabulary that we use throughout this README.
+
+
 
 <br />
 
@@ -23,11 +41,11 @@ Full robot code for NASA Lunabotics 2020 competition. For any clarifications, su
 
 <a name="communications"></a>
 
-## 1&nbsp;&nbsp;&nbsp;&nbsp;Communications
+## 2&nbsp;&nbsp;&nbsp;&nbsp;Communications
 
 <a name="server-robot"></a>
 
-### 1.1&nbsp;&nbsp;&nbsp;&nbsp;Server ⟺ Robot
+### 2.1&nbsp;&nbsp;&nbsp;&nbsp;Server ⟺ Robot
 
 One Teensy/ESP pair does not have enough power to handle all the functionality of the robot at once, due to the Teensy's limited output capability and processing power. As such, the the robot functionality is handled over four Teensy/ESP pairs, each representing one subset of the robot's functionality. Specifically, this means there is a Teensy/ESP pair for:
 
@@ -105,7 +123,7 @@ ___
 
 <a name="gcs-server"></a>
 
-### 1.2&nbsp;&nbsp;&nbsp;&nbsp;GCS ⟺ Server
+### 2.2&nbsp;&nbsp;&nbsp;&nbsp;GCS ⟺ Server
 
 Work in progress
 
@@ -119,7 +137,7 @@ ___
 
 <a name="additional-resources"></a>
 
-## 2&nbsp;&nbsp;&nbsp;&nbsp;Additional Resources
+## 3&nbsp;&nbsp;&nbsp;&nbsp;Additional Resources
 
 All of the Academic Year 2020 software trainings can be found [here on Drive](https://drive.google.com/drive/folders/1dmQQXun6l71bd5Ws7cGFXm-T3bJ-IMG3?usp=sharing). You can also find many other resources on most of the topics used in our code (like Python programming, control theory, MQTT, etc.) [in this sheet](https://docs.google.com/document/d/1CRIx5FonDIs1Xs_TqEQANZTEb21N-sBxE2AgeskZIi8/edit?usp=sharing). These resources include blogs, YouTube tutorials, and textbooks. 
 
@@ -131,7 +149,7 @@ All of the Academic Year 2020 software trainings can be found [here on Drive](ht
 
 <a name="todo"></a>
 
-## 3&nbsp;&nbsp;&nbsp;&nbsp;ADD TO README (WIP)
+## 4&nbsp;&nbsp;&nbsp;&nbsp;ADD TO README (WIP)
 
 - Description of the robot
 - Code structure (NUC, robot, GCS)
