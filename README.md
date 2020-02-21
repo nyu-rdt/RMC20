@@ -1,4 +1,4 @@
-![Lunabotics Logo](/docs/luna_logo.jpg?raw=true)
+<div style="text-align:center"><img src="/docs/luna_logo.jpg" /></div>
 
 # NYU Robotic Design Team - 2020
 
