@@ -1,6 +1,8 @@
+#!/usr/bin/env python
+
 from __future__ import division
 from __future__ import print_function
-from advanced_ros_demo.msg import Pose
+from rdt_localization.msg import Pose
 import rospy
 import cv2
 import apriltag
