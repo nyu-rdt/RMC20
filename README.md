@@ -26,7 +26,7 @@ One Teensy/ESP pair does not have enough power to handle all the functionality o
  **1. Writing commands to the drivetrain</b>\
  2. Writing commands to the rest of the robot's limbs</b>\
  3. Reading sensor (except LIDAR) data and sending it back to the server
-  4. Reading LIDAR data and sending it back to the server **
+  4. Reading LIDAR data and sending it back to the server**
 
 In this section, Teensy/ESP pair #1 will be referred to as the **Drivetrain ESP**, #2 will be referred to as the **Limb ESP**, #3 will be referred to as the **Sensor ESP**, and #4 will be referred to as the **LIDAR ESP**. These communicate with the server nodes `send_drive_vector` (#1), `send_limb_controls` (#2), and `read_robot_state` (#3,4). A diagram of this can be found at the bottom of this section.
 
@@ -95,7 +95,7 @@ Used to send data about the linear actuators' current state from the Sensor ESP 
 
 <a name="todo"></a>
 
-## ADD TO README (WIP)
+## 2&nbsp;&nbsp;&nbsp;&nbsp;ADD TO README (WIP)
 
 - Description of the robot
 - Code structure (NUC, robot, GCS)
