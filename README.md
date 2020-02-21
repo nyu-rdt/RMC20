@@ -87,7 +87,18 @@ Used to send sensor data from the robot's Sensor ESP to the `read_robot_state` n
 
 ___
 #### `robotState/obstacleData`
-Used to send drive commands from the server, specifically from the `send_limb_controls` node on the server, to the Limb ESP, to rotate the digging drum. The data is sent in the following format: **work in progress**
+Used to send sensor data, specifically LIDAR data, from the robot's LIDAR ESP to the `read_robot_state` node on the server. This sensor data will give the `state_controller` node on the server information on the topology of the ground ahead of it. This then allows the `obstacle_detection` node to perform calculations on this data to determine whether or not there is an obstacle (hill or pit) in the robot's path. 
+
+There are 4 LIDARs mounted in an array on the front of the robot, angled downwards to scan for obstacles. The data is sent in the following format: 
+
+```
+{ float lidar1
+float lidar2
+float lidar3
+float lidar4 }
+```
+
+- `float lidar1` , `float lidar2` , `float lidar3` , `float lidar4`  are the distances that the 4 LIDARs read, from left to right. The distances are in centimeters.
 
 ___
 <br />
