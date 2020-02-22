@@ -36,6 +36,7 @@ add_executable(framework_node
     src/JumpTable.cpp
     src/Manager.cpp
     src/ROSTable.cpp
+    src/MoveFunction.cpp
 )
 
 target_link_libraries(framework_node

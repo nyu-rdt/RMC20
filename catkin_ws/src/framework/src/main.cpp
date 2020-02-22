@@ -2,6 +2,8 @@
 #include "std_msgs/String.h"
 #include "std_msgs/Int32.h"
 
+#include "FunctionList.h"
+
 std::vector<char> movementE(const std::vector<bool>& input){
     std::vector<char> out;
     out.push_back(0);
@@ -22,26 +24,6 @@ void movementD(const std::vector<char>& data){
     ROS_INFO("%s", s.c_str());
 }
 
-std::vector<char> jumpE(const std::vector<bool>& input){
-    std::vector<char> out;
-    out.push_back(0);
-    if (input[0]){out[0] = 1;}
-    return out;
-}
-
-void jumpD(const std::vector<char>& data){
-    if(data[0] == 0){ ROS_INFO("FALL"); }
-    if(data[0] == 1){ ROS_INFO("JUMP"); }
-}
-
-void jumpS(bool sender){
-    ROS_INFO("--Press E for Hops--");
-}
-
-void jumpC(bool sender){
-    ROS_INFO("--Done with Hops--");
-}
-
 ros::NodeHandle* emojiHandler;
 ros::Publisher emojiPub;
 
@@ -57,8 +39,6 @@ void emojiDecoder(const std::string& data){
     msg.data = data;
     emojiPub.publish(msg);
 }
-
-std::vector<rdt::Keyboard> jumpK = {rdt::Keyboard::E};
 
 int main(int argc, char** argv){
     rdt::Manager manager(argc, argv);
