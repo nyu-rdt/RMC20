@@ -5,8 +5,12 @@ import rospy
 from std_msgs.msg import String
 from rdt_localization.msg import Pose
 
-# Topics that are inputs from other nodes
-HEARTBEAT_NODE = "robotCmds/Drive"
+# Topic names
+TOPIC_FROM_HEARTBEAT_NODE = "server/heartbeat"
+TOPIC_FROM_LOCALIZATION_NODE = "server/localization"
+TOPIC_TO_DRIVE_NODE = "server/sendDriveVec"
+TOPIC_TO_LIMB_NODE = "server/sendLimbVec"
+
 ROSPY_LOOP_RATE = 50
 
 # Most variables are open to being replaced
@@ -71,7 +75,7 @@ def main():
         robot_x = data.x
         robot_y = data.y
         robot_orientation = data.orientation
-    rospy.Subscriber('robotData/Pose', Pose, get_pose)
+    rospy.Subscriber(TOPIC_FROM_LOCALIZATION_NODE, Pose, get_pose)
 
     # Handle input robot commands from GCS
     def parse_manual_commands (data):
