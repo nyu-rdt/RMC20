@@ -9,6 +9,8 @@ Full robot code for NASA Lunabotics 2020 competition. For any clarifications, su
 **Current maintainer:** Dan Shafman (@danshafman on Slack)
 
 ## Table of Contents
+[1&nbsp;&nbsp;Introduction](#introduction)
+
 [2&nbsp;&nbsp;Communications](#communications)
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[2.1&nbsp;&nbsp;Server ⟺ Robot](#server-robot)
@@ -31,7 +33,7 @@ Full robot code for NASA Lunabotics 2020 competition. For any clarifications, su
 
 In this section we will be introducing the NASA Lunabotics 2020 competition and the purpose, design, and operation of our robot. We will also be introducing some technical terms and vocabulary that we use throughout this README.
 
-
+The Lunabotics competition is a simulation of an off-world mining mission: our robot, which simulates a moon rover
 
 <br />
 
