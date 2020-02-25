@@ -219,8 +219,8 @@ def turtle_draw(coordinates, orientation, angular_rotation):
 
 def main():
     # Setup ROS Node
-    pub = rospy.Publisher('server/localization', Pose, queue_size=10)
-    rospy.init_node('localization')
+    pub = rospy.Publisher('robotData/Pose', Pose, queue_size=10)
+    rospy.init_node('aptag_optimized')
     rate = rospy.Rate(1)
 
     # Setup turtle
