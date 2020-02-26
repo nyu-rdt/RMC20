@@ -1,0 +1,2 @@
+framework:og_heartbeat
+-DCATKIN_DEVEL_PREFIX=/home/rdt/Desktop/RMC20/gcs_code/devel -DCMAKE_INSTALL_PREFIX=/home/rdt/Desktop/RMC20/gcs_code/install -G Unix Makefiles

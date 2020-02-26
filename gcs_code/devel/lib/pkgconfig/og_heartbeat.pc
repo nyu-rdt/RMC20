@@ -1,0 +1,8 @@
+prefix=/home/rdt/Desktop/RMC20/gcs_code/devel
+
+Name: og_heartbeat
+Description: Description of og_heartbeat
+Version: 0.0.0
+Cflags: 
+Libs: -L/home/rdt/Desktop/RMC20/gcs_code/devel/lib 
+Requires: 

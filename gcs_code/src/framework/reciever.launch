@@ -1,0 +1,5 @@
+<launch>
+  <node name="framework_node_reciever" pkg="framework" type="framework_node">
+    <param name="type" value="reciever" type="str"/>
+  </node>
+</launch>

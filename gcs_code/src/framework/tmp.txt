@@ -1,0 +1,15 @@
+rosparam set type "sender" && rosrun framework framework_node __name:=s
+rosparam set type "reciever" && rosrun framework framework_node __name:=r
+rosrun framework_test tester_send
+rosrun framework_test tester_recv
+
+NOTE AFTER RUNNING "catkin_make clean", need to call "catkin_make install" before "catkin_make" for the service files
+
+
+Jin
+roscore
+cd ~/catkin_ws
+source ./devel/setup.bash
+rosrun beginner_tutorials talker
+
+On other package.xml use <depend>framework</depend> to include the required srv and msg file
