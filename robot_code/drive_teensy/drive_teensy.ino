@@ -1,3 +1,22 @@
+/* NYU RDT
+ * Drive Control code
+ * 7    - bit string will be sent from the topic that we the esp is subscribed to
+FOR DRIVE
+7bits
+0 = mode
+  0- forwards/backwards
+  1- rotating
+  2- arm movement
+1-3 = speed
+  0- forwards/backwards
+  1- percentage
+  2- percentage
+4-7 = degrees
+  0-neg/pos
+  1-1st dig
+  2-2nd dig
+  3-3th dig
+ */
 #include <Servo.h>
 
 Servo Spark;
@@ -47,7 +66,7 @@ void interpret(int& commandUpdate){
 void drive(String commandUpdate){
   //if [0] is 0, go forwards, if 1, go backwards
   //translates degrees into different percentages for the wheels divided like a hotdog
-//   val = (commandUpdate.substring(2,4)).toInt();
+   val = (commandUpdate.substring(1,4)).toInt();
 
   if((commandUpdate[0].toInt())==1){
         val*=-1;
