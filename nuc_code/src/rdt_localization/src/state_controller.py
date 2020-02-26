@@ -18,7 +18,7 @@ ROSPY_LOOP_RATE = 50
     # i.e. instead of if (robot_cannot_move), we might use something like if (motor_speed == 0)
 
 # Robot variables
-robot_state = 1
+robot_state = 0
 robot_localized = False
 robot_cannot_move = False # If the robot cannot move
 robot_exited_hole = False  # If the robot is out of the hole that it just dug
@@ -45,7 +45,6 @@ lin_act_depo_ready = False # If the linear actuators are in position to deposit
 lin_act_drive_config = False # If the linear actuators are in drive configuration
 
 # Rest of the variables
-autonomous = True # If the robot is acting autonomously
 e_stop = False # If the robot needs to emergency stop
 inc_obstacle = False # If there are incoming obstacle
 artag_seen = False # If April Tags can be located
@@ -78,10 +77,15 @@ def main():
     rospy.Subscriber(TOPIC_FROM_LOCALIZATION_NODE, Pose, get_pose)
 
     # Handle input robot commands from GCS
+    drive_string, limb_string = "", ""
     def parse_manual_commands (data):
-        pass
+        if (data[0] == "1"):
+            drive_string = data.data[1:]
+        elif (data[0] == "2"):
+            limb_string = data.data[1:]
 
     rospy.Subscriber(HEARTBEAT_NODE, String, parse_manual_commands)
+
 
 
     # Publishers
@@ -111,8 +115,14 @@ def main():
 
 
 
+        # STATE 0: Manual state
+        if robot_state == 0:
+            # Relay commands from decoders to robot
+            pub_drive_cmd.publish(drive_string)
+            pub_limb_cmd.publish(limb_string)
+
         # STATE 1: Competition starts
-        if robot_state == 1:
+        elif robot_state == 1:
             # Probably some setup code
             robot_state = 2
 
