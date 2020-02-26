@@ -49,7 +49,7 @@ void drive(String commandUpdate){
   //translates degrees into different percentages for the wheels divided like a hotdog
 //   val = (commandUpdate.substring(2,4)).toInt();
 
-  if((commandUpdate.substring(2,3).toInt())==1){
+  if((commandUpdate[0].toInt())==1){
         val*=-1;
      }
 
