@@ -31,19 +31,23 @@ void setup (){
   val = 0;
   Spark.attach(3);
   Serial1.begin(115200);
+  Serial.begin(9600);
 }
 
 void loop() {
   
   if(Serial1.available() > 0){
      comms = Serial1.read();
-//     Serial1.println(comms);
+     //][----Serial1.println(comms);
   }
+  //if(Serial.available() > 0){
+  //   val = (Serial.parseInt());
+  //}
   interpret(comms);
 //  delay(15);
 
-  if (writetest) {
-    digitalWrite(1, HIGH);
+  //if (writetest) {
+    //digitalWrite(1, HIGH);
   }
 }
 
