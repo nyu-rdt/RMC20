@@ -41,6 +41,7 @@ void emojiDecoder(const std::string& data){
 }
 
 int main(int argc, char** argv){
+    // ros::init(argc, argv, "receiver");
     rdt::Manager manager(argc, argv);
     // manager.commands.insert(1, {rdt::Keyboard::W,rdt::Keyboard::A,rdt::Keyboard::S,rdt::Keyboard::D},
     // movementE, movementD);

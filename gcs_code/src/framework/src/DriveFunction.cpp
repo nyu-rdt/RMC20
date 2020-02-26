@@ -9,8 +9,8 @@
 //She tried really hard
 
 //ros::NodeHandle pointer;
-ros::NodeHandle pointer;
-ros::Publisher DriveFunction_Pub = pointer.advertise<std_msgs::String>("server/heartbeat", 1000);
+ros::NodeHandlePtr pointer;
+ros::Publisher DriveFunction_Pub;
 std::vector<rdt::Keyboard> driveKey = {rdt::Keyboard::W, rdt::Keyboard::A, rdt::Keyboard::S, rdt::Keyboard::D};
 
 std::vector<char> driveEncoder(const std::vector<bool>& input) { //Input is true or false for each key
@@ -53,7 +53,10 @@ void driveDecoder(const std::vector<char>& data){ //Data is the result of the en
 		ros::spinOnce();
 }
 
-void driveSetup(bool sender){} //Prepares the ROS Topic here
+void driveSetup(bool sender){
+		pointer =  boost::make_shared<ros::NodeHandle>();
+		DriveFunction_Pub = pointer->advertise<std_msgs::String>("server/heartbeat", 1000);
+} //Prepares the ROS Topic here
 				//sender == 0 then receive, == 1 then send
          //Dan, Charcles told me if this doesn't work then make the pointer in global above the publisher
 void driveCleanup(bool sender){} //Do nothing like Jin
