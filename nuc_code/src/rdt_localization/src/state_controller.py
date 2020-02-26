@@ -54,6 +54,7 @@ bin_full = False # If the storage bin is full
 bin_empty = False # If the storage bin is empty
 
 def main():
+    robot_state = 0
     #VERY TEMPORARY VARIABLE
     dig_zone_y_coord = 4.6
 
@@ -84,13 +85,13 @@ def main():
         elif (data[0] == "2"):
             limb_string = data.data[1:]
 
-    rospy.Subscriber(HEARTBEAT_NODE, String, parse_manual_commands)
+    rospy.Subscriber(TOPIC_FROM_HEARTBEAT_NODE, String, parse_manual_commands)
 
 
 
     # Publishers
-    pub_drive_cmd = rospy.Publisher('robotCmds/Drive', Pose, queue_size=10) # Drive commands
-    pub_limb_cmd = rospy.Publisher('robotCmds/Limbs', Pose, queue_size=10) # Limb commands
+    pub_drive_cmd = rospy.Publisher(TOPIC_TO_DRIVE_NODE, String, queue_size=10) # Drive commands
+    pub_limb_cmd = rospy.Publisher(TOPIC_TO_LIMB_NODE, String, queue_size=10) # Limb commands
 
 
 
@@ -118,9 +119,15 @@ def main():
         # STATE 0: Manual state
         if robot_state == 0:
             # Relay commands from decoders to robot
-            pub_drive_cmd.publish(drive_string)
-            pub_limb_cmd.publish(limb_string)
+            outmsg_drive = String()
+            outmsg_drive.data = drive_string
 
+            outmsg_limb = String()
+            outmsg_limb = limb_string
+
+            pub_drive_cmd.publish(outmsg_drive)
+            pub_limb_cmd.publish(outmsg_limb)
+            
         # STATE 1: Competition starts
         elif robot_state == 1:
             # Probably some setup code
