@@ -45,7 +45,8 @@ int main(int argc, char** argv){
     // manager.commands.insert(1, {rdt::Keyboard::W,rdt::Keyboard::A,rdt::Keyboard::S,rdt::Keyboard::D},
     // movementE, movementD);
 
-    manager.commands.insert(1, jumpK, jumpE, jumpD, jumpS, jumpC);
+    // manager.commands.insert(1, jumpK, jumpE, jumpD, jumpS, jumpC);
+    manager.commands.insert(1, driveKey, driveEncoder, driveDecoder, driveSetup, driveCleanup);
 
     manager.commandsRos.AddBroadcast("slot1",nullptr,nullptr);
     manager.commandsRos.AddBroadcast("slot2",nullptr,nullptr);
