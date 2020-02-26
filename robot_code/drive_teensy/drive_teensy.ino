@@ -6,22 +6,22 @@ bool writetest = false;
 
 int val;
 int val2;
-String comms;
+int comms;
 
 void setup (){
-  pinMode(1, OUTPUT);
-  
-//  val = 0;
-//  Spark.attach(3);
+  val = 0;
+  Spark.attach(3);
   Serial1.begin(115200);
 }
+
 void loop() {
+  
   if(Serial1.available() > 0){
-     comms = Serial1.readStringUntil('\n');
-     Serial1.println(comms);
+     comms = Serial1.read();
+//     Serial1.println(comms);
   }
   interpret(comms);
-  delay(15);
+//  delay(15);
 
   if (writetest) {
     digitalWrite(1, HIGH);
@@ -29,32 +29,25 @@ void loop() {
 }
 
 
-void interpret(String& commandUpdate){
-//  switch(commandUpdate[0]){
-//    case '0':
-//      drive(commandUpdate.substring(1,7));
-//      break;
-//    case  '1':
-//      //keep one side stationary, the other rotates
-//      rotate(commandUpdate.substring(1,3));
-//      break;
-//    case '3':
-//      //slowly rotate wheels in different directions slicing like a hamburger
-//      rollUp(commandUpdate.substring(1,3));
-//      break; 
-//  }
-
-  switch (commandUpdate[0]) {
-    case '1':
-      writetest = true;
+void interpret(int& commandUpdate){
+  switch(commandUpdate[0].toInt()){
     case '0':
-      writetest = false;
+      drive(commandUpdate.substring(1,7));
+      break;
+    case  '1':
+      //keep one side stationary, the other rotates
+      rotate(commandUpdate.substring(1,3));
+      break;
+    case '3':
+      //slowly rotate wheels in different directions slicing like a hamburger
+      rollUp(commandUpdate.substring(1,3));
+      break; 
   }
 }
 void drive(String commandUpdate){
   //if [0] is 0, go forwards, if 1, go backwards
   //translates degrees into different percentages for the wheels divided like a hotdog
-   val = (commandUpdate.substring(2,3)).toInt();
+//   val = (commandUpdate.substring(2,4)).toInt();
 
   if((commandUpdate.substring(2,3).toInt())==1){
         val*=-1;
