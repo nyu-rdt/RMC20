@@ -127,7 +127,24 @@ ___
 
 ### 2.2&nbsp;&nbsp;&nbsp;&nbsp;GCS ⟺ Server
 
-Work in progress
+Two main objective's of the team's robot code this year are to minimize data transfer across the arena border and to maintain autonomy until a dire situation is reached. The GCS to Server communication protocols are built with this objective in mind. As such, at the competition start, the robot defaults to autonomous mode. Teleoperated mode can be invoked in two ways:
+
+- The robot reaching a fatal error state in its autonomous operation, where it cannot restore normal operation.
+- A key on the keyboard being pressed while the robot is in autonomous mode.
+
+This pattern is built on top of two main programs: a **Manager** and a **Socket**. There is an identical Manager and Socket running on both the GCS and the Server, though they perform different functions for different purposes. 
+
+#### Ground Control Station
+
+On the GCS side, the Manager detects key presses using [SDL](https://wiki.libsdl.org/Tutorials), a library that allows a program to interface with computer peripherals such as a keyboard. It then maps these key presses to their respective **encoder** (discussed in the *"Making an Encoder/Decoder"* section). The encoder heavily encodes these key presses down to one or two bytes. These encoded bytes are passed to the Socket, which simply relays them across the wireless network to the receiving Server. 
+
+#### Server
+
+For manual control, the Socket on the Server side does the opposite of what the GCS Socket does. It simply receives encoded bytes and relays them to the Server Manager. This, once again, performs the opposite function of the GCS Manager. Once the Manager gets an encoded byte, it determines which **decoder** to pass it on to
+
+#### Making an Encoder/Decoder
+
+
 
 ___
 
