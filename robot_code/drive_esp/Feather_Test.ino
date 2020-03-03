@@ -3,6 +3,7 @@
 #include "Adafruit_MQTT.h"
 #include "Adafruit_MQTT_Client.h"
 #include "arduino_secrets.h" 
+#include "Lidar.h"
 
 
 ///////please enter your sensitive data in the Secret tab/arduino_secrets.h
@@ -39,12 +40,16 @@ void setup() {
   Serial.print("You're connected to the network");
   printCurrentNet();
   printWiFiData();
+  for (byte i = 0; i < 4; i++){
+    pinMode(INPUT, lidar_pins[i]);
+  }
   mqtt.subscribe(&inTopic);
 }
 
 void loop() {
   checkConnection();
   scanForCmd();
+  Lidar_Loop();
 }
 // Constantly check the connection and reconnect if it is dropped
 void checkConnection(){
