@@ -12,3 +12,6 @@
 WiFiClient client;
 Adafruit_MQTT_Client mqtt(&client, SERVER_ADDR, SERVER_PORT, "driveTopic", "");
 Adafruit_MQTT_Subscribe inTopic = Adafruit_MQTT_Subscribe(&mqtt, TOPIC_NAME_IN);
+
+// Lidar Pins
+const int lidar_pins[4] = {13, 12, 11, 10};
