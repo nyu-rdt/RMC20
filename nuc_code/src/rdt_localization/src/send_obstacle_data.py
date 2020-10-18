@@ -11,31 +11,34 @@ import math
 def on_connect(client, userdata, flags, rc):
 	rospy.loginfo("Connected: receiving obstacle data")
 
-# callback function gets executed when topic "robotCmds/sendObstacleData" receives new drive_vector
+# callback function gets executed when topic "robotCmds/obstacle" receives new obstacle data
 def publish_obstacle_data(data):
 	obstacle = str(data.data)
 	client.publish("server/receiveObstacleData", indicatingObstacles(obstacle))
+
+def processinginput(input):
+	return input.replace(" ","").split(",")
 #take in 4 floats of the distance observed by each lidar
 #return string indicates whether there is an obstacle
 #input format: 
-#11\n 10\n 30\n 35\n
+#1:11,2:12,3:15,4:3
 #output format: 
-#left true\n right false
+#1 true\n2 true\n3 true\n4 true
 #optional input: vertical distance, theta of sensors (in radian), margin of error 
 
 #note: does not account for curvature
 def indicatingObstacles(input, ydist = 4.5, theta = math.pi/4, margin = 0.2):
-	name = ["outer left","inner left", "inner right","outer right"]
-	lst = input.splitlines()
+	lst = processinginput(input)
 	ret = []
 	acceptabledist = ydist/math.cos(theta) if theta<math.pi/2 else 0
 	for i in range(len(lst)):
 		try:
-			dist = float(lst[i])
+			sensor = lst[i].split(":")
+			dist = float(sensor[1])
 			if acceptabledist*(1-margin)<=dist<=acceptabledist*(1+margin):
-				ret.append("false")
+				ret.append(sensor[0]+" false")
 			else:
-				ret.append("true")
+				ret.append(sensor[0]+" true")
 		except:
 			pass
 	return "\n".join(ret)
