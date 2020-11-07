@@ -11,7 +11,7 @@ from std_msgs.msg import String
 
 # pop up status indicator window for connection status 
 # green circle for good connection, red for bad
-class Manager:
+class GCSManager:
     def __init__(self, title="  RDT Command Framework":str, width=640:int, height=480:int):
         
         self.commands = FunctionTable() 
@@ -21,7 +21,6 @@ class Manager:
         # rospy.init_node('framework_node')
         self.width = width
         self.height = height
-        self.isGcs = True #gcs == ground control station, if false == NUC is on the bin originally sender
         self.keyCompressedPrev = 0U
         self.keyCompressed
         self.headerSize
@@ -31,21 +30,6 @@ class Manager:
         # needed for communicating with atlas_socket
         self.recvHandler = rospy.Publisher("SendBuffer", String, queue_size=10)
         self.sendHandler = rospy.Subscriber("RecvBuffer", String, ReceiveCallback)
-
-        # setting function pointers
-        if (self.isGcs):
-            # this file is running on the gcs
-            #orginially was send[name] in cpp file
-            gl_setup(title, width, height)
-            self.loopFunc = gcsLoop 
-            self.sendFunc = gcsSend
-            self.recvFunc = gcsRecv 
-        else:
-            # this file is running on the bin
-            #orginially was recv[name] in cpp file
-            self.loopFunc = binLoop
-            self.sendFunc = binSend
-            self.recvFunc = binRecv
 
     def gcsLoop() -> None: 
         # original: sendLoop()
@@ -70,14 +54,14 @@ class Manager:
                 #if a key is pressed
                 elif event.type == pygame.KEYDOWN:
                     self.handle_key_down(event.key)
-                    currentData = self.sendFunc() 
-                    #sends data 
+                    currentData = self.gcsSend() 
+                    #sends data s
                     self.send(currentData)
                     threshold = curr+delta
                 #if a key was released 
                 elif event.type == pygame.KEYUP:
                     self.handle_key_up(event.key)
-                    currentData = self.sendFunc() 
+                    currentData = self.gcsSend() 
                     #sends data 
                     self.send(currentData)
                     threshold = curr+delta
@@ -136,35 +120,6 @@ class Manager:
 
         self.commandsRos.nextSend[tmp2] &= ~(1<<tmp1);
 
-
-    
-    def binLoop() -> None : 
-        while(not rospy.is_shutdown()): 
-            pass 
-
-
-    def binSend() -> list[char] :
-        # original: recvSend()
-        return []
-    
-    def binRecv(data:list[char]) -> None: 
-        sizeOfC = len(self.commandsRos.nextSend) 
-        sizeOfInt = 4 
-        if(len(data) < sizeOfC + sizeOfInt): 
-            return
-        for i in range(len(data)):
-            print("%d ", (int)data[i])
-        print()
-        self.commands.parse(data, sizeOfInt + sizeOfC);
-
-        for i in range(sizeOfC): 
-            c = data[sizeOfInt + i]
-            if( c != 0 ): 
-                for j in range(8): 
-                    if(((c & (1<<j))) != 0): 
-                        self.send(commandsRos.valAt(i*8+j))
-
-
     
     # initializes pygame object (sdl wrapper - sdl is the c++ equivalent)
     # creating a pygame screen, which is where the user input will go and the robot graphics will be shown
@@ -186,10 +141,7 @@ class Manager:
     def ReceiveCallback(self, msg):
         self.recv(msg.data)
 
-
-
 ### https://www.pygame.org/docs/ref/key.html
-
 
     def handle_key_down(self, key): 
         if KeyMap.pygames_to_keys.contains(key):
@@ -202,16 +154,13 @@ class Manager:
             keyCompressed -= (1<<(KeyMap.pygames_to_keys[key].value))
 
 
-
-
     def loop(self):
-        #set up and start LoopFunc
         #sets up Manager to be able to run the Loop functoin
-        self.commands.setup(self.isGcs) 
-        self.commandsRos.setup(self.isGcs)
+        self.commands.setup(True) 
+        self.commandsRos.setup(True)
 
         #calls loop function 
-        self.LoopFunc()
+        self.gcsLoop()
 
     #send is overloaded in the original cpp file
     # data:str[] and data:str
@@ -220,7 +169,7 @@ class Manager:
         self.sendHandler.publish("".join(data))
         
     def recv(self, data:[char]):
-        self.recvfunc(data)
+        self.gcsSend(data)
 
 
 
