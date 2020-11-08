@@ -168,7 +168,7 @@ def main():
                 if (artag_seen == False):
                     manual_timer -= 1;
 
-        # STATE 5: Machine moves to digging area
+        # STATE 6: Machine moves to digging area
         elif robot_state == 6:
             # Error checking
             if (robot_cannot_move): #temp variable
