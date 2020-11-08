@@ -4,18 +4,20 @@
 FOR DRIVE
 7bits
 0 = mode
-  0- forwards/backwards
-  1- rotating
-  2- arm movement
+  if this bit is....
+    0- forwards/backwards
+    1- rotating
+    2- arm movement
 1-3 = speed
-  0- forwards/backwards
-  1- percentage
-  2- percentage
+  0th index represents forwards/backwards
+    0-forwards
+    1-backwards
+  1st & 2nd index are the percent of total motor power
 4-7 = degrees
-  0-neg/pos
-  1-1st dig
-  2-2nd dig
-  3-3th dig
+  0th index is negative/positive degree
+    0 is pos
+    1 is negative
+  indexes 1-3 represent each index of degree (eg(270))
  */
 #include <Servo.h>
 
