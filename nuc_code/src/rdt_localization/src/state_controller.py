@@ -166,23 +166,47 @@ def main():
                 # Rotate robot and predetermine orientation of robot
                 # Wait 5 seconds then switch to manual control
                 if (artag_seen == False):
-                    manual_timer -= 1;
+                    manual_timer -= 1
 
         # STATE 6: Machine moves to digging area
         elif robot_state == 6:
             # Error checking
             if (robot_cannot_move): #temp variable
+                # find inverse of drive_string
+                if drive_string[1] == 0:
+                    inverse_drive_string =  str(0)+str(1)+drive_string[2:]
+                else:
+                    inverse_drive_string = str(0)+str(0)+drive_string[2:]
                 # Find reverse of drive vector and input (backtrack)
-                # If unsuccessful, switch to manual control
+                outmsg_drive.data = inverse_drive_string
+                if robot_cannot_move:
+                    # TIP(Turn in place) 
+                    #setting outmsg_drive.data to the drivevector corresponding to TIP
+                    #rotating 5 degrees positive
+                    outmsg_drive.data = "1"+"000"+"005"
+                    # If unsuccessful, switch to manual control
                 pass
             elif (inc_obstacle):
-                # Move around the obstacle using sensors
+                # TIP 
+                # setting outmsg_drive.data to the drivevector corresponding to TIP
+                # rotating 5 degrees positive
+                while inc_obstacle:
+                    outmsg_drive.data = "1"+"000"+"005"
+                # Store obstacle loc as x & y coordinates for return 
                 # If unsuccessful, switch to manual control
+                manual_timer -= 1
                 pass
             elif (artag_seen == False):
-                # Spin in place (3 rotations per 10 seconds)
+                # Store location of past, reverse drive vector
+                if drive_string[1] == 0:
+                    inverse_drive_string =  str(0)+str(1)+drive_string[2:]
+                else:
+                    inverse_drive_string = str(0)+str(0)+drive_string[2:]
+                # Spin in place for 90 degs
+                if artag_seen == False:
+                    outmsg_drive.data = "1"+"000"+"090"
                 # If unsuccessful, switch to manual control
-                manual_timer -= 1;
+                manual_timer -= 1
                 pass
 
             if (robot_y > dig_zone_y_coord):
