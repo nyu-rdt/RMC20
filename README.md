@@ -73,12 +73,19 @@ byte offset_driveMode }
 ```
 
 - `byte robotSpeed` can take on a value from **0 to 200**, representing a percentage of the robot's potential speed to write to the motor controllers (**0** means 100% speed backward, **100** means 0% speed, **200** means 100% speed forward).
+
 - `byte offset_driveMode` can take on a value from **0 to 255**. The robot has four separate "drive modes" it can be in, depending on what relation the wheels need to turn in relation to one another. The following values of this byte mean that the robot is in a specific drive mode:
+
   -  **Value: 0 to 200**, the robot is assumed to be in "forward-driving" mode. In this mode, the bot is attempting to drive normally such as in **ConOps states 6 and 16**. The left-side and right-side wheels are treated as two independent units in this mode, each being written `robotSpeed` with a "turning offset" specified by the value of this byte.
-    - This "turning offset" represents the difference between the value that will be written to the left/right-side wheels. This is used for turning the bot while it is driving. For an example, given a `robotSpeed` of *80*, an "offset" value of *0* means that the left-side wheels and right-side wheels will receive the same value (80%), so the robot will go straight. Alternatively, an "offset" of *30* means that the left-side wheels will get a speed of *80%* while the right-side wheels will receive a speed of 80 - 30 = *50%*. This will cause the robot to veer right. 
+
+    ​	This "turning offset" represents the difference between the value that will be written to the left/right-side wheels. This is used for turning the bot while it is driving. For an example, given a `robotSpeed` of *80*, an "offset" value of *0* means that the left-side wheels and right-side wheels will receive the same value (80%), so the robot will go straight. Alternatively, an "offset" of *30* means that the left-side wheels will get a speed of *80%* while the right-side wheels will receive a speed of 80 - 30 = *50%*. This will cause the robot to veer right. 
+
   - **Value: 253** is the "changing digging drum elevation" mode of the robot, such as in **ConOps states 8 and 11**. In this mode, the robot's arms are attempting to raise or lower the digging drum, and the wheels must concurrently turn at a speed to match. The front-side and back-side wheels are treated as two independent units, each being written `robotSpeed`. No offset is necessary for this mode, since at no point in the ConOps are the arms rotating at different speeds.
+
   - **Value: 254** is the "turning in place" mode of the robot, where it is rotating in-place around its own center axis such as in **ConOps states 15 and 17**. Like the forward-driving mode, the left- and right-side wheels are treated as two independent units, being written `robotSpeed` and `-1*robotSpeed`, respectively. No offset is necessary for this mode.
+
   - **Value: 255** is reserved for ESTOP. In this mode, `robotSpeed` is ignored and a speed of 0 is written to all controllers.
+
   - **Value: 201 to 252** are unused values and can be ignored.
 
 ___
