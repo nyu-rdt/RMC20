@@ -1,4 +1,5 @@
-# convert Manager to python
+# This file acts as the BIN Manager in the Arena, is the NUC receiving commands from GCS 
+# Contains all BIN functions from original Manager.py, main functionality is RECEIVING
 # https://github.com/nyu-rdt/RMC20/blob/ground_control_station/gcs_code/src/framework/src/Manager.cpp
 
 
@@ -31,14 +32,11 @@ class BINManager:
         self.recvHandler = rospy.Publisher("SendBuffer", String, queue_size=10)
         self.sendHandler = rospy.Subscriber("RecvBuffer", String, ReceiveCallback)
 
-    
-    def binLoop() -> None : 
-        while(not rospy.is_shutdown()): 
-            pass 
-
     def binSend() -> list[char] :
         # original: recvSend()
         return []
+    
+    #Deleted binLoop() because it was just a pass
     
     def binRecv(data:list[char]) -> None: 
         sizeOfC = len(self.commandsRos.nextSend) 
@@ -99,8 +97,11 @@ class BINManager:
 
     def loop(self):
         #set up and start LoopFunc
-        #sets up Manager to be able to run the Loop functoin
-        self.commands.setup(False) 
+        #sets up Manager to be able to run the Loop function 
+        
+        #In the original Manager.py, this would check self.isGCS to see if this is running the GCS or the BIN loop
+        #Now that we split this into GCS/BIN, we have it based off True/False
+        self.commands.setup(False) #Does this need to be False?
         self.commandsRos.setup(False)
 
         #calls loop function 
@@ -124,7 +125,5 @@ class BINManager:
         # s = [msg.data.begin(), msg.data.end()]
         # recv(s)
         self.recv(msg)
-
-    # this is literally blank lmao
-    def SendImmediate(self):
-        pass
+        
+  #Deleted SendImmediate here because it was blank (see original Manager.py)
