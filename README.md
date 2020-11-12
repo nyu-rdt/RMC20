@@ -68,9 +68,9 @@ ___
 Used to send drive commands from the server, specifically from the `send_drive_vector` node on the server, to the Drivetrain ESP. These commands will be used to control the robot's drivetrain. The data is sent in the following format: 
 
 ```
-{ float robotSpeed,
-float offset,
-int driveMode }
+{ byte robotSpeed,
+byte offset,
+byte driveMode }
 ```
 
 - `float robotSpeed` can take on a value from **-100 to 100**, representing a percentage of the robot's potential speed to write to the motor controllers.
