@@ -80,7 +80,7 @@ byte offset_driveMode }
 
     <ul style="list-style-type: none;">
       <li>
-        This "turning offset" represents the difference between the value that will be written to the left/right-side wheels. This is used for turning the bot while it is driving. <br>
+        This "turning offset" represents the difference between the value that will be written to the left/right-side wheels. This is used for turning the bot while it is driving. <br><br>
         For an example, given a `robotSpeed` of *80*, an "offset" value of *0* means that the left-side wheels and the right-side wheels will receive the same value (80%), so the robot will go straight. Alternatively, an "offset" of *30* means that the left-side wheels will get a speed of *80%* while the right-side wheels will receive a speed of 80 - 30 = *50%*. This will cause the robot to veer right.  
       </li>
     </ul>
