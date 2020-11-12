@@ -78,7 +78,7 @@ byte offset_driveMode }
 
   -  **Value: 0 to 200**, the robot is assumed to be in "forward-driving" mode. In this mode, the bot is attempting to drive normally such as in **ConOps states 6 and 16**. The left-side and right-side wheels are treated as two independent units in this mode, each being written `robotSpeed` with a "turning offset" specified by the value of this byte.
 
-    <ul style="list-style: none;">
+    <ul style="list-style-type: square;">
       <li>
         This "turning offset" represents the difference between the value that will be written to the left/right-side wheels. This is used for turning the bot while it is driving. 
       </li>
