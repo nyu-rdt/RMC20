@@ -1,4 +1,4 @@
-from manager.py import * 
+from KeyMap import Key_library
 
 class Functions:
     # constructor
@@ -20,20 +20,32 @@ class Functions:
 
         # lst(tuple(chr, int))
         self.func_vector = None
-        
-        # lst(Functions)
-        self.func_table = None
+
     
-    '''
-    come back to this, we don't know what Keyboard object is ***
-    *** is this its own full function???? ***
-    returns list(Keyboard)
-    parameters: None
-    '''
-    def keyboard(self):
-        pass
-        """
-    *** brief description ***
+class FunctionTable:
+    # constructor
+    def __init__(self):
+        self.curr_index = 0
+        self.compressed_used = 0
+
+        # holds a tuple of a character and an integer
+        # (char, int)
+        self.func_vector = []
+
+        # lst(Functions)
+        self.func_table = []
+
+
+    # destructor
+    def __del__(self):
+        self.curr_index = None
+        self.compressed_used = None
+        self.manage = None
+        self.func_vector = None
+
+
+    """
+    Function used to insert a function into func_table by providing its components
     returns None
     parameters:
         num_bytes: int
@@ -45,63 +57,33 @@ class Functions:
     """
     def insert(self, num_bytes, keyboard, encoder, decoder, setup, cleanup):
         func = Functions(keyboard, encoder, decoder, setup, cleanup, num_bytes)
-        self.insert(func)
+        self.insert_function(func)
+
+
     '''
+    Function used to insert a function into func_table by providing the function
     returns None
     parameters:
-      f: Functions
+        f: Functions
     '''
-    def insert(self, function):
-      self.func_table.append(function)
-      total = 0
-      '''
-      for element in function.keyboard:
-        #bitwise or function: x|y = x or y
-        total = total|1
-        #left shift bits of total  
-        total << (int)k; 
-        !! Can't make sense of this line
-        (tot = 1 or tot)
-        left shift tot (int)k times 
-        (k is the "template" of a keyboard object in a ranged for loop
-        which is apparently being cast to an integer???)
-      }
-      compressed_used = compressed_used | total;
-      '''
-      curr_index += 1
-      #Append to Manager class's funcVector, not 
-      self.funcVector.append((total,curr_index))
+    def insert_function(self, function):
+        self.func_table.append(function)
+        tot = 0
 
-# end of part 1
-
-
-class FunctionTable:
+        # casting k to int isn't allowed in python
+        # easy solution would be to change KeyMap from Enum to IntEnum, see how it affects other files first
+        for k in function.keyboard:
+            tot |= 1 << int(k)
     
-    class Manager:
-        pass
-    #according to the c++ file & what charles said, manager has its own python
-    #file, so we imported the file & called in constructor
+        self.compressed_used |= tot
 
-    # constructor
-    def __init__(self):
-        self.curr_index = 0
-        self.compressed_used = 0
-        self.manage = manager()
-        # holds a tuple of a character and an integer
-        # (char, int)
-        self.funcVector = []
+        self.func_vector.append((tot, self.curr_index))
 
-    # destructor
-    def __del__(self):
-        self.curr_index = None
-        self.compressed_used = None
-        self.manage = None
-        self.funcVector = None
+        self.curr_index += 1
 
-#get sheep code 
 
     def setup(self, sender):
-         for data in self.funcVector:
+         for data in self.func_vector:
             '''
             Following line may not work in python
             We are casting the first field of data which is a char as an index
@@ -110,6 +92,7 @@ class FunctionTable:
             f = self.func_table[data[0]] 
             if f.setup != None:
                 f.setup(sender)
+
 
     '''
     Taking a snippet of key_val that is length f.num_bytes and then passing it to the decode function
@@ -158,18 +141,11 @@ class FunctionTable:
     def encode(self, compressed, compressed_prev, header):
         delta = compressed ^ compressed_prev
 
-        expanded = []
-        '''
-        *** Translating this piece of code requires the Keyboard class to be made first *** 
-
-        std::vector<bool> expanded;
-        expanded.resize((int)Keyboard::LAST);
-        for(int i=0;i<(int)Keyboard::LAST;++i){
-            expanded[i] = (compressed & (1<<i)) > 0;
-        }
-        '''
+        expanded = [False] * len(Key_library)
+        for i in range(len(expanded)):
+            expanded[i] = (compressed & (1<<i)) > 0
     
-        for data in self.funcVector:
+        for data in self.func_vector:
             if data[1] & compressed or data[1] & delta:
                 '''
                 Following line may not work in python
@@ -191,8 +167,7 @@ class FunctionTable:
                     for uc in out:
                         header.append(uc)
 
-
-
+    
     '''
     Does a bitwise and to find changes in the keyboard
 
