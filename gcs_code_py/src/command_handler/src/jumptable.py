@@ -125,7 +125,7 @@ class FunctionTable:
                 key_val[curr -> curr + f.num_bytes]
                 }
                 '''
-                for i in range(0, f.num_bytes-curr):
+                for i in range(0, f.num_bytes):
                     data[i] = key_val[i + curr]
 
                 f.decode(data)
