@@ -1,7 +1,7 @@
 # translation of Keyboard.h
 # when the user hits the keyboard, this maps the key by storing it as a bit
 
-import pygames 
+import pygame
 from enum import Enum, auto
 
 class Key_library(Enum):

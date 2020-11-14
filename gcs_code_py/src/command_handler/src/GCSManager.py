@@ -6,7 +6,7 @@
 
 #!/usr/bin/env python
 # import filenames-interpreter and user-input libraries
-import sys, pygame, rospy, KeyMap
+import sys, pygame, rospy, KeyMap, typing
 
 from std_msgs.msg import String
 
@@ -14,7 +14,7 @@ from std_msgs.msg import String
 # pop up status indicator window for connection status 
 # green circle for good connection, red for bad
 class GCSManager:
-    def __init__(self, title="  RDT Command Framework":str, width=640:int, height=480:int):
+    def __init__(self, title="  RDT Command Framework", width=640, height=480):
         
         self.commands = FunctionTable() 
         self.commandsRos = RosTable() 
@@ -23,7 +23,7 @@ class GCSManager:
         # rospy.init_node('framework_node')
         self.width = width
         self.height = height
-        self.keyCompressedPrev = 0U
+        self.keyCompressedPrev = 0
         self.keyCompressed
         self.headerSize
         self.window
@@ -33,7 +33,7 @@ class GCSManager:
         self.recvHandler = rospy.Publisher("SendBuffer", String, queue_size=10)
         self.sendHandler = rospy.Subscriber("RecvBuffer", String, ReceiveCallback)
 
-    def gcsLoop() -> None: 
+    def gcsLoop(): 
         # original: sendLoop()
         '''
         handels key presses & publishes to ROS
@@ -50,7 +50,7 @@ class GCSManager:
             curr = pygame.time.get_ticks() 
             #check for if there is a keyboard click 
             for events in pygames.event.get(): #gets a queue of events
-                if event.type = pygame.NOEVENT: 
+                if event.type == pygame.NOEVENT: 
                     break
                 elif event.type == pygame.QUIT: return
                 #if a key is pressed
@@ -72,8 +72,8 @@ class GCSManager:
             if(threshold<curr): 
                 threshold = curr+delta 
                 #4 is the size of an integer in bytes 
-                header = [0 for _ in range(4+len(self.commandsRos.nextSend)]
-                for i in range(4): s    s
+                header = [0 for _ in range(4+len(self.commandsRos.nextSend))]
+                for i in range(4):
                     header[i] = str(curr & 0xFF) 
                     cur = cur >> 8 
                 for i in range(len(self.commandsRos.nextSend)): 
@@ -86,7 +86,7 @@ class GCSManager:
 
         
     
-    def gcsSend() -> list[char]:
+    def gcsSend():
         #First 4 index of Header represent the time it was sent, the rest of header repersents the command being sent 
         #this will only work for 71582 minutes before conflicts or 2^32 miliseconds 
         # original: sendSend()
@@ -96,7 +96,7 @@ class GCSManager:
             shift = 4 #size of tick in bytes. Tick is an int so 4 bytes
             #there might be a conversion error in python because python ints are 24 bytes
 
-            header = [0 for _ in range(shift+ len(self.commandsRos.nextSend)]
+            header = [0 for _ in range(shift+ len(self.commandsRos.nextSend))]
             for i in range(0, shift): 
                 header[i] = str(tick & 0xFF)
                 tick = tick >> 8 
@@ -110,7 +110,7 @@ class GCSManager:
         return [] 
             
 
-    def gcsRecv(data:list[char]):
+    def gcsRecv(data):
         # original: sendRecv()
         if(len(data) == 0):
             return 
@@ -125,7 +125,7 @@ class GCSManager:
     
     # initializes pygame object (sdl wrapper - sdl is the c++ equivalent)
     # creating a pygame screen, which is where the user input will go and the robot graphics will be shown
-    def gl_setup(self, title:char, width:int, height:int): 
+    def gl_setup(self, title, width, height): 
         pygame.init()
         screen_size = (width, height)
         screen = pygame.display.set_mode(screen_size)
@@ -166,16 +166,16 @@ class GCSManager:
 
     #send is overloaded in the original cpp file
     # data:str[] and data:str
-    def send(self, data:list[char] ):
+    def send(self, data):
         #rospy.loginfo(data)
         self.sendHandler.publish("".join(data))
         
-    def recv(self, data:[char]):
+    def recv(self, data):
         self.gcsSend(data)
 
 
 
-    def RecieveCallback(self, msg:str) -> None:
+    def RecieveCallback(self, msg):
         # void rdt::Manager::RecieveCallback(const std_msgs::String::ConstPtr& msg){
         #     recv(std::vector<char>(msg->data.begin(), msg->data.end()));
         # }
