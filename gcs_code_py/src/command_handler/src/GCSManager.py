@@ -1,4 +1,6 @@
-# convert Manager to python
+# This file acts as the GCS Manager, is the NUC SENDING commands from GCS to Arena
+# Contains all GCS functions from original Manager.py, main functionality is SENDING
+# While sending is the main purpose, GCS also might receive feedback from BIN
 # https://github.com/nyu-rdt/RMC20/blob/ground_control_station/gcs_code/src/framework/src/Manager.cpp
 
 
@@ -180,7 +182,3 @@ class GCSManager:
         # s = [msg.data.begin(), msg.data.end()]
         # recv(s)
         self.recv(msg)
-
-    # this is literally blank lmao
-    def SendImmediate(self):
-        pass
