@@ -83,14 +83,14 @@ class BINManager:
 
 
     def handle_key_down(self, key): 
-        if KeyMap.pygames_to_keys.contains(key):
-            #original: keyCompressed |= (1<<(KeyMap.pygames_to_keys[key].value))
-            keyCompressed += (1<<(KeyMap.pygames_to_keys[key].value))
+        if KeyMap.pygame_to_keys.contains(key):
+            #original: keyCompressed |= (1<<(KeyMap.pygame_to_keys[key].value))
+            keyCompressed += (1<<(KeyMap.pygame_to_keys[key].value))
             
     def handle_key_up(self): 
-        if KeyMap.pygames_to_keys.contains(key):
-            #original: keyCompressed &= ~(1<<(KeyMap.pygames_to_keys[key].value))
-            keyCompressed -= (1<<(KeyMap.pygames_to_keys[key].value))
+        if KeyMap.pygame_to_keys.contains(key):
+            #original: keyCompressed &= ~(1<<(KeyMap.pygame_to_keys[key].value))
+            keyCompressed -= (1<<(KeyMap.pygame_to_keys[key].value))
 
 
 

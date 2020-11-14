@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
 import rospy, sys
-import GCSManager
+from GCSManager import GCSManager
+from KeyMap import *
 
 
 def movementEncoder(inp): 
@@ -20,25 +21,30 @@ def movementDecoder(data):
     if(data[0]&4): s+="S"
     if(data[0]&8): s+="D"
     rospy.loginfo(data) 
-    
+
+def testSetup(hi):
+    pass
+
+def testCleanup(hello):
+    pass
 
 
 def run(argc, argv): 
-    manager = GCSManager(argc, argv)
-    manager.commands.insert(1, driveKey, driveEncoder, driveDecoder, driveSetup, driveCleanup);
+    manager = GCSManager()
+    manager.commands.insert(1, [Key_library.W, Key_library.A, Key_library.S, Key_library.D], movementEncoder, movementDecoder, testSetup, testCleanup);
 
-    manager.commandsRos.AddBroadcast("slot1",None,None);
-    manager.commandsRos.AddBroadcast("slot2",None,None);
-    manager.commandsRos.AddBroadcast("slot3",None,None);
-    manager.commandsRos.AddBroadcast("slot4",None,None);
-    manager.commandsRos.AddBroadcast("slot5",None,None);
-    manager.commandsRos.AddBroadcast("slot6",None,None);
-    manager.commandsRos.AddBroadcast("slot7",None,None);
-    manager.commandsRos.AddBroadcast("EMOJI", emojiSetup,emojiDecoder);
-    manager.commandsRos.AddBroadcast("slot8",None,None);
+    manager.commandsRos.addBroadcast("slot1",None,None);
+    manager.commandsRos.addBroadcast("slot2",None,None);
+    manager.commandsRos.addBroadcast("slot3",None,None);
+    manager.commandsRos.addBroadcast("slot4",None,None);
+    manager.commandsRos.addBroadcast("slot5",None,None);
+    manager.commandsRos.addBroadcast("slot6",None,None);
+    manager.commandsRos.addBroadcast("slot7",None,None);
+    #manager.commandsRos.addBroadcast("EMOJI", emojiSetup,emojiDecoder);
+    manager.commandsRos.addBroadcast("slot8",None,None);
 
     manager.loop()
 
-run(sys.argv[1], len(sys.argv))
+run(1, 1)
 
 

@@ -73,11 +73,11 @@ class FunctionTable:
         # casting k to int isn't allowed in python
         # easy solution would be to change KeyMap from Enum to IntEnum, see how it affects other files first
         for k in function.keyboard:
-            tot |= 1 << int(k)
+            tot |= 1 << k.value
     
         self.compressed_used |= tot
 
-        self.func_vector.append((tot, self.curr_index))
+        self.func_vector.append((self.curr_index, tot))
 
         self.curr_index += 1
 
@@ -89,6 +89,7 @@ class FunctionTable:
             We are casting the first field of data which is a char as an index
             We may need to do something special to avoid issues in python
             '''
+            print(data[0])
             f = self.func_table[data[0]] 
             if f.setup != None:
                 f.setup(sender)
@@ -156,10 +157,10 @@ class FunctionTable:
                 if f.encoder != None:
                     inputs = []
                     for k in f.keyboard:
-                        inputs.append(expanded[int(k)])
+                        inputs.append(expanded[k.value])
                     
                     out = f.encoder(inputs)
-                    if len(out) != f.num_byte:
+                    if len(out) != f.num_bytes:
                         print('wrong number of bytes')
                         continue
                     
@@ -176,4 +177,4 @@ class FunctionTable:
         compressed: int
     '''
     def has_update(self, compressed):
-        return (self.compressed_used & compressed) > 0
+        return (self.compressed_used & compressed) != 0

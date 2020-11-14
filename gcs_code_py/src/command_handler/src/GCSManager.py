@@ -6,9 +6,11 @@
 
 #!/usr/bin/env python
 # import filenames-interpreter and user-input libraries
-import sys, pygame, rospy, KeyMap, typing
+import sys, pygame, rospy, KeyMap
 
 from std_msgs.msg import String
+from jumptable import *
+from ROSTable import *
 
 
 # pop up status indicator window for connection status 
@@ -20,26 +22,28 @@ class GCSManager:
         self.commandsRos = RosTable() 
         
         # ros init with command line arguments, needs to be finished. possible line of code:
-        # rospy.init_node('framework_node')
+        rospy.init_node('gcs_manager')
         self.width = width
         self.height = height
         self.keyCompressedPrev = 0
-        self.keyCompressed
-        self.headerSize
-        self.window
-        self.context
+        self.keyCompressed = 0
+        self.headerSize = 4
+        #self.window
+        #self.context
+
+        self.gl_setup(title, width, height)
 
         # needed for communicating with atlas_socket
-        self.recvHandler = rospy.Publisher("SendBuffer", String, queue_size=10)
-        self.sendHandler = rospy.Subscriber("RecvBuffer", String, ReceiveCallback)
+        self.sendHandler = rospy.Publisher("SendBuffer", String, queue_size=10)
+        self.recvHandler = rospy.Subscriber("RecvBuffer", String, self.ReceiveCallback)
 
-    def gcsLoop(): 
+    def gcsLoop(self): 
         # original: sendLoop()
         '''
         handels key presses & publishes to ROS
         not sure if se
         '''
-        publish_data = rospy.Publisher(self.keyCompressed, String)
+        #publish_data = rospy.Publisher(self.keyCompressed, String)
         
         print("Starting: \n")
         delta = 1000 #1 second
@@ -49,7 +53,7 @@ class GCSManager:
             #current time 
             curr = pygame.time.get_ticks() 
             #check for if there is a keyboard click 
-            for events in pygames.event.get(): #gets a queue of events
+            for event in pygame.event.get(): #gets a queue of events
                 if event.type == pygame.NOEVENT: 
                     break
                 elif event.type == pygame.QUIT: return
@@ -74,8 +78,8 @@ class GCSManager:
                 #4 is the size of an integer in bytes 
                 header = [0 for _ in range(4+len(self.commandsRos.nextSend))]
                 for i in range(4):
-                    header[i] = str(curr & 0xFF) 
-                    cur = cur >> 8 
+                    header[i] = curr & 0xFF 
+                    curr = curr >> 8 
                 for i in range(len(self.commandsRos.nextSend)): 
                     header[4+i] = self.commandsRos.nextSend[i]
                 self.send(header);
@@ -86,11 +90,11 @@ class GCSManager:
 
         
     
-    def gcsSend():
+    def gcsSend(self):
         #First 4 index of Header represent the time it was sent, the rest of header repersents the command being sent 
         #this will only work for 71582 minutes before conflicts or 2^32 miliseconds 
         # original: sendSend()
-        if(self.commands.hasUpdate(self.keyCompressed ^ self.keyCompressedPrev)): 
+        if(self.commands.has_update(self.keyCompressed ^ self.keyCompressedPrev)): 
             header = [] 
             tick = pygame.time.get_ticks()  
             shift = 4 #size of tick in bytes. Tick is an int so 4 bytes
@@ -98,7 +102,7 @@ class GCSManager:
 
             header = [0 for _ in range(shift+ len(self.commandsRos.nextSend))]
             for i in range(0, shift): 
-                header[i] = str(tick & 0xFF)
+                header[i] = tick & 0xFF
                 tick = tick >> 8 
             # itterates through the rest of the array len(self.commandsRos.nextSend)
             for i in range(shift, len(header)): 
@@ -110,13 +114,13 @@ class GCSManager:
         return [] 
             
 
-    def gcsRecv(data):
+    def gcsRecv(self, data):
         # original: sendRecv()
         if(len(data) == 0):
             return 
         tmp1 = int(data[0]) 
         #might need to change the str part idk what htis does std::string(data.begin()+1,data.end())
-        self.commandsRos.decode(tmp1, "".join(data) );
+        self.commandsRos.decode(tmp1, "".join([chr(byte) for byte in data]) );
         tmp2 = tmp1 >> 3 
         tmp1 -= tmp2 << 3  
 
@@ -146,14 +150,14 @@ class GCSManager:
 ### https://www.pygame.org/docs/ref/key.html
 
     def handle_key_down(self, key): 
-        if KeyMap.pygames_to_keys.contains(key):
-            #original: keyCompressed |= (1<<(KeyMap.pygames_to_keys[key].value))
-            keyCompressed += (1<<(KeyMap.pygames_to_keys[key].value))
+        if key in KeyMap.pygame_to_keys:
+            #original: keyCompressed |= (1<<(KeyMap.pygame_to_keys[key].value))
+            self.keyCompressed += (1<<(KeyMap.pygame_to_keys[key].value))
             
-    def handle_key_up(self): 
-        if KeyMap.pygames_to_keys.contains(key):
-            #original: keyCompressed &= ~(1<<(KeyMap.pygames_to_keys[key].value))
-            keyCompressed -= (1<<(KeyMap.pygames_to_keys[key].value))
+    def handle_key_up(self, key): 
+        if key in KeyMap.pygame_to_keys:
+            #original: keyCompressed &= ~(1<<(KeyMap.pygame_to_keys[key].value))
+            self.keyCompressed -= (1<<(KeyMap.pygame_to_keys[key].value))
 
 
     def loop(self):
@@ -168,17 +172,10 @@ class GCSManager:
     # data:str[] and data:str
     def send(self, data):
         #rospy.loginfo(data)
-        self.sendHandler.publish("".join(data))
+        print("data:", data)
+        self.sendHandler.publish("".join([chr(byte) for byte in data]))
         
     def recv(self, data):
         self.gcsSend(data)
 
 
-
-    def RecieveCallback(self, msg):
-        # void rdt::Manager::RecieveCallback(const std_msgs::String::ConstPtr& msg){
-        #     recv(std::vector<char>(msg->data.begin(), msg->data.end()));
-        # }
-        # s = [msg.data.begin(), msg.data.end()]
-        # recv(s)
-        self.recv(msg)
