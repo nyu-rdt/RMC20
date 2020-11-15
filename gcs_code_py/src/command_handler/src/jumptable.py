@@ -105,7 +105,8 @@ class FunctionTable:
     '''
     def parse(self, key_val, curr):
         while curr < len(key_val):
-            f = self.func_table[key_val[curr]]
+
+            f = self.func_table[ord(key_val[curr])]
             curr += 1
 
             if f.decoder != None:
@@ -123,13 +124,15 @@ class FunctionTable:
 
                 this is the same as going from 0 -> f.num_bytes
 
-                key_val[curr -> curr + f.num_bytes]
+                key_val[curr -> curr + f.numz_bytes]
                 }
                 '''
                 for i in range(0, f.num_bytes):
-                    data[i] = key_val[i + curr]
+                    data[i] = ord(key_val[i + curr])
 
-                f.decode(data)
+                curr += f.num_bytes
+
+                f.decoder(data)
 
 
     '''

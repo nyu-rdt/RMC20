@@ -2,6 +2,7 @@
 
 import rospy, sys
 from GCSManager import GCSManager
+from BINManager import BINManager
 from KeyMap import *
 
 
@@ -15,12 +16,12 @@ def movementEncoder(inp):
     return out 
 
 def movementDecoder(data):
-    out = [] 
+    s = ""
     if(data[0]&1): s+="W" 
     if(data[0]&2): s+="A" 
     if(data[0]&4): s+="S"
     if(data[0]&8): s+="D"
-    rospy.loginfo(data) 
+    rospy.loginfo(s) 
 
 def testSetup(hi):
     pass
@@ -30,7 +31,8 @@ def testCleanup(hello):
 
 
 def run(argc, argv): 
-    manager = GCSManager()
+    #manager = GCSManager()
+    manager = BINManager()
     manager.commands.insert(1, [Key_library.W, Key_library.A, Key_library.S, Key_library.D], movementEncoder, movementDecoder, testSetup, testCleanup);
 
     manager.commandsRos.addBroadcast("slot1",None,None);

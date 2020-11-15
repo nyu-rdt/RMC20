@@ -172,8 +172,10 @@ class GCSManager:
     # data:str[] and data:str
     def send(self, data):
         #rospy.loginfo(data)
-        print("data:", data)
-        self.sendHandler.publish("".join([chr(byte) for byte in data]))
+        print("raw_data: ", data)
+        data_to_send = "".join([chr(byte) for byte in data])
+        print("send_data: ", data_to_send)
+        self.sendHandler.publish(data_to_send)
         
     def recv(self, data):
         self.gcsSend(data)
