@@ -13,9 +13,10 @@ outputBuffer = Queue.Queue(maxsize = -1)
 #publishes output data
 pub = rospy.Publisher("RecvBuffer", String, queue_size=10)
 
+"""
+"""
 def SendBuffer(data:std_msgs.msg ):
     global inputBuffer
-    # print("recieved", data.data)
     if(len(data.data)>0):
         inputBuffer.put(data.data)
 
@@ -39,54 +40,79 @@ class AtlasSocket(threading.Thread):
         self.initialized = False
         self.no_response_counter = 0
         self.conn_break = False
-        self.hanging = True
-        self.failsafe_th = failsafe_th
+        self.hanging = True 
+        self.failsafe_th = failsafe_th #Fail Safe Threshold, the amount of time the connection is allowed to fail 
         self.report_rate = report_rate
-        self.reconnection_flag = False
+        self.reconnection_flag = False 
         self.HEARTBEAT_PACKAGE = self.data2bytestring([0x4E, 0x52, 0x00])	#initialize the heartbeat package
+        #a small amount of data that is sent to check if the connection is still alive
         self.last_data = self.HEARTBEAT_PACKAGE	#default value of last_data is heartbeat package
         super(AtlasSocket, self).__init__(name = threadName)
+    
+    """
+    Trys to recieve data sent from the other atlas socket and stores it in output buffer 
+    """
+    def get_data(self): 
+        receive_data = bytearray(2500)
+        #tries to read data from a socket
+        try:
+            receive_nbytes, receive_addr = self.conn.recvfrom_into(receive_data, 2048)	#read data from socket
+        except:
+            receive_nbytes = 0
+        #If no data is received, increaase no response counter, This is the fail safee
+        if receive_nbytes == 0:
+            self.no_response_counter += 1
+            #if the connection fails more than the threshold, break the connection
+            if self.no_response_counter >= self.failsafe_th:
+                self.no_response_counter = self.failsafe_th		
+                self.conn_break = True	
+                self.reset_socket()
+                #receive_dict['type'] = 'connection_break'	#make a 'connection_break' data to inform the main thread
+                #self.output_buffer.put(receive_data)		#put dict into output buffer(queue)
+        #If data received, put the bytes into ouput_buffer       
+        else:	
+            self.no_response_counter = 0	
+            self.conn_break = False
+            print("Recieved", receive_data[0:receive_nbytes])
+            self.output_buffer.put(receive_data[0:receive_nbytes])
+    
+    """
+    Send data from the rostopic, SendBuffer to the heartbeat_package
+    """
+    def send_data(self):
+        #handle the no-response situation(reconnection) and send HEARTBEAT_PACKAGE to reconnect to the robot   
+        if self.no_response_counter > 0:			
+            self.conn.sendto(self.HEARTBEAT_PACKAGE, (self.target_ip, self.target_port))
+            self.reconnection_flag = True
+        #if there is at least one command need to be send in the input buffer(queue), send it
+        elif not self.input_buffer.empty():
+            #clear the flag of reconnection
+            if self.reconnection_flag:
+                self.reconnection_flag = False  
+            #get new command from queue
+            else:
+                self.last_data = self.input_buffer.get()
+            print(len(self.last_data), self.last_data)
+            self.conn.sendto(self.last_data, (self.target_ip, self.target_port))
+        #send the heartbeat package if there is not data needed to be sent
+        else: 
+            self.conn.sendto(self.HEARTBEAT_PACKAGE, (self.target_ip, self.target_port))
+        
+    """
+    Runs atlas socket 
+    """
     def run(self):
         global ros_dead
         ros_dead = rospy.is_shutdown()
         rate = rospy.Rate(self.report_rate) #10hz
-
+        #run while ros topic is still active 
         while not ros_dead:
             ros_dead = rospy.is_shutdown()
+            #if connection is unstable stop sending and recieving 
             if not self.hanging:
-                receive_data = bytearray(2500)
-                try:
-                    receive_nbytes, receive_addr = self.conn.recvfrom_into(receive_data, 2048)	#read data from socket
-                except:
-                    receive_nbytes = 0
-                if receive_nbytes == 0:		#if there is no data in receiving buffer. Obviously, if there is no alive connection, socket will attempt connect to target continously
-                    self.no_response_counter += 1		#increasing no-response counter
-                    if self.no_response_counter >= self.failsafe_th:	#if the no-response counter reach the threshold
-                        self.no_response_counter = self.failsafe_th		#limit the no-response counter value
-                        self.conn_break = True		#set the connection break flag
-                        #receive_dict['type'] = 'connection_break'	#make a 'connection_break' data to inform the main thread
-                        #self.output_buffer.put(receive_data)		#put dict into output buffer(queue)
-                else:	#if there are some return values
-                    self.no_response_counter = 0	#clear the no-response counter
-                    self.conn_break = False
-                    print("Recieved", receive_data[0:receive_nbytes])
-                    self.output_buffer.put(receive_data[0:receive_nbytes])
-                    #What we get from the other person - jin 2020
-                    
-                if self.no_response_counter > 0:			#handle the no-response situation(reconnection)
-                    self.conn.sendto(self.HEARTBEAT_PACKAGE, (self.target_ip, self.target_port))	#send self.HEARTBEAT_PACKAGE to reconnect to the robot rather than sending command
-                    #print "recover package sent"
-                    self.reconnection_flag = True
-                elif not self.input_buffer.empty():		#if there is at least one command need to be send in the input buffer(queue), send it
-                    if self.reconnection_flag:
-                        self.reconnection_flag = False 		#clear the flag of reconnection
-                    else:
-                        self.last_data = self.input_buffer.get()	#get new command from queue
-                    print(len(self.last_data), self.last_data)
-                    self.conn.sendto(self.last_data, (self.target_ip, self.target_port))
-                else:	#if the connection is still alive but there is no data needed to be sent, just send the heartbeat package
-                    self.conn.sendto(self.HEARTBEAT_PACKAGE, (self.target_ip, self.target_port))
-            rate.sleep() #now sleep at self.report_rate frequency
+                self.get_data() 
+                self.send_data()
+            rate.sleep() #sleep at self.report_rate frequency
         self.conn.close()
         
     """
@@ -104,19 +130,50 @@ class AtlasSocket(threading.Thread):
             self.conn.setblocking(0)
         except:
             self.conn.close()
+            return
         self.initialized = True 	#set initialized flag
-    def change_target(self, target_ip, target_port):	#change the target information if necessary
+
+    """
+    Reset socket to its original state if there is no connection
+    """
+    def reset_socket(): 
+        self.socket_stop()     
+        self.socket_start()
+        while(not self.initialized):
+            self.socket_start()
+        self.conn_break = False
+        self.no_response_counter = 0
+    """
+    Change the Target info
+    """
+    def change_target(self, target_ip, target_port):
         self.target_ip = target_ip
         self.target_port = target_port
-    def change_local(self, local_ip, local_port):	#change the local information if necessary
+
+    """
+    Change the Local info
+    """
+    def change_local(self, local_ip, local_port):	
         self.local_ip = local_ip
         self.local_port = local_port
         self.socket_init()
-    def change_report_rate(self, report_rate):	#change the report rate if necessary
+
+    """
+    Change the Report Rate
+    """
+    def change_report_rate(self, report_rate):
         self.report_rate = report_rate
-    def change_failsafe_threshold(self, failsafe_th):	#change the failsafe threshold if necessary
+
+    """
+    Changes the Failure Threshold
+    """
+    def change_failsafe_threshold(self, failsafe_th):	
         self.failsafe_th = failsafe_th
-    def data2bytestring(self, data):	#data is an integer list, we have to convert it into a bytestring e.g.[0x01,0x02,0x03] -> '\x01\x02\x03'
+
+    """
+    Convert data from an integer list into a bytestring e.g.[0x01,0x02,0x03] -> '\x01\x02\x03'
+    """
+    def data2bytestring(self, data):
         s = ''
         for x in data:
             s += struct.pack('B',x)
@@ -130,14 +187,20 @@ class AtlasSocket(threading.Thread):
         initializes socket, hanging is False
     
     """
+
+    """
+    stop the program if the socket connection is stopped 
+    """
     def socket_stop(self):
         self.hanging = True
+    """
+    Initializes the socket and starts the program
+    """
     def socket_start(self):
         self.socket_init()
         self.hanging = False
 
 """
-    pubThread():
     retrieves data from output buffer topic and writes to the ROS topic
 """
 def pubThread():
