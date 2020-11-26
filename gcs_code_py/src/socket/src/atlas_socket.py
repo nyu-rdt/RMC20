@@ -15,7 +15,7 @@ pub = rospy.Publisher("RecvBuffer", String, queue_size=10)
 
 """
 """
-def SendBuffer(data:std_msgs.msg ):
+def SendBuffer(data):
     global inputBuffer
     if(len(data.data)>0):
         inputBuffer.put(data.data)
@@ -136,10 +136,11 @@ class AtlasSocket(threading.Thread):
     """
     Reset socket to its original state if there is no connection
     """
-    def reset_socket(): 
+    def reset_socket(self): 
+        global ros_dead
         self.socket_stop()     
         self.socket_start()
-        while(not self.initialized):
+        while(not self.initialized and not ros_dead):
             self.socket_start()
         self.conn_break = False
         self.no_response_counter = 0
@@ -221,10 +222,10 @@ def pubThread():
     return
 
 if __name__ == '__main__':
-    rospy.init_node("Take_On_Me", anonymous=False)
+    rospy.init_node("atlas_socket", anonymous=False)
     pubThread = threading.Thread(target = pubThread)
     pubThread.start()
-    sock = AtlasSocket("",inputBuffer, outputBuffer, target_ip = '192.168.1.4' , local_ip = '192.168.1.2')
+    sock = AtlasSocket("",inputBuffer, outputBuffer, target_ip = '192.168.1.2' , local_ip = '192.168.1.15')
     sock.socket_start()
     sock.run()
     pubThread.join()
