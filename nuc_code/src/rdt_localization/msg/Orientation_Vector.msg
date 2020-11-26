@@ -1,0 +1,3 @@
+Pose robot_pose
+Location dig_zone
+int64 robot_speed
