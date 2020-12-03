@@ -55,25 +55,26 @@ def PID_error(data):
     # Angular offset between camera forward line and line between digging zone/bot
     desired_theta = math.degrees(math.atan2(displacement[0]/displacement[1]))
     
-    '''
-    angle_error = desired_theta - robot_orient
-    Desired theta & orientation can still be negative if >180. Possible edge cases:
-    Digging angle is >180 => desired_theta is negative:
-        robot_orient is <180 => robot_orient positive
-        we want to turn +(360-|angle_error|)
-    Digging angle is <180 => desired_theta is positive
-        robot_orient is >180 => robot_orient negative
-        we want to turn -(360-|angle_error|)
-        wait this is wrong ffffffffffffffff
-    '''
-    #OOF
-    #plz do vector my brain can't handle edge cases thx
     # Range of angle_error: [-180, 180]
-    angle_error = (desired_theta - robot_orient)
+    angle_error = abs(desired_theta - robot_orient)
+    '''
     if desired_theta < 0 and robot_orient > 0:
         angle_error = 360 - (abs(angle_error))
     elif desired_theta > 0 and robot_orient < 0:
         angle_error = -(360-abs(angle_error))
+    '''
+
+    # dont rely on this idk what im doing
+    turn_left = desired_theta > robot_orient
+
+    #angle error > 180, rather turn the other way bcuz speed
+    if angle_error > 180:
+        turn_left =  not turn_left
+        angle_error = 360 - angle_error%360 #should cover when angle_error > 360 if bug happens
+
+    if not turn_left: #tba for flippy flip
+        angle_error *= -1 
+    
     return angle_error
 
 def main():
