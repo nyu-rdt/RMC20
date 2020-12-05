@@ -49,7 +49,7 @@ def PID_error(data):
     displacement = (float(data.dig_zone.x) - float(data.robot_pose.x), float(data.dig_zone.y) - float(data.robot_pose.y))
 
     # Angular offset between camera forward line and line between digging zone/bot
-    desired_theta = math.degrees(math.atan2(displacement[0]/displacement[1]))
+    desired_theta = math.degrees(math.atan2(displacement[0], displacement[1]))
     
     # Range of angle_error: [-180, 180]
     angle_error = abs(desired_theta - robot_orient)
