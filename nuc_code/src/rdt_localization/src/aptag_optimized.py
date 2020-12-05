@@ -219,16 +219,16 @@ def turtle_draw(coordinates, orientation, angular_rotation):
 
 def main():
     # Setup ROS Node
-    pub = rospy.Publisher('robotData/Pose', Pose, queue_size=10)
+    pub = rospy.Publisher('server/localization', Pose, queue_size=10)
     rospy.init_node('aptag_optimized')
     rate = rospy.Rate(1)
 
     # Setup turtle
-    turtle.clear()
-    turtle.setworldcoordinates(-500, 0, 500, 1000)
-    turtle.penup()
-    turtle.speed(5)
-    turtle.turtlesize(2, 2, 1)
+    # turtle.clear()
+    # turtle.setworldcoordinates(-500, 0, 500, 1000)
+    # turtle.penup()
+    # turtle.speed(5)
+    # turtle.turtlesize(2, 2, 1)
 
     '''
     Values come from running camera calibration file (fx, fy, cx,cy).
@@ -280,15 +280,15 @@ def main():
                 stored_pose.append(pose)
                 stored_id.append(detection.tag_id)
 
-            overlay = frame // 2 + dimg[:, :, None] // 2
+            #overlay = frame // 2 + dimg[:, :, None] // 2
 
             # Draws all overlays before going to next frame. Must import cv2 in apriltag module
             # _draw_pose(overlay, camera_params, tag_size, pose, z_sign=1)
-            for det in range(num_detections):
-                apriltag._draw_pose(overlay, camera_params, 0.17, pose, z_sign=1)
+            #for det in range(num_detections):
+            #    apriltag._draw_pose(overlay, camera_params, 0.17, pose, z_sign=1)
 
-            cv2.imshow(window, overlay)
-            cv2.waitKey(27)
+            #cv2.imshow(window, overlay)
+            #cv2.waitKey(27)
 
         # Outputs only if tags are detected
         if num_detections > 0:
@@ -308,7 +308,7 @@ def main():
 
             pub.publish(outmsg)
 
-            turtle_draw(center_coords, orientation, angular_rotation)
+            # turtle_draw(center_coords, orientation, angular_rotation)
 
             rate.sleep()
 

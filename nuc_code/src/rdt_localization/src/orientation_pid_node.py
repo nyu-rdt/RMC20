@@ -1,8 +1,4 @@
 #!/usr/bin/env python
-
-# TODO:
-# matplotlib tool for fine-tuning (last-priority)
-
 import rospy
 import time
 import math
@@ -18,7 +14,7 @@ G_KP = 0.0
 G_KI = 0.0
 G_KD = 0.0
 G_WINDUP = 360.0
-pub = rospy.Publisher('robotData/drive_vector', Drive_Vector, queue_size=10)
+pub = rospy.Publisher('server/send_drive_vec', Drive_Vector, queue_size=10)
 
 """
 Callback function executed every time a new Orientation_Vector is received on orient_vector
@@ -78,7 +74,8 @@ def PID_error(data):
     return angle_error
 
 def main():
-    rospy.Subscriber("robotData/orient_vector", Orientation_Vector, run_pid)
+    rospy.init_node('orientation_pid_node')
+    rospy.Subscriber("server/orient_vector", Orientation_Vector, run_pid)
     rospy.spin()
     
 if __name__ == '__main__':

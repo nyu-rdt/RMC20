@@ -3,15 +3,21 @@
 import rospy
 
 from std_msgs.msg import String
-from rdt_localization.msg import Pose
+from rdt_localization.msg import *
+
+# Digging zones
+DIG_ZONE = Location()
+DIG_ZONE.x = -2.5
+DIG_ZONE.y = 2.7
 
 # Topic names
 TOPIC_FROM_HEARTBEAT_NODE = "server/heartbeat"
 TOPIC_FROM_LOCALIZATION_NODE = "server/localization"
-TOPIC_TO_DRIVE_NODE = "server/sendDriveVec"
+TOPIC_TO_PID_CONTROLLER_NODE = "server/orient_vector"
+TOPIC_TO_DRIVE_NODE = "server/send_drive_vec"
 TOPIC_TO_LIMB_NODE = "server/sendLimbVec"
 
-ROSPY_LOOP_RATE = 50
+ROSPY_LOOP_RATE = 10
 
 # Most variables are open to being replaced
     # (I mean this in the sense that we can replace these variables with tangible conditions)
@@ -19,6 +25,7 @@ ROSPY_LOOP_RATE = 50
 
 # Robot variables
 robot_state = 0
+robot_pose = None
 robot_localized = False
 robot_cannot_move = False # If the robot cannot move
 robot_exited_hole = False  # If the robot is out of the hole that it just dug
@@ -53,8 +60,21 @@ door_closed = False # If the door is closed
 bin_full = False # If the storage bin is full
 bin_empty = False # If the storage bin is empty
 
+def get_pose (data):
+    global robot_localized
+    global robot_pose
+    robot_pose = data
+    robot_localized = True
+
 def main():
-    robot_state = 0
+    global DIG_ZONE
+
+    global robot_localized
+    global robot_pose
+
+    pid_pub = rospy.Publisher(TOPIC_TO_PID_CONTROLLER_NODE, Orientation_Vector, queue_size=10) # Output to PID controller node
+
+    robot_state = 5
     #VERY TEMPORARY VARIABLE
     dig_zone_y_coord = 4.6
 
@@ -70,11 +90,6 @@ def main():
 
     # Subscribers
     # Subscirbe to robot localization
-    robot_x, robot_y, robot_orientation = None, None, None
-    def get_pose (data):
-        robot_x = data.x
-        robot_y = data.y
-        robot_orientation = data.orientation
     rospy.Subscriber(TOPIC_FROM_LOCALIZATION_NODE, Pose, get_pose)
 
     # Handle input robot commands from GCS
@@ -100,7 +115,9 @@ def main():
         # Switch to manual control
         pass
 
-    while True:
+    while not rospy.is_shutdown():
+        
+        """
         # To see if the April Tags are seen
         if (-50 < robot_x < 50):
             artag_seen = True
@@ -109,10 +126,11 @@ def main():
                 manual_timer += 1
         else:
             artag_seen = False
+        """
 
-        if (manual_timer <= 0):
-            # Switch to manual control
-            pass
+        # if (manual_timer <= 0):
+        #     # Switch to manual control
+        #     pass
 
 
 
@@ -159,17 +177,31 @@ def main():
 
         # STATE 5: Nuc localizes robot
         elif robot_state == 5:
+            rospy.loginfo("DEBUG: STATE 5")
             # Make sure the April Tags are being detected
             if (robot_localized):
                 robot_state = 6
-            else: # Error checking
+            #else: # Error checking
                 # Rotate robot and predetermine orientation of robot
                 # Wait 5 seconds then switch to manual control
-                if (artag_seen == False):
-                    manual_timer -= 1
+                #if (artag_seen == False):
+                #    manual_timer -= 1
 
         # STATE 6: Machine moves to digging area
         elif robot_state == 6:
+            rospy.loginfo("DEBUG: STATE 6")
+
+            # Build Orientation_Vector consisting of bot and digging zone positions
+            if not robot_pose == None:
+                rospy.loginfo("DEBUG: PUBLISHING")
+
+                outvec = Orientation_Vector()
+                outvec.robot_pose = robot_pose
+                outvec.dig_zone = DIG_ZONE
+                outvec.robot_speed = 200
+
+                pid_pub.publish(outvec)
+            """
             # Error checking
             if (robot_cannot_move): #temp variable
                 # find inverse of drive_string
@@ -214,6 +246,7 @@ def main():
             else:
                 # Continue moving towards the digging area
                 pass
+            """
 
         # STATE 7: Drum begins to turn
         elif robot_state == 7:
@@ -411,6 +444,8 @@ def main():
             else:
                 # Continue reorientating robot
                 pass
+
+        rate.sleep()
 
         # In most of the states, the state will not simply be set to the next number
         # at the end of the 'elif.' Rather, it will be set to the next number once some

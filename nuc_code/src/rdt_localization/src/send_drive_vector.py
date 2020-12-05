@@ -16,7 +16,7 @@ def publish_drive_vector(data):
 
 def state_controller_listener():
 	rospy.init_node("send_drive_vector")
-	rospy.Subscriber("server/sendDriveVec", String, publish_drive_vector)
+	rospy.Subscriber("server/send_drive_vec", String, publish_drive_vector)
 	
 	client = mqtt.Client()
 	client.on_connect = on_connect		
