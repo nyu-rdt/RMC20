@@ -1,4 +1,14 @@
 #!/usr/bin/env python
+
+"""
+orientation_pid_node.py
+
+Node that subscribes to server/orient_vector and utilizes the given info to create an 
+appropriate outmsg to the topic server/send_drive_vec using a PID controller
+
+Used to ensure the robot takes an efficient path to its destination 
+"""
+
 import rospy
 import time
 import math
@@ -9,30 +19,40 @@ from rdt_localization.msg import Drive_Vector
 from rdt_localization.msg import Orientation_Vector
 
 from pid_controller import PID
-#This line was commented out bcuz mttkinter cannot be install on nuc.
+
+# NOTE, anything involving "pid_simulator" has been commented out because it is not 100% functional yet
+# If the simulator never ends up working, we can just remove those lines of code
+
 #from pid_simulator import PID_simulator
+
+# TODO: Tune P, I, D constants
+#Global Variables
 G_KP = 0.5
 G_KI = 0.0
 G_KD = 0.0
 G_WINDUP = 360.0
 pub = rospy.Publisher('server/send_drive_vec', Drive_Vector, queue_size=10)
 controller = PID(G_KP, G_KI, G_KD)
+# simulator = PID_simulator()
+# simulator = PID_simulator(controller)
+
 """
 Callback function executed every time a new Orientation_Vector is received on orient_vector
 """
-#simulator = PID_simulator(controller)
 def run_pid(data):
     global G_KP,G_KD,G_WINDUP
-    global simulator
+    # global simulator
     global pub
     angle_error = PID_error(data)
 
-    #offset = simulator.update_feedback(angle_error)
-    #The above line was commented out because mttkinter from pid_simulator cannot be pip install on the nuc.
-    #Once it is, we can try to restore this line to get a mt
+    # offset = simulator.update_feedback(angle_error) Commented out because mttkinter from pid_simulator cannot be pip install on the nuc
+
     offset = controller.update(angle_error)
 
+    # simulator.update_feedback(angle_error)
+
     rospy.loginfo(offset)
+
     # PID outputs in the following range:
     # [(G_KP*-180)-(G_KD*-360)-G_WINDUP, (G_KP*180)+(G_KD*360)+G_WINDUP]
     # We want to scale the output to [0, 200] to be compliant with the offset format
@@ -60,26 +80,23 @@ def PID_error(data):
     # Angular offset between camera forward line and line between digging zone/bot
     desired_theta = math.degrees(math.atan2(displacement[0], displacement[1]))
     
-    # Range of angle_error: [-180, 180]
+    # Initial range of angle_error: [0, 360]
     angle_error = abs(desired_theta - robot_orient)
-    '''
-    if desired_theta < 0 and robot_orient > 0:
-        angle_error = 360 - (abs(angle_error))
-    elif desired_theta > 0 and robot_orient < 0:
-        angle_error = -(360-abs(angle_error))
-    '''
 
-    # dont rely on this idk what im doing
+    # TODO: Determine if the directions need to be negated 
+    # Determining whether we want to turn left
     turn_left = desired_theta > robot_orient
 
-    #angle error > 180, rather turn the other way bcuz speed
+    # If the error is more than 180, turn the opposite direction
     if angle_error > 180:
-        turn_left =  not turn_left
-        angle_error = 360 - angle_error%360 #should cover when angle_error > 360 if bug happens
+        turn_left = not turn_left
+        angle_error = 360 - angle_error%360 
 
-    if not turn_left: #tba for flippy flip
+    # If we're not turning left, error should be negative
+    if not turn_left:
         angle_error *= -1 
     
+    # Final range of angle_error: [-180, 180]
     return angle_error
 
 def main():
