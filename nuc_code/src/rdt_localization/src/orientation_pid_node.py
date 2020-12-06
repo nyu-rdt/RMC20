@@ -17,11 +17,10 @@ G_KD = 0.0
 G_WINDUP = 360.0
 pub = rospy.Publisher('server/send_drive_vec', Drive_Vector, queue_size=10)
 controller = PID(G_KP, G_KI, G_KD)
-simulator = PID_simulator()
 """
 Callback function executed every time a new Orientation_Vector is received on orient_vector
 """
-simulator = PID_simulator(controller)
+#simulator = PID_simulator(controller)
 def run_pid(data):
     global G_KP,G_KD,G_WINDUP
     global simulator
@@ -32,8 +31,6 @@ def run_pid(data):
     #The above line was commented out because mttkinter from pid_simulator cannot be pip install on the nuc.
     #Once it is, we can try to restore this line to get a mt
     offset = controller.update(angle_error)
-
-    simulator.update_feedback(angle_error)
 
     rospy.loginfo(offset)
     # PID outputs in the following range:
