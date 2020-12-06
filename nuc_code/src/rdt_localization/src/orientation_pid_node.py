@@ -9,21 +9,33 @@ from rdt_localization.msg import Drive_Vector
 from rdt_localization.msg import Orientation_Vector
 
 from pid_controller import PID
-
-G_KP = 0.0
+#This line was commented out bcuz mttkinter cannot be install on nuc.
+#from pid_simulator import PID_simulator
+G_KP = 0.5
 G_KI = 0.0
 G_KD = 0.0
 G_WINDUP = 360.0
 pub = rospy.Publisher('server/send_drive_vec', Drive_Vector, queue_size=10)
-
+controller = PID(G_KP, G_KI, G_KD)
+simulator = PID_simulator()
 """
 Callback function executed every time a new Orientation_Vector is received on orient_vector
 """
+simulator = PID_simulator(controller)
 def run_pid(data):
-    controller = PID(G_KP, G_KI, G_KD)
+    global G_KP,G_KD,G_WINDUP
+    global simulator
+    global pub
     angle_error = PID_error(data)
+
+    #offset = simulator.update_feedback(angle_error)
+    #The above line was commented out because mttkinter from pid_simulator cannot be pip install on the nuc.
+    #Once it is, we can try to restore this line to get a mt
     offset = controller.update(angle_error)
-    
+
+    simulator.update_feedback(angle_error)
+
+    rospy.loginfo(offset)
     # PID outputs in the following range:
     # [(G_KP*-180)-(G_KD*-360)-G_WINDUP, (G_KP*180)+(G_KD*360)+G_WINDUP]
     # We want to scale the output to [0, 200] to be compliant with the offset format
