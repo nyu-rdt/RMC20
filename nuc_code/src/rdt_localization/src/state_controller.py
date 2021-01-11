@@ -60,6 +60,24 @@ door_closed = False # If the door is closed
 bin_full = False # If the storage bin is full
 bin_empty = False # If the storage bin is empty
 
+# Connection variables
+drive_and_limbs_connected = False
+sensor_connected = False
+obstacle_connected = False
+
+# Callback functions
+def get_drive_and_limb_connection(data):
+    global drive_and_limbs_connected
+    drive_and_limbs_connected = True
+
+def get_sensor_data(data):
+    global sensor_connected
+    sensor_connected = True
+
+def get_obstable_data(data):
+    global obstacle_connected
+    obstacle_connected = True
+
 def get_pose (data):
     global robot_localized
     global robot_pose
@@ -86,11 +104,12 @@ def main():
     max_manual_timer =  ROSPY_LOOP_RATE * 5 # If the robot doesn't fix itself in 5 seconds, it will be switched to manual
     manual_timer = max_manual_timer
 
-
-
     # Subscribers
     # Subscirbe to robot localization
     rospy.Subscriber(TOPIC_FROM_LOCALIZATION_NODE, Pose, get_pose)
+    rospy.Subscriber("robotCmds/drive_and_limbs", String, get_drive_and_limb_connection)
+    rospy.Subscriber("robotState/sensorData", String, get_sensor_data)
+    rospy.Subscriber("robotState/obstacleData", String, get_obstable_data)
 
     # Handle input robot commands from GCS
     drive_string, limb_string = "", ""
@@ -153,8 +172,8 @@ def main():
 
         # STATE 2: Machine connects to NUC
         elif robot_state == 2:
-            # Code to connect the NUC to the robot using MQTT
-            robot_state = 3
+            if drive_connected and limbs_connected and sensor_connected and obstacle_connected:
+                robot_state = 3
 
         # STATE 3: Initiate autonomy program
         elif robot_state == 3:
@@ -163,17 +182,22 @@ def main():
 
         # STATE 4: Deploy Lifting Arms
         elif robot_state == 4:
-            # Error checking
-            if (arm_stuck):
-                manual_timer -= 1
-            else:
-                manual_timer = max_manual_timer
+            global state_4_start_time
 
-            if (arm_deployed == False):
-                # Continue deploying arms
-                pass
-            else:
+            # Initialize state_4_start_time
+            if(state_4_start_time == None): 
+                state_4_start_time = time.time()
+                rospy.loginfo("DEBUG: STATE 4")
+            current_time = time.time() 
+
+            # Try to localize robot for 30 seconds
+            if robot_localized: 
+                rospy.loginfo("DEBUG: ROBOT LOCALIZED")
                 robot_state = 5
+
+            # ERROR STATE: Ri4a
+            elif current_time - state_4_start_time > 30:
+                pass
 
         # STATE 5: Nuc localizes robot
         elif robot_state == 5:
