@@ -26,7 +26,7 @@ def main():
     rospy.init_node("ping_drive_and_limb")
     pub = rospy.Publisher('server/send_drive_vec', Bool, queue_size=10)
     client = mqtt.Client()
-        client.on_connect = on_connect
+    client.on_connect = on_connect
     subscribe.callback(drive_ping_received, "robotState/drivePing", hostname="localhost", port=1883)
     subscribe.callback(limbs_ping_received, "robotState/limbPing", hostname="localhost", port=1883)
     while not rospy.is_shutdown():

@@ -92,7 +92,7 @@ def main():
 
     pid_pub = rospy.Publisher(TOPIC_TO_PID_CONTROLLER_NODE, Orientation_Vector, queue_size=10) # Output to PID controller node
 
-    robot_state = 5
+    robot_state = 1
     #VERY TEMPORARY VARIABLE
     dig_zone_y_coord = 4.6
 
@@ -172,7 +172,8 @@ def main():
 
         # STATE 2: Machine connects to NUC
         elif robot_state == 2:
-            if drive_connected and limbs_connected and sensor_connected and obstacle_connected:
+            rospy.loginfo("DEBUG: STATE 2")
+            if drive_and_limbs_connected and sensor_connected and obstacle_connected:
                 robot_state = 3
 
         # STATE 3: Initiate autonomy program
