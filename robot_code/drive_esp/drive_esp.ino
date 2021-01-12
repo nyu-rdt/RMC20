@@ -36,6 +36,7 @@ FOR DRIVE
 #define SERVER_PORT 1883
 
 #define TOPIC_NAME_IN "robotCmds/drive"
+#define TOPIC_NAME_OUT "robotState/drivePing"
 #define MQTT_RECONNECT_TIMEOUT 200
 #define MQTT_READ_TIMEOUT 50
 
@@ -43,6 +44,7 @@ FOR DRIVE
 WiFiClient client;
 Adafruit_MQTT_Client mqtt(&client, SERVER_ADDR, SERVER_PORT, "driveTopic", "");
 Adafruit_MQTT_Subscribe inTopic = Adafruit_MQTT_Subscribe(&mqtt, TOPIC_NAME_IN);
+Adafruit_MQTT_Publish pingTopic = Adafruit_MQTT_Publish(&mqtt, TOPIC_NAME_OUT);
 
 
 void setup() {
@@ -88,6 +90,13 @@ void scanForCmd(){
   while ((subPtr = mqtt.readSubscription(MQTT_READ_TIMEOUT))){
     if (subPtr == &inTopic){
       char* command = (char*) inTopic.lastread; 
+      
+      // Check if last message was 'ping' byte; if it was, forward
+      // response to ping channel
+      if (*command == 252) {
+        pingTopic.publish(1);
+      }
+      
       Serial.write(command);
     }
   }
