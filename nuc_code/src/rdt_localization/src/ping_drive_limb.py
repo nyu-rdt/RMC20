@@ -4,6 +4,8 @@ from std_msgs.msg import Bool
 
 import rospy
 import paho.mqtt.client as clienttype
+
+import struct
 client = None
 
 drive_subsystem_connect = False
@@ -38,6 +40,7 @@ def main():
     
     client = clienttype.Client()
     client.on_connect = on_connect
+    client.on_message = on_message
     client.connect("localhost", 1883)
 
     client.subscribe("robotCmds/drivePing")
@@ -46,8 +49,8 @@ def main():
     #subscribe.callback(drive_ping_received, "robotState/drivePing", hostname="localhost", port=1883)
     #subscribe.callback(limbs_ping_received, "robotState/limbPing", hostname="localhost", port=1883)
     while not rospy.is_shutdown():
-        client.publish("robotCmds/drive", 252, retain=True)
-        client.publish("robotCmds/limbs", 252, retain=True)
+        client.publish("robotCmds/drive", struct.pack('B', 252), retain=True)
+        client.publish("robotCmds/limbs", struct.pack('B', 252), retain=True)
         #rospy.loginfo("loop de loop")
         if drive_subsystem_connect and limbs_subsystem_connect:
             pub.publish(True)
