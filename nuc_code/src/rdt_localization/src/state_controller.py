@@ -3,6 +3,7 @@
 import rospy
 
 from std_msgs.msg import String
+from std_msgs.msg import Bool
 from rdt_localization.msg import *
 
 # Digging zones
@@ -92,7 +93,7 @@ def main():
 
     pid_pub = rospy.Publisher(TOPIC_TO_PID_CONTROLLER_NODE, Orientation_Vector, queue_size=10) # Output to PID controller node
 
-    robot_state = 1
+    robot_state = 2
     #VERY TEMPORARY VARIABLE
     dig_zone_y_coord = 4.6
 
@@ -103,11 +104,12 @@ def main():
     # Timers
     max_manual_timer =  ROSPY_LOOP_RATE * 5 # If the robot doesn't fix itself in 5 seconds, it will be switched to manual
     manual_timer = max_manual_timer
+    state_4_start_time = None
 
     # Subscribers
     # Subscirbe to robot localization
     rospy.Subscriber(TOPIC_FROM_LOCALIZATION_NODE, Pose, get_pose)
-    rospy.Subscriber("robotCmds/drive_and_limbs", String, get_drive_and_limb_connection)
+    rospy.Subscriber("server/ping_drive_limb", Bool, get_drive_and_limb_connection)
     rospy.Subscriber("robotState/sensorData", String, get_sensor_data)
     rospy.Subscriber("robotState/obstacleData", String, get_obstable_data)
 
@@ -173,23 +175,23 @@ def main():
         # STATE 2: Machine connects to NUC
         elif robot_state == 2:
             rospy.loginfo("DEBUG: STATE 2")
-            if drive_and_limbs_connected and sensor_connected and obstacle_connected:
+            # if drive_and_limbs_connected and sensor_connected and obstacle_connected:
+            if drive_and_limbs_connected:
                 robot_state = 3
 
         # STATE 3: Initiate autonomy program
         elif robot_state == 3:
+            rospy.loginfo("DEBUG: STATE 3")
             # More setup code?
             robot_state = 4
 
         # STATE 4: Deploy Lifting Arms
         elif robot_state == 4:
-            global state_4_start_time
-
             # Initialize state_4_start_time
             if(state_4_start_time == None): 
-                state_4_start_time = time.time()
+                state_4_start_time = rospy.get_time()
                 rospy.loginfo("DEBUG: STATE 4")
-            current_time = time.time() 
+            current_time = rospy.get_time() 
 
             # Try to localize robot for 30 seconds
             if robot_localized: 

@@ -28,23 +28,23 @@ def on_message(client, userdata, msg):
     global drive_subsystem_connect
     global limbs_subsystem_connect
     rospy.loginfo("Message received")
-    if msg.topic == "robotCmds/drivePing":
+    if msg.topic == "robotState/drivePing":
         drive_subsystem_connect = True
-    elif msg.topic == "robotCmds/limbPing":
+    elif msg.topic == "robotState/limbPing":
         limbs_subsystem_connect = True
 
 def main():
     global client    
     rospy.init_node("ping_drive_limb")
-    pub = rospy.Publisher('server/send_drive_vec', Bool, queue_size=10)
+    pub = rospy.Publisher('server/ping_drive_limb', Bool, queue_size=10)
     
     client = clienttype.Client()
     client.on_connect = on_connect
     client.on_message = on_message
     client.connect("localhost", 1883)
 
-    client.subscribe("robotCmds/drivePing")
-    client.subscribe("robotCmds/limbPing")
+    client.subscribe("robotState/drivePing")
+    client.subscribe("robotState/limbPing")
     
     #subscribe.callback(drive_ping_received, "robotState/drivePing", hostname="localhost", port=1883)
     #subscribe.callback(limbs_ping_received, "robotState/limbPing", hostname="localhost", port=1883)
@@ -52,7 +52,7 @@ def main():
         client.publish("robotCmds/drive", struct.pack('B', 252), retain=True)
         client.publish("robotCmds/limbs", struct.pack('B', 252), retain=True)
         #rospy.loginfo("loop de loop")
-        if drive_subsystem_connect and limbs_subsystem_connect:
+        if drive_subsystem_connect: #and limbs_subsystem_connect:
             pub.publish(True)
         client.loop()
         
