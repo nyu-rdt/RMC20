@@ -1,10 +1,24 @@
 #!/usr/bin/env python
 
+"""
+state_controller.py
+
+The 'main' node in the ROS network - it interfaces with several other nodes to keep a track of the
+robot's state constantly. This includes the robot's location, the position of its limbs, and how
+much load it is carrying.
+"""
+
 import rospy
+import math
 
 from std_msgs.msg import String
 from std_msgs.msg import Bool
 from rdt_localization.msg import *
+
+# Deposition zone
+DEPOSITION_ZONE = Location()
+DEPOSITION_ZONE.x = -2.5
+DEPOSITION_ZONE.y = 2.7
 
 # Digging zones
 DIG_ZONE = Location()
@@ -13,55 +27,54 @@ DIG_ZONE.y = 2.7
 
 # Topic names
 TOPIC_FROM_HEARTBEAT_NODE = "server/heartbeat"
-TOPIC_FROM_LOCALIZATION_NODE = "server/localization"
-TOPIC_TO_PID_CONTROLLER_NODE = "server/orient_vector"
-TOPIC_TO_DRIVE_NODE = "server/send_drive_vec"
-TOPIC_TO_LIMB_NODE = "server/sendLimbVec"
-
-ROSPY_LOOP_RATE = 10
+TOPIC_FROM_LOCALIZATION_NODE = "server/localization"    # Contains bot's pose/location
+TOPIC_FROM_PING_NODE = "server/ping_drive_limb"         # Checks connection to drive/limb subsystems
+TOPIC_TO_PID_CONTROLLER_NODE = "server/orient_vector"   # Passes pose/location to PID controller
+# TOPIC_TO_DRIVE_NODE = "server/send_drive_vec"           # Passes drive vector to send to bot
+# TOPIC_TO_LIMB_NODE = "server/send_limb_vec"             # Passes limb vector to send to bot
 
 # Most variables are open to being replaced
-    # (I mean this in the sense that we can replace these variables with tangible conditions)
-    # i.e. instead of if (robot_cannot_move), we might use something like if (motor_speed == 0)
+# (I mean this in the sense that we can replace these variables with tangible conditions)
+# i.e. instead of if (robot_cannot_move), we might use something like if (motor_speed == 0)
 
 # Robot variables
-robot_state = 0
+robot_state = 2
 robot_pose = None
 robot_localized = False
-robot_cannot_move = False # If the robot cannot move
-robot_exited_hole = False  # If the robot is out of the hole that it just dug
-robot_face_depo = False # If the robot is facing the deposition zone
-robot_in_depo_dist = False # If the robot is in distance to deposit
-robot_depo_fail = False # If the robot crashes into the deposition bin or wall, or if the robot fails alignment
-robot_unstable = False # If the robot becomes unstable while raising its frame
-robot_face_dig_zone = False # If the robot is facing the digging zone
+# robot_cannot_move = False             # If the robot cannot move
+# robot_exited_hole = False             # If the robot is out of the hole that it just dug
+# robot_face_depo = False               # If the robot is facing the deposition zone
+# robot_in_depo_dist = False            # If the robot is in distance to deposit
+# robot_depo_fail = False               # If the robot crashes into the deposition bin or wall, or if the robot fails alignment
+# robot_unstable = False                # If the robot becomes unstable while raising its frame
+# robot_face_dig_zone = False           # If the robot is facing the digging zone
+    
+# # Arm variables       
+# arm_deployed = False                  # If the arms have been initially deployed
+# arm_stuck = False                     # If the arms are not being deployed despite being told to do so
+# arm_hit_surface = False               # If arms have contacted a surface
+# arm_min_extend = False                # If the arms have reached their minimum extension
+# arm_gears_slip = False                # If the arm gears have slipped
+# arm_rot_reached = False               # If the preset arm rotation in preparation to continue moving
+# arm_drive_config = False              # If the arm has extended to the driving configuration
+# arm_depo_ready = False                # If the arms are in position to deposit
+    
+# # Linear Actuator variables       
+# lin_act_stuck = False                 # If the linear actuators are stuck
+# lin_act_ext = False                   # If the linear actuators are fully extended
+# lin_act_depo_ready = False            # If the linear actuators are in position to deposit
+# lin_act_drive_config = False          # If the linear actuators are in drive configuration
 
-# Arm variables
-arm_deployed = False # If the arms have been initially deployed
-arm_stuck = False # If the arms are not being deployed despite being told to do so
-arm_hit_surface = False  # If arms have contacted a surface
-arm_min_extend = False # If the arms have reached their minimum extension
-arm_gears_slip = False # If the arm gears have slipped
-arm_rot_reached = False # If the preset arm rotation in preparation to continue moving
-arm_drive_config = False # If the arm has extended to the driving configuration
-arm_depo_ready = False # If the arms are in position to deposit
+# # Rest of the variables   
+# e_stop = False                        # If the robot needs to emergency stop
+# inc_obstacle = False                  # If there are incoming obstacle
+# artag_seen = False                    # If April Tags can be located
+# drum_turning = False                  # If drums are turning
+# door_closed = False                   # If the door is closed
+# bin_full = False                      # If the storage bin is full
+# bin_empty = False                     # If the storage bin is empty
 
-# Linear Actuator variables
-lin_act_stuck = False # If the linear actuators are stuck
-lin_act_ext = False # If the linear actuators are fully extended
-lin_act_depo_ready = False # If the linear actuators are in position to deposit
-lin_act_drive_config = False # If the linear actuators are in drive configuration
-
-# Rest of the variables
-e_stop = False # If the robot needs to emergency stop
-inc_obstacle = False # If there are incoming obstacle
-artag_seen = False # If April Tags can be located
-drum_turning = False # If drums are turning
-door_closed = False # If the door is closed
-bin_full = False # If the storage bin is full
-bin_empty = False # If the storage bin is empty
-
-# Connection variables
+# Ping subsystem variables
 drive_and_limbs_connected = False
 sensor_connected = False
 obstacle_connected = False
@@ -79,6 +92,8 @@ def get_obstable_data(data):
     global obstacle_connected
     obstacle_connected = True
 
+# Callback to handle data received from localization node. 
+# data: rdt_localization/Pose
 def get_pose (data):
     global robot_localized
     global robot_pose
@@ -86,32 +101,28 @@ def get_pose (data):
     robot_localized = True
 
 def main():
+    global robot_state
     global DIG_ZONE
-
     global robot_localized
     global robot_pose
-
-    pid_pub = rospy.Publisher(TOPIC_TO_PID_CONTROLLER_NODE, Orientation_Vector, queue_size=10) # Output to PID controller node
-
-    robot_state = 2
-    #VERY TEMPORARY VARIABLE
-    dig_zone_y_coord = 4.6
 
     # Setup ROS Node
     rospy.init_node('controller')
     rate = rospy.Rate(ROSPY_LOOP_RATE)
 
+    # Subscribers
+    rospy.Subscriber(TOPIC_FROM_LOCALIZATION_NODE, Pose, get_pose)
+    rospy.Subscriber(TOPIC_FROM_PING_NODE, Bool, get_drive_and_limb_connection)
+    rospy.Subscriber("robotState/sensorData", String, get_sensor_data)
+    rospy.Subscriber("robotState/obstacleData", String, get_obstable_data)
+
+    # Publishers
+    pid_pub = rospy.Publisher(TOPIC_TO_PID_CONTROLLER_NODE, Orientation_Vector, queue_size=10) # Output to PID controller node
+
     # Timers
     max_manual_timer =  ROSPY_LOOP_RATE * 5 # If the robot doesn't fix itself in 5 seconds, it will be switched to manual
     manual_timer = max_manual_timer
     state_4_start_time = None
-
-    # Subscribers
-    # Subscirbe to robot localization
-    rospy.Subscriber(TOPIC_FROM_LOCALIZATION_NODE, Pose, get_pose)
-    rospy.Subscriber("server/ping_drive_limb", Bool, get_drive_and_limb_connection)
-    rospy.Subscriber("robotState/sensorData", String, get_sensor_data)
-    rospy.Subscriber("robotState/obstacleData", String, get_obstable_data)
 
     # Handle input robot commands from GCS
     drive_string, limb_string = "", ""
@@ -205,18 +216,6 @@ def main():
         # STATE 5: Nuc localizes robot
         elif robot_state == 5:
             rospy.loginfo("DEBUG: STATE 5")
-            # Make sure the April Tags are being detected
-            if (robot_localized):
-                robot_state = 6
-            #else: # Error checking
-                # Rotate robot and predetermine orientation of robot
-                # Wait 5 seconds then switch to manual control
-                #if (artag_seen == False):
-                #    manual_timer -= 1
-
-        # STATE 6: Machine moves to digging area
-        elif robot_state == 6:
-            rospy.loginfo("DEBUG: STATE 6")
 
             # Build Orientation_Vector consisting of bot and digging zone positions
             if not robot_pose == None:
@@ -274,6 +273,10 @@ def main():
                 # Continue moving towards the digging area
                 pass
             """
+
+        # STATE 6: Machine moves to digging area
+        elif robot_state == 6:
+            robot_state = 7
 
         # STATE 7: Drum begins to turn
         elif robot_state == 7:
@@ -348,26 +351,42 @@ def main():
 
         # STATE 14: Drum stops spinning
         elif robot_state == 14:
-            if (drum_turning == False):
-                robot_state = 15
-            else:
-                # Stop the drum from spinning
-                pass
-
-        # STATE 15: Orient to deposition zone
-        elif robot_state == 15:
             # Error checking
             if (artag_seen == False):
                 # This is different from the first resolution for this problem
                 # Move robot slowly forward for 5 seconds
                 # If unsuccessful, switch to manual control
                 pass
-
-            if (robot_face_depo):
-                robot_state = 16
+        ​
+            if (robot_pose.orientation == (math.atan(robot_pose.y / robot_pose.x)) * 180 / math.pi):
+                robot_state = 15
             else:
-                # Continue orientating the robot
-                pass
+                # Robot rotates in place
+                outmsg = Drive_Vector()
+                outmsg.offset_driveMode = 254
+                outmsg.robot_spd = 150
+        ​
+                pub_drive_cmd.publish(outmsg)
+
+        # STATE 15: Orient to deposition zone
+        elif robot_state == 15:
+            # Continue navigating to correct distance from deposition zone
+            x_difference = abs(DEPOSITION_ZONE.x - robot_pose.x)
+            y_difference = abs(DEPOSITION_ZONE.y - robot_pose.y)
+            tolerance_cm_from_depo = 10
+        ​
+            if (x_difference < tolerance_cm_from_depo) and (y_difference < tolerance_cm_from_depo):
+                robot_state = 16
+            if not robot_pose == None:
+                rospy.loginfo("DEBUG: PUBLISHING")
+                
+                outvec = Orientation_Vector()
+                outvec.robot_pose = robot_pose
+                outvec.dig_zone = DEPOSITION_ZONE
+                # TODO: change dig_zone above to target_zone
+                outvec.robot_speed = 200
+        ​
+                pid_pub.publish(outvec) 
 
         # STATE 16: Machine navigates to some distance from depo zone
         elif robot_state == 16:
