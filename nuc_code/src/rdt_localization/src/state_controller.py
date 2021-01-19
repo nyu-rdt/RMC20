@@ -276,7 +276,7 @@ def main():
 
         # STATE 6: Machine moves to digging area
         elif robot_state == 6:
-            robot_state = 7
+            pass
 
         # STATE 7: Drum begins to turn
         elif robot_state == 7:
@@ -352,20 +352,22 @@ def main():
         # STATE 14: Drum stops spinning
         elif robot_state == 14:
             # Error checking
+            tolerance = 3
             if (artag_seen == False):
                 # This is different from the first resolution for this problem
                 # Move robot slowly forward for 5 seconds
                 # If unsuccessful, switch to manual control
                 pass
-        ​
-            if (robot_pose.orientation == (math.atan(robot_pose.y / robot_pose.x)) * 180 / math.pi):
+
+            if tolerance >= abs((math.atan(robot_pose.y / robot_pose.x)) * 180 / math.pi) - robot_pose.orientation:
+                rospy.loginfo("robot correct")
                 robot_state = 15
             else:
                 # Robot rotates in place
                 outmsg = Drive_Vector()
                 outmsg.offset_driveMode = 254
                 outmsg.robot_spd = 150
-        ​
+
                 pub_drive_cmd.publish(outmsg)
 
         # STATE 15: Orient to deposition zone
@@ -374,7 +376,7 @@ def main():
             x_difference = abs(DEPOSITION_ZONE.x - robot_pose.x)
             y_difference = abs(DEPOSITION_ZONE.y - robot_pose.y)
             tolerance_cm_from_depo = 10
-        ​
+
             if (x_difference < tolerance_cm_from_depo) and (y_difference < tolerance_cm_from_depo):
                 robot_state = 16
             if not robot_pose == None:
@@ -385,8 +387,8 @@ def main():
                 outvec.dig_zone = DEPOSITION_ZONE
                 # TODO: change dig_zone above to target_zone
                 outvec.robot_speed = 200
-        ​
-                pid_pub.publish(outvec) 
+
+                pid_pub.publish(outvec)      
 
         # STATE 16: Machine navigates to some distance from depo zone
         elif robot_state == 16:
