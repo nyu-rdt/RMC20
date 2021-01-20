@@ -221,7 +221,7 @@ def main():
     # Setup ROS Node
     pub = rospy.Publisher('server/localization', Pose, queue_size=10)
     rospy.init_node('aptag_optimized')
-    rate = rospy.Rate(1)
+    rate = rospy.Rate(10)
 
     # Setup turtle
     # turtle.clear()
@@ -280,15 +280,15 @@ def main():
                 stored_pose.append(pose)
                 stored_id.append(detection.tag_id)
 
-            #overlay = frame // 2 + dimg[:, :, None] // 2
+            overlay = frame // 2 + dimg[:, :, None] // 2
 
             # Draws all overlays before going to next frame. Must import cv2 in apriltag module
-            # _draw_pose(overlay, camera_params, tag_size, pose, z_sign=1)
+            #_draw_pose(overlay, camera_params, tag_size, pose, z_sign=1)
             #for det in range(num_detections):
-            #    apriltag._draw_pose(overlay, camera_params, 0.17, pose, z_sign=1)
+            #   apriltag._draw_pose(overlay, camera_params, 0.17, pose, z_sign=1)
 
-            #cv2.imshow(window, overlay)
-            #cv2.waitKey(27)
+            cv2.imshow(window, overlay)
+            cv2.waitKey(27)
 
         # Outputs only if tags are detected
         if num_detections > 0:
@@ -304,6 +304,8 @@ def main():
             outmsg = Pose()
             outmsg.x = center_coords[0]
             outmsg.y = center_coords[1]
+            #outmsg.x = 13.74
+            #outmsg.y = -5
             outmsg.orientation = orientation
 
             pub.publish(outmsg)
