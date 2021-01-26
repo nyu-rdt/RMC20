@@ -1,5 +1,20 @@
 #!/usr/bin/env python
 
+"""
+aptag_optimized.py
+
+Determines the position and orientation of the robot within the arena. There are four apriltags
+pasted on the four vertical sides of the robot, which a camera on the server observes. This node
+reads from that camera's stream and processes it using OpenCV to determine the aforementioned
+parameters. 
+
+For a more in-depth description of localization, reference the README.
+
+TODO:
+- Debug issue where orientation jumps around
+- Figure out which way x and y are relative to the arena walls
+"""
+
 from __future__ import division
 from __future__ import print_function
 from rdt_localization.msg import Pose

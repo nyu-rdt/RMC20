@@ -1,3 +1,9 @@
+'''
+pid_simulator.py
+
+Work in progress - Triet
+'''
+
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg

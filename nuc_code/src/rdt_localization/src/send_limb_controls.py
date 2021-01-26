@@ -1,30 +1,46 @@
 #!/usr/bin/env python
 
+"""
+send_limb_controls.py
+
+Node to relay limb commands from the state controller to the robot through the MQTT network. For 
+more information on the format of the limb commands, reference README.
+
+TODO:
+- Implement publish_limb_vector once the subsystem gets manufactured
+"""
+
 from std_msgs.msg import String
 
 import paho.mqtt.client as mqtt
 import rospy
 
-# callback function gets executed when connection is made to server
+'''
+Debug message for when the client connects successfully
+'''
 def on_connect(client, userdata, flags, rc):
-	rospy.loginfo("Connected, send limb vector")
+    rospy.loginfo("DEBUG: SEND_LIMB_VECTOR CONNECTED")
 
-# callback function gets executed when topic "server/sendLimbVec" receives new limb_vector
+'''
+Relay the last received drive command to the robot
+data: TBD
+'''
 def publish_limb_vector(data):
-	limb_vector = str(data.data)
-	client.publish("robotCmds/limbs", limb_vector)
+	pass
 
-def state_controller_listener():
-	rospy.init_node("send_limb_vector")
-	rospy.Subscriber("server/sendLimbVec", String, publish_limb_vector)
+def main():
+	# Setup ROS node
+    rospy.init_node("send_limb_vector")
+    
+    # Setup MQTT client
+    client = mqtt.Client()
+    client.on_connect = on_connect
+    client.connect("localhost", 1883)
+    
+    rospy.Subscriber("server/send_limb_vec", Drive_Vector, publish_limb_vector)
 
-	client = mqtt.Client()
-	client.on_connect = on_connect
-	
-	# connects to the server on the NUC
-	client.connect("localhost", 1883)
-
-	rospy.spin()
+    while not rospy.is_shutdown():
+        client.loop()
 
 if __name__ == "__main__":
-	state_controller_listener()
+	main()

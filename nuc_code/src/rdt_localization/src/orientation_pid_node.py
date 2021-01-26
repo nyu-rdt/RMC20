@@ -3,10 +3,9 @@
 """
 orientation_pid_node.py
 
-Node that subscribes to server/orient_vector and utilizes the given info to create an 
-appropriate outmsg to the topic server/send_drive_vec using a PID controller
-
-Used to ensure the robot takes an efficient path to its destination 
+Node that subscribes to state_controller and utilizes the given info to create an appropriate 
+outmsg to the send_drive_vector node using a PID controller. Used to ensure the robot takes an 
+efficient path to its destination .
 """
 
 import rospy
@@ -75,7 +74,7 @@ def PID_error(data):
     robot_orient = float(data.robot_pose.orientation)
 
     # Displacement between the center of the robot and the digging zone
-    displacement = (float(data.dig_zone.x) - float(data.robot_pose.x), float(data.dig_zone.y) - float(data.robot_pose.y))
+    displacement = (float(data.target_zone.x) - float(data.robot_pose.x), float(data.target_zone.y) - float(data.robot_pose.y))
 
     # Angular offset between camera forward line and line between digging zone/bot
     desired_theta = math.degrees(math.atan2(displacement[0], displacement[1]))
