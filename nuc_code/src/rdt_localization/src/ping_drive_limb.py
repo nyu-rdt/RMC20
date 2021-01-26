@@ -49,8 +49,10 @@ def main():
     #subscribe.callback(drive_ping_received, "robotState/drivePing", hostname="localhost", port=1883)
     #subscribe.callback(limbs_ping_received, "robotState/limbPing", hostname="localhost", port=1883)
     while not rospy.is_shutdown():
-        client.publish("robotCmds/drive", struct.pack('B', 252), retain=True)
-        client.publish("robotCmds/limbs", struct.pack('B', 252), retain=True)
+        rbt_ping = 252
+        rbt_ping = rbt_ping << 24
+        client.publish("robotCmds/drive", struct.pack('I', rbt_ping), retain=True)
+        client.publish("robotCmds/limbs", struct.pack('I', rbt_ping), retain=True)
         #rospy.loginfo("loop de loop")
         if drive_subsystem_connect: #and limbs_subsystem_connect:
             pub.publish(True)

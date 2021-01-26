@@ -39,7 +39,7 @@ TOPIC_TO_LIMB_NODE = "server/send_limb_vec"             # Passes limb vector to 
 # i.e. instead of if (robot_cannot_move), we might use something like if (motor_speed == 0)
 
 # Robot variables
-robot_state = 4
+robot_state = 25
 robot_pose = None
 robot_localized = False
 robot_cannot_move = False             # If the robot cannot move
@@ -119,6 +119,8 @@ def main():
 
     # Publishers
     pid_pub = rospy.Publisher(TOPIC_TO_PID_CONTROLLER_NODE, Orientation_Vector, queue_size=10) # Output to PID controller node
+    pub_drive_cmd = rospy.Publisher(TOPIC_TO_DRIVE_NODE, Drive_Vector, queue_size=10) # Drive commands
+    pub_limb_cmd = rospy.Publisher(TOPIC_TO_LIMB_NODE, String, queue_size=10) # Limb commands
 
     # Timers
     max_manual_timer =  ROSPY_LOOP_RATE * 5 # If the robot doesn't fix itself in 5 seconds, it will be switched to manual
@@ -134,14 +136,6 @@ def main():
             limb_string = data.data[1:]
 
     rospy.Subscriber(TOPIC_FROM_HEARTBEAT_NODE, String, parse_manual_commands)
-
-
-
-    # Publishers
-    pub_drive_cmd = rospy.Publisher(TOPIC_TO_DRIVE_NODE, Drive_Vector, queue_size=10) # Drive commands
-    pub_limb_cmd = rospy.Publisher(TOPIC_TO_LIMB_NODE, String, queue_size=10) # Limb commands
-
-
 
     # If the robot needs to emergency stop
     if (e_stop == True):
