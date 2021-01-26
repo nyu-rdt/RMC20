@@ -71,6 +71,22 @@ ros::message_operations::Printer< ::rdt_localization::Pose_<ContainerAllocator> 
 return s;
 }
 
+
+template<typename ContainerAllocator1, typename ContainerAllocator2>
+bool operator==(const ::rdt_localization::Pose_<ContainerAllocator1> & lhs, const ::rdt_localization::Pose_<ContainerAllocator2> & rhs)
+{
+  return lhs.x == rhs.x &&
+    lhs.y == rhs.y &&
+    lhs.orientation == rhs.orientation;
+}
+
+template<typename ContainerAllocator1, typename ContainerAllocator2>
+bool operator!=(const ::rdt_localization::Pose_<ContainerAllocator1> & lhs, const ::rdt_localization::Pose_<ContainerAllocator2> & rhs)
+{
+  return !(lhs == rhs);
+}
+
+
 } // namespace rdt_localization
 
 namespace ros
@@ -78,12 +94,6 @@ namespace ros
 namespace message_traits
 {
 
-
-
-// BOOLTRAITS {'IsFixedSize': True, 'IsMessage': True, 'HasHeader': False}
-// {'std_msgs': ['/opt/ros/melodic/share/std_msgs/cmake/../msg'], 'rdt_localization': ['/home/dan/Code/RMC20/nuc_code/src/rdt_localization/msg']}
-
-// !!!!!!!!!!! ['__class__', '__delattr__', '__dict__', '__doc__', '__eq__', '__format__', '__getattribute__', '__hash__', '__init__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', '_parsed_fields', 'constants', 'fields', 'full_name', 'has_header', 'header_present', 'names', 'package', 'parsed_fields', 'short_name', 'text', 'types']
 
 
 
