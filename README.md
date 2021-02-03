@@ -108,13 +108,13 @@ Used to send sensor data, specifically LIDAR data, from the robot's LIDAR ESP to
 There are 4 LIDARs mounted in an array on the front of the robot, angled downwards to scan for obstacles. The data is sent in the following format: 
 
 ```
-{ float lidar1
-float lidar2
-float lidar3
-float lidar4 }
+{ byte lidar1
+byte lidar2
+byte lidar3
+byte lidar4 }
 ```
 
-- `float lidar1` , `float lidar2` , `float lidar3` , `float lidar4`  are the distances that the 4 LIDARs read, from left to right. The distances are in centimeters.
+- `byte lidar1` , `byte lidar2` , `byte lidar3` , `byte lidar4`  are the distances that the 4 LIDARs read, from left to right. The distances are in centimeters.
 
 ___
 <br />
