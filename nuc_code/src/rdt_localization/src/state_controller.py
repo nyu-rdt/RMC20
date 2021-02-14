@@ -7,7 +7,7 @@ The 'main' node in the ROS network - it interfaces with several other nodes to k
 robot's state constantly. This includes the robot's location, the position of its limbs, and how
 much load it is carrying.
 
-Completed states: 2, 4, 5, 14, 15
+Completed states: 2, 4, 5, 14, 15, 19, 20
 Tested states: 2
 """
 
@@ -37,10 +37,12 @@ TOPIC_FROM_HEARTBEAT_NODE = "server/heartbeat"          # Interface with heartbe
 TOPIC_FROM_LOCALIZATION_NODE = "server/localization"    # Contains bot's pose/location
 TOPIC_FROM_PING_NODE = "server/ping_drive_limb"         # Checks connection to drive/limb subsystems
 TOPIC_FROM_SENSOR_NODE = "server/sensor_data"           # Contains the bot's last array of sensor data
-TOPIC_FROM_OBSTACLE_NODE = "server_obstalce_data"       # Contains the bot's last array of obstacle data
+TOPIC_FROM_OBSTACLE_NODE = "server/obstacle_data"        # Contains the bot's last array of obstacle data
 TOPIC_TO_PID_CONTROLLER_NODE = "server/orient_vector"   # Passes pose/location to PID controller
 TOPIC_TO_DRIVE_NODE = "server/send_drive_vec"           # Passes drive vector to send to bot
 TOPIC_TO_LIMB_NODE = "server/send_limb_vec"             # Passes limb vector to send to bot
+
+TURN_IN_PLACE_SPEED = 50
 
 # Most variables are open to being replaced
 # (I mean this in the sense that we can replace these variables with tangible conditions)
@@ -67,7 +69,7 @@ arm_gears_slip = False                # If the arm gears have slipped
 arm_rot_reached = False               # If the preset arm rotation in preparation to continue moving
 arm_drive_config = False              # If the arm has extended to the driving configuration
 arm_depo_ready = False                # If the arms are in position to deposit
-    
+
 # Linear Actuator variables       
 lin_act_stuck = False                 # If the linear actuators are stuck
 lin_act_ext = False                   # If the linear actuators are fully extended
@@ -113,6 +115,8 @@ data: TBD
 '''
 def get_obstacle_data(data):
     global obstacle_connected
+    global inc_obstacle
+    inc_obstacle = data
     obstacle_connected = True
 
 '''
@@ -154,13 +158,13 @@ def main():
     rospy.Subscriber(TOPIC_FROM_LOCALIZATION_NODE, Pose, get_pose)
     rospy.Subscriber(TOPIC_FROM_PING_NODE, Bool, get_drive_and_limb_connection)
     rospy.Subscriber(TOPIC_FROM_SENSOR_NODE, String, get_sensor_data)
-    rospy.Subscriber(TOPIC_FROM_OBSTACLE_NODE, String, get_obstacle_data)
+    rospy.Subscriber(TOPIC_FROM_OBSTACLE_NODE, Obstacle, get_obstacle_data)
     rospy.Subscriber(TOPIC_FROM_HEARTBEAT_NODE, String, parse_manual_commands)
 
     # Publishers
     pub_pid = rospy.Publisher(TOPIC_TO_PID_CONTROLLER_NODE, Orientation_Vector, queue_size=10)
     pub_drive_cmd = rospy.Publisher(TOPIC_TO_DRIVE_NODE, Drive_Vector, queue_size=10)
-    pub_limb_cmd = rospy.Publisher(TOPIC_TO_LIMB_NODE, String, queue_size=10)
+    pub_limb_cmd = rospy.Publisher(TOPIC_TO_LIMB_NODE, Limb_Vector, queue_size=10)
 
     # Timers
     curr_state_start_time = None
@@ -211,8 +215,11 @@ def main():
         elif robot_state == 5:
             ros_log("DEBUG: STATE 5")
 
+            if inc_obstacle.left or inc_obstacle.right:
+                robot_state = 27
+
             # Build Orientation_Vector consisting of bot and digging zone positions
-            if not robot_pose == None:
+            elif not robot_pose == None:
                 ros_log("DEBUG: PUBLISHING")
 
                 outvec = Orientation_Vector()
@@ -389,21 +396,36 @@ def main():
                 # Continue raising the arms
                 pass
 
-        # STATE 19: Linear actuators raise drum to upper limit
+        # STATE 19: Open storage bin door to release payload
         elif robot_state == 19:
-            if (lin_act_depo_ready):
+            if (bin_empty):
                 robot_state = 20
             else:
-                # Continue raising the linear actuators
-                pass
+                # Open the storage bin door
+                outvec = Limb_Vector()
+                # speeds are 0 for now
+                outvec.linActs_speed = 0
+                outvec.arm_speed = 0
+                outvec.drum_speed = 0
 
-        # STATE 20: Open storage bin door to release payload
+                outvec.door = True 
+
+                pub_limb_cmd.publish(outvec)
+
+        # STATE 20: Close door
         elif robot_state == 20:
-            if (bin_empty):
+            if (door_closed):
                 robot_state = 21
             else:
-                # Open the storage bin door
-                pass
+                # Close the door
+                outvec = Limb_Vector()
+                outvec.linActs_speed = 0
+                outvec.arm_speed = 0
+                outvec.drum_speed = 0
+
+                outvec.door = False 
+
+                pub_limb_cmd.publish(outvec)
 
         # STATE 21: Close door
         elif robot_state == 21:
@@ -437,13 +459,24 @@ def main():
                 # Navigate back/diagonally until April Tags are sighted
                 pass
 
-        # STATE 25: Reorient robot to next digging zone
-        else:
-            if (robot_face_dig_zone):
+        # STATE Ri5B: Error state of obstacle detected
+        elif robot_state == 27:
+            ros.log(“DEBUG STATE 27”)
+            # If no more obstacle detected, transition back to state 5
+            if (not (inc_obstacle.left or inc_obstacle.right)):
                 robot_state = 5
             else:
-                # Continue reorientating robot
-                pass
+                # Turn left if obstacle to the right, & vice versa
+                if (inc_obstacle.left):
+                    speed = TURN_IN_PLACE_SPEED
+                else:
+                    speed = 200 - TURN_IN_PLACE_SPEED
+                    
+                # Send out correcting drive vector to turn bot in place
+                rot = Drive_Vector()
+                rot.offset_driveMode = 254
+                rot.robot_spd = speed
+                pub_drive_cmd.publish(rot)
 
         rate.sleep()
 

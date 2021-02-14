@@ -27,6 +27,16 @@ import time
 import turtle
 import copy
 
+'''
+Values come from running camera calibration file (fx, fy, cx,cy).
+Camera should be calibrated for each new computer and new camera.
+If the projected green box for the apriltag does not have sudden jumps when you turn the tag slightly,
+then the calibration is correct.
+Sometimes, if the outputs aren't correct, try calibrating with a higher number of detections. 
+The better the calibration, the less you need to adjust the scale of the measurements in center_position()
+'''
+# camera_params = [1.01446618 * 10 ** 3, 1.02086461 * 10 ** 3, 6.09583146 * 10 ** 2, 3.66171174 * 10 ** 2]
+camera_params = [1.13681104 * 10 ** 3, 1.13670829 * 10 ** 3, 9.61298528 * 10 ** 2, 5.50718212 * 10 ** 2]
 
 # All distance and lengths in meters
 # All angles output converted to degrees
@@ -80,6 +90,7 @@ def rotation_matrix_to_euler_angles(R, tag_id):
 
     elif tag_id == 6:
         return numpy.array([math.degrees(x), math.degrees(y), math.degrees(z)])
+        
 
 
 '''
@@ -233,6 +244,8 @@ def turtle_draw(coordinates, orientation, angular_rotation):
 
 
 def main():
+    global camera_params
+
     # Setup ROS Node
     pub = rospy.Publisher('server/localization', Pose, queue_size=10)
     rospy.init_node('aptag_optimized')
@@ -244,17 +257,6 @@ def main():
     # turtle.penup()
     # turtle.speed(5)
     # turtle.turtlesize(2, 2, 1)
-
-    '''
-    Values come from running camera calibration file (fx, fy, cx,cy).
-    Camera should be calibrated for each new computer and new camera.
-    If the projected green box for the apriltag does not have sudden jumps when you turn the tag slightly,
-    then the calibration is correct.
-    Sometimes, if the outputs aren't correct, try calibrating with a higher number of detections. 
-    The better the calibration, the less you need to adjust the scale of the measurements in center_position()
-    '''
-    # camera_params = [1.01446618 * 10 ** 3, 1.02086461 * 10 ** 3, 6.09583146 * 10 ** 2, 3.66171174 * 10 ** 2]
-    camera_params = [1.13681104 * 10 ** 3, 1.13670829 * 10 ** 3, 9.61298528 * 10 ** 2, 5.50718212 * 10 ** 2]
 
     # Set value for camera
     cap = cv2.VideoCapture(0)
@@ -298,9 +300,9 @@ def main():
             overlay = frame // 2 + dimg[:, :, None] // 2
 
             # Draws all overlays before going to next frame. Must import cv2 in apriltag module
-            #_draw_pose(overlay, camera_params, tag_size, pose, z_sign=1)
-            #for det in range(num_detections):
-            #   apriltag._draw_pose(overlay, camera_params, 0.17, pose, z_sign=1)
+            _draw_pose(overlay, camera_params, tag_size, pose, z_sign=1)
+            for det in range(num_detections):
+            apriltag._draw_pose(overlay, camera_params, 0.17, pose, z_sign=1)
 
             cv2.imshow(window, overlay)
             cv2.waitKey(27)
