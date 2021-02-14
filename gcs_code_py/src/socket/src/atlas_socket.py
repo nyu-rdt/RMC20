@@ -20,9 +20,11 @@ import threading, Queue
 import struct
 
 # Global constants
-G_TARGET_IP = "192.168.1.2"
+# G_TARGET_IP = "192.168.1.2"
+G_TARGET_IP = "127.0.0.1"
 G_TARGET_PORT = 10010
-G_LOCAL_IP = "192.168.1.15"
+# G_LOCAL_IP = "192.168.1.15"
+G_LOCAL_IP = "127.0.0.1"
 G_LOCAL_PORT = 10010
 G_REPORT_RATE = 20                # Rate (in Hz) that connection is checked 
 G_FAILSAFE_THRESHOLD = 60         # How many failed connections until ESTOP is triggered
