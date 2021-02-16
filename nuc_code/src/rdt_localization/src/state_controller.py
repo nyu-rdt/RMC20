@@ -34,6 +34,7 @@ ROSPY_LOOP_RATE = 20
 
 # Robot constants
 TARGET_TOLERANCE = 10                                   # Tolerance (cm) how far robot can stop from its target
+ROTATION_TOLERANCE                                      # Tolerance (deg) how close the robot should rotate to its target
 TURN_IN_PLACE_SPEED = 50
 MANUAL_SPEED_FWD = 200
 MANUAL_SPEED_REVERSE = 0
@@ -381,7 +382,6 @@ def main():
         # STATE 14: Drum stops spinning
         elif robot_state == 14:
             # Error checking
-            tolerance = 3
             if (artag_seen == False):
                 # This is different from the first resolution for this problem
                 # Move robot slowly forward for 5 seconds
@@ -391,7 +391,7 @@ def main():
             ros_log("orientation:" + str(robot_pose.orientation))
             ros_log("x:" + str(robot_pose.x))
             ros_log("y:" + str(robot_pose.y))
-            if tolerance >= abs(((math.atan((robot_pose.x) / robot_pose.y)) * 180 / math.pi)+180 - robot_pose.orientation):
+            if ROTATION_TOLERANCE >= abs(((math.atan((robot_pose.x) / robot_pose.y)) * 180 / math.pi)+180 - robot_pose.orientation):
                 ros_log("robot correct")
                 robot_state = 15
             else:
@@ -525,11 +525,43 @@ def main():
 
         # STATE 24: Navigate back/diagonally until April Tags sighted
         elif robot_state == 24:
-            if (artag_seen):
-                robot_state = 25
-            else:
-                # Navigate back/diagonally until April Tags are sighted
+            # Error checking
+            if not artag_seen:
+                # (Keep rotating)
                 pass
+
+            # Use law of cosines to find desired angle (c^2 = a^2 + b^2 - 2ab * cos(C))
+            # Where a, b, c = triangle sides and C = desired angle
+            # Three points will be robot robot_x/y++, x/y, and the dig zone
+            top_p = (robot_pose.x, robot_pose.y + 1)
+            robot_p = (robot_pose.x, robot_pose.y)
+            dig_p = (DIG_ZONE.x, DIG_ZONE.y)
+
+            # I am using distance formula (dist = sqrt((x2 - x1)^2 + (y2 - y1)^2))
+            a_sq = ((top_p[0] - robot_p[0]) ** 2 ) + ((top_p[1] - robot_p[1]) ** 2)
+            b_sq = ((dig_p[0] - robot_p[0]) ** 2 ) + ((dig_p[1] - robot_p[1]) ** 2)
+            c_sq = ((top_p[0] - dig_p[0]) ** 2 ) + ((top_p[1] - dig_p[1]) ** 2)
+
+            a = math.sqrt(a_sq)
+            b = math.sqrt(b_sq)
+            
+            desired_orient = math.acos((a_sq + b_sq - c_sq) / (2 * a * b))
+            
+            ros_log("desired orient:" + desired_orient)
+            ros_log("orientation:" + str(robot_pose.orientation))
+            ros_log("x:" + str(robot_pose.x))
+            ros_log("y:" + str(robot_pose.y))
+            
+            if ROTATION_TOLERANCE >= abs(desired_orient - robot_pose.orientation):
+                ros_log("robot correct")
+                robot_state = 4  # The next state
+            else:
+                # Robot rotates in place
+                outmsg = Drive_Vector()
+                outmsg.offset_driveMode = 254  # Turn in place
+                outmsg.robot_spd = 150  # 50% speed forward rotation
+            
+                pub_drive_cmd.publish(outmsg)
 
         # STATE Ri5B: Error state of obstacle detected
         elif robot_state == 27:
