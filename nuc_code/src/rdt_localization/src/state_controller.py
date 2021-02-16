@@ -7,7 +7,7 @@ The 'main' node in the ROS network - it interfaces with several other nodes to k
 robot's state constantly. This includes the robot's location, the position of its limbs, and how
 much load it is carrying.
 
-Completed states: 2, 4, 5, 14, 15, 19, 20, 27(Ri5B)
+Completed states: 2, 4, 5, 14, 15, 19, 20, 24, 27(Ri5B)
 Tested states: 2
 """
 
