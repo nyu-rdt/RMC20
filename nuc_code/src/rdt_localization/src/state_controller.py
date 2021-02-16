@@ -37,10 +37,11 @@ TOPIC_FROM_HEARTBEAT_NODE = "server/heartbeat"          # Interface with heartbe
 TOPIC_FROM_LOCALIZATION_NODE = "server/localization"    # Contains bot's pose/location
 TOPIC_FROM_PING_NODE = "server/ping_drive_limb"         # Checks connection to drive/limb subsystems
 TOPIC_FROM_SENSOR_NODE = "server/sensor_data"           # Contains the bot's last array of sensor data
-TOPIC_FROM_OBSTACLE_NODE = "server/obstacle_data"        # Contains the bot's last array of obstacle data
+TOPIC_FROM_OBSTACLE_NODE = "server/obstacle_data"       # Contains the bot's last array of obstacle data
 TOPIC_TO_PID_CONTROLLER_NODE = "server/orient_vector"   # Passes pose/location to PID controller
 TOPIC_TO_DRIVE_NODE = "server/send_drive_vec"           # Passes drive vector to send to bot
 TOPIC_TO_LIMB_NODE = "server/send_limb_vec"             # Passes limb vector to send to bot
+TOPIC_TO_MANUAL_DRIVE = "server/manual_drive"           # Receives key presses/releases from command handler
 
 TURN_IN_PLACE_SPEED = 50
 
@@ -85,13 +86,23 @@ door_closed = False                   # If the door is closed
 bin_full = False                      # If the storage bin is full
 bin_empty = False                     # If the storage bin is empty
 
-# Connection variables
+# Comms variables
+last_keys = None                      # Last received set of manual commands
 drive_and_limbs_connected = False
 sensor_connected = False
 obstacle_connected = False
 
 
 # ROS callback functions
+'''
+Gets the last set of key presses/releases from the GCS.
+data: rdt_localization/Keyboard
+'''
+def manualDriveRecieve(data): 
+    global last_keys
+    previous = last_keys
+    last_keys = data 
+
 '''
 Gets response from ping_drive_limb node to ensure that the locomotion and limbs subsystems are 
 active and connected.
@@ -143,6 +154,59 @@ def ros_log(info):
     if RUN_VERBOSE:
         rospy.loginfo(info)
 
+'''
+Parses the last received keyboard command and composes output vectors accordingly.
+drive_vec: rdt_localization/Drive_Vector
+'''
+def process_manual_cmd(drive_vec):
+    global last_keys
+
+    # WA command
+    if (last_keys.w and last_keys.a):
+        drive_vec.offset_driveMode = 50
+        drive_vec.robot_spd = MANUAL_SPEED_FWD
+
+    # WD command
+    elif (last_keys.w and last_keys.d):
+        drive_vec.offset_driveMode = 150
+        drive_vec.robot_spd = MANUAL_SPEED_FWD
+
+    # SA command
+    elif (last_keys.s and last_keys.a):
+        drive_vec.offset_driveMode = 50
+        drive_vec.robot_spd = MANUAL_SPEED_REVERSE
+    
+    # SD command
+    elif (last_keys.s and last_keys.d):
+        drive_vec.offset_driveMode = 150
+        drive_vec.robot_spd = MANUAL_SPEED_REVERSE
+        
+    # W command  
+    elif(last_keys.w):
+        drive_vec.offset_driveMode = 100
+        drive_vec.robot_spd = MANUAL_SPEED_FWD
+
+    # A command
+    elif(last_keys.a):
+        drive_vec.offset_driveMode = 254
+        drive_vec.robot_spd = 0
+
+    # S command
+    elif(last_keys.s): 
+        drive_vec.offset_driveMode = 100
+        drive_vec.robot_spd = MANUAL_SPEED_REVERSE
+
+    # D command
+    elif(last_keys.d):
+        drive_vec.offset_driveMode = 254 
+        drive_vec.robot_spd = 200
+
+    # no keys are pressed
+    else:
+        drive_vec.offset_driveMode = 100
+        drive_vec.robot_spd = 100
+
+    return drive_vec
 
 def main():
     global robot_state
@@ -160,6 +224,7 @@ def main():
     rospy.Subscriber(TOPIC_FROM_SENSOR_NODE, String, get_sensor_data)
     rospy.Subscriber(TOPIC_FROM_OBSTACLE_NODE, Obstacle, get_obstacle_data)
     rospy.Subscriber(TOPIC_FROM_HEARTBEAT_NODE, String, parse_manual_commands)
+    rospy.Subscriber(TOPIC_TO_MANUAL_DRIVE, String, manualDriveRecieve)
 
     # Publishers
     pub_pid = rospy.Publisher(TOPIC_TO_PID_CONTROLLER_NODE, Orientation_Vector, queue_size=10)
@@ -173,7 +238,12 @@ def main():
     while not rospy.is_shutdown():
         # STATE 0: Manual state
         if robot_state == 0:
-            pass
+            global last_keys 
+
+            # Process the last received manual commands and send them
+            drive_vec = Drive_Vector() 
+            process_manual_cmd(drive_vec)
+            pub_drive_cmd.publish(drive_vec)
             
         # STATE 1: Competition starts
         elif robot_state == 1:
