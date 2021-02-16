@@ -7,7 +7,7 @@ The 'main' node in the ROS network - it interfaces with several other nodes to k
 robot's state constantly. This includes the robot's location, the position of its limbs, and how
 much load it is carrying.
 
-Completed states: 2, 4, 5, 14, 15, 19, 20
+Completed states: 2, 4, 5, 14, 15, 19, 20, 27(Ri5B)
 Tested states: 2
 """
 
@@ -32,6 +32,12 @@ DIG_ZONE.x = -2.5
 DIG_ZONE.y = 2.7
 ROSPY_LOOP_RATE = 20
 
+# Robot constants
+TARGET_TOLERANCE = 10                                   # Tolerance (cm) how far robot can stop from its target
+TURN_IN_PLACE_SPEED = 50
+MANUAL_SPEED_FWD = 200
+MANUAL_SPEED_REVERSE = 0
+
 # Topic names
 TOPIC_FROM_HEARTBEAT_NODE = "server/heartbeat"          # Interface with heartbeat protocol to ensure connection
 TOPIC_FROM_LOCALIZATION_NODE = "server/localization"    # Contains bot's pose/location
@@ -42,8 +48,6 @@ TOPIC_TO_PID_CONTROLLER_NODE = "server/orient_vector"   # Passes pose/location t
 TOPIC_TO_DRIVE_NODE = "server/send_drive_vec"           # Passes drive vector to send to bot
 TOPIC_TO_LIMB_NODE = "server/send_limb_vec"             # Passes limb vector to send to bot
 TOPIC_TO_MANUAL_DRIVE = "server/manual_drive"           # Receives key presses/releases from command handler
-
-TURN_IN_PLACE_SPEED = 50
 
 # Most variables are open to being replaced
 # (I mean this in the sense that we can replace these variables with tangible conditions)
@@ -403,9 +407,9 @@ def main():
             # Continue navigating to correct distance from deposition zone
             x_difference = abs(DEPOSITION_ZONE.x - robot_pose.x)
             y_difference = abs(DEPOSITION_ZONE.y - robot_pose.y)
-            tolerance_cm_from_depo = 10
 
-            if (x_difference < tolerance_cm_from_depo) and (y_difference < tolerance_cm_from_depo):
+            # Check that robot is within tolerance at depo zone
+            if (x_difference < TARGET_TOLERANCE) and (y_difference < TARGET_TOLERANCE):
                 robot_state = 16
             if not robot_pose == None:
                 ros_log("DEBUG: PUBLISHING")
@@ -413,7 +417,6 @@ def main():
                 outvec = Orientation_Vector()
                 outvec.robot_pose = robot_pose
                 outvec.target_zone = DEPOSITION_ZONE
-                # TODO: change dig_zone above to target_zone
                 outvec.robot_speed = 200
 
                 pub_pid.publish(outvec)      
@@ -471,9 +474,8 @@ def main():
             if (bin_empty):
                 robot_state = 20
             else:
-                # Open the storage bin door
+                # Send out 'open door' vector
                 outvec = Limb_Vector()
-                # speeds are 0 for now
                 outvec.linActs_speed = 0
                 outvec.arm_speed = 0
                 outvec.drum_speed = 0
@@ -487,7 +489,7 @@ def main():
             if (door_closed):
                 robot_state = 21
             else:
-                # Close the door
+                # Send out 'close door' vector
                 outvec = Limb_Vector()
                 outvec.linActs_speed = 0
                 outvec.arm_speed = 0
