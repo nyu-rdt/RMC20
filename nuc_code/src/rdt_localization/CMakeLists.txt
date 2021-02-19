@@ -53,6 +53,8 @@ add_message_files(
   Location.msg
   Orientation_Vector.msg
   Drive_Vector.msg
+  Obstacle.msg
+  Limb_Vector.msg
 )
 
 ## Generate services in the 'srv' folder

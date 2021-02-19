@@ -36,7 +36,7 @@ Sometimes, if the outputs aren't correct, try calibrating with a higher number o
 The better the calibration, the less you need to adjust the scale of the measurements in center_position()
 '''
 # camera_params = [1.01446618 * 10 ** 3, 1.02086461 * 10 ** 3, 6.09583146 * 10 ** 2, 3.66171174 * 10 ** 2]
-camera_params = [1.13681104 * 10 ** 3, 1.13670829 * 10 ** 3, 9.61298528 * 10 ** 2, 5.50718212 * 10 ** 2]
+camera_params = [825.90832362, 823.90765969, 418.65176814, 206.27259118]
 
 # All distance and lengths in meters
 # All angles output converted to degrees
@@ -300,9 +300,9 @@ def main():
             overlay = frame // 2 + dimg[:, :, None] // 2
 
             # Draws all overlays before going to next frame. Must import cv2 in apriltag module
-            _draw_pose(overlay, camera_params, tag_size, pose, z_sign=1)
-            for det in range(num_detections):
-            apriltag._draw_pose(overlay, camera_params, 0.17, pose, z_sign=1)
+            #_draw_pose(overlay, camera_params, tag_size, pose, z_sign=1)
+            #for det in range(num_detections):
+            	#apriltag._draw_pose(overlay, camera_params, 0.17, pose, z_sign=1)
 
             cv2.imshow(window, overlay)
             cv2.waitKey(27)

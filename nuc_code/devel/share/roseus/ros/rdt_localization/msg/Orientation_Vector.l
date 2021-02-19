@@ -14,18 +14,18 @@
 
 (defclass rdt_localization::Orientation_Vector
   :super ros::object
-  :slots (_robot_pose _dig_zone _robot_speed ))
+  :slots (_robot_pose _target_zone _robot_speed ))
 
 (defmethod rdt_localization::Orientation_Vector
   (:init
    (&key
     ((:robot_pose __robot_pose) (instance rdt_localization::Pose :init))
-    ((:dig_zone __dig_zone) (instance rdt_localization::Location :init))
+    ((:target_zone __target_zone) (instance rdt_localization::Location :init))
     ((:robot_speed __robot_speed) 0)
     )
    (send-super :init)
    (setq _robot_pose __robot_pose)
-   (setq _dig_zone __dig_zone)
+   (setq _target_zone __target_zone)
    (setq _robot_speed (round __robot_speed))
    self)
   (:robot_pose
@@ -35,13 +35,13 @@
      (progn
        (if __robot_pose (setq _robot_pose (car __robot_pose)))
        _robot_pose)))
-  (:dig_zone
-   (&rest __dig_zone)
-   (if (keywordp (car __dig_zone))
-       (send* _dig_zone __dig_zone)
+  (:target_zone
+   (&rest __target_zone)
+   (if (keywordp (car __target_zone))
+       (send* _target_zone __target_zone)
      (progn
-       (if __dig_zone (setq _dig_zone (car __dig_zone)))
-       _dig_zone)))
+       (if __target_zone (setq _target_zone (car __target_zone)))
+       _target_zone)))
   (:robot_speed
    (&optional __robot_speed)
    (if __robot_speed (setq _robot_speed __robot_speed)) _robot_speed)
@@ -50,8 +50,8 @@
    (+
     ;; rdt_localization/Pose _robot_pose
     (send _robot_pose :serialization-length)
-    ;; rdt_localization/Location _dig_zone
-    (send _dig_zone :serialization-length)
+    ;; rdt_localization/Location _target_zone
+    (send _target_zone :serialization-length)
     ;; int64 _robot_speed
     8
     ))
@@ -61,8 +61,8 @@
               (make-string-output-stream (send self :serialization-length)))))
      ;; rdt_localization/Pose _robot_pose
        (send _robot_pose :serialize s)
-     ;; rdt_localization/Location _dig_zone
-       (send _dig_zone :serialize s)
+     ;; rdt_localization/Location _target_zone
+       (send _target_zone :serialize s)
      ;; int64 _robot_speed
 #+(or :alpha :irix6 :x86_64)
        (progn (sys::poke _robot_speed (send s :buffer) (send s :count) :long) (incf (stream-count s) 8))
@@ -81,8 +81,8 @@
    (buf &optional (ptr- 0))
    ;; rdt_localization/Pose _robot_pose
      (send _robot_pose :deserialize buf ptr-) (incf ptr- (send _robot_pose :serialization-length))
-   ;; rdt_localization/Location _dig_zone
-     (send _dig_zone :deserialize buf ptr-) (incf ptr- (send _dig_zone :serialization-length))
+   ;; rdt_localization/Location _target_zone
+     (send _target_zone :deserialize buf ptr-) (incf ptr- (send _target_zone :serialization-length))
    ;; int64 _robot_speed
 #+(or :alpha :irix6 :x86_64)
       (setf _robot_speed (prog1 (sys::peek buf ptr- :long) (incf ptr- 8)))
@@ -99,11 +99,11 @@
    self)
   )
 
-(setf (get rdt_localization::Orientation_Vector :md5sum-) "09467e8e0e560bedfd1a1c32cc5278c6")
+(setf (get rdt_localization::Orientation_Vector :md5sum-) "32c0233ad09fff327409092d7163201c")
 (setf (get rdt_localization::Orientation_Vector :datatype-) "rdt_localization/Orientation_Vector")
 (setf (get rdt_localization::Orientation_Vector :definition-)
       "Pose robot_pose
-Location dig_zone
+Location target_zone
 int64 robot_speed
 ================================================================================
 MSG: rdt_localization/Pose
@@ -118,6 +118,6 @@ float32 y
 
 
 
-(provide :rdt_localization/Orientation_Vector "09467e8e0e560bedfd1a1c32cc5278c6")
+(provide :rdt_localization/Orientation_Vector "32c0233ad09fff327409092d7163201c")
 
 

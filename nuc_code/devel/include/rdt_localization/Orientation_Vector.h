@@ -27,12 +27,12 @@ struct Orientation_Vector_
 
   Orientation_Vector_()
     : robot_pose()
-    , dig_zone()
+    , target_zone()
     , robot_speed(0)  {
     }
   Orientation_Vector_(const ContainerAllocator& _alloc)
     : robot_pose(_alloc)
-    , dig_zone(_alloc)
+    , target_zone(_alloc)
     , robot_speed(0)  {
   (void)_alloc;
     }
@@ -42,8 +42,8 @@ struct Orientation_Vector_
    typedef  ::rdt_localization::Pose_<ContainerAllocator>  _robot_pose_type;
   _robot_pose_type robot_pose;
 
-   typedef  ::rdt_localization::Location_<ContainerAllocator>  _dig_zone_type;
-  _dig_zone_type dig_zone;
+   typedef  ::rdt_localization::Location_<ContainerAllocator>  _target_zone_type;
+  _target_zone_type target_zone;
 
    typedef int64_t _robot_speed_type;
   _robot_speed_type robot_speed;
@@ -78,7 +78,7 @@ template<typename ContainerAllocator1, typename ContainerAllocator2>
 bool operator==(const ::rdt_localization::Orientation_Vector_<ContainerAllocator1> & lhs, const ::rdt_localization::Orientation_Vector_<ContainerAllocator2> & rhs)
 {
   return lhs.robot_pose == rhs.robot_pose &&
-    lhs.dig_zone == rhs.dig_zone &&
+    lhs.target_zone == rhs.target_zone &&
     lhs.robot_speed == rhs.robot_speed;
 }
 
@@ -136,12 +136,12 @@ struct MD5Sum< ::rdt_localization::Orientation_Vector_<ContainerAllocator> >
 {
   static const char* value()
   {
-    return "09467e8e0e560bedfd1a1c32cc5278c6";
+    return "32c0233ad09fff327409092d7163201c";
   }
 
   static const char* value(const ::rdt_localization::Orientation_Vector_<ContainerAllocator>&) { return value(); }
-  static const uint64_t static_value1 = 0x09467e8e0e560bedULL;
-  static const uint64_t static_value2 = 0xfd1a1c32cc5278c6ULL;
+  static const uint64_t static_value1 = 0x32c0233ad09fff32ULL;
+  static const uint64_t static_value2 = 0x7409092d7163201cULL;
 };
 
 template<class ContainerAllocator>
@@ -161,7 +161,7 @@ struct Definition< ::rdt_localization::Orientation_Vector_<ContainerAllocator> >
   static const char* value()
   {
     return "Pose robot_pose\n"
-"Location dig_zone\n"
+"Location target_zone\n"
 "int64 robot_speed\n"
 "================================================================================\n"
 "MSG: rdt_localization/Pose\n"
@@ -191,7 +191,7 @@ namespace serialization
     template<typename Stream, typename T> inline static void allInOne(Stream& stream, T m)
     {
       stream.next(m.robot_pose);
-      stream.next(m.dig_zone);
+      stream.next(m.target_zone);
       stream.next(m.robot_speed);
     }
 
@@ -214,9 +214,9 @@ struct Printer< ::rdt_localization::Orientation_Vector_<ContainerAllocator> >
     s << indent << "robot_pose: ";
     s << std::endl;
     Printer< ::rdt_localization::Pose_<ContainerAllocator> >::stream(s, indent + "  ", v.robot_pose);
-    s << indent << "dig_zone: ";
+    s << indent << "target_zone: ";
     s << std::endl;
-    Printer< ::rdt_localization::Location_<ContainerAllocator> >::stream(s, indent + "  ", v.dig_zone);
+    Printer< ::rdt_localization::Location_<ContainerAllocator> >::stream(s, indent + "  ", v.target_zone);
     s << indent << "robot_speed: ";
     Printer<int64_t>::stream(s, indent + "  ", v.robot_speed);
   }

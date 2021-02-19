@@ -21,7 +21,7 @@ class Orientation_Vector {
     if (initObj === null) {
       // initObj === null is a special case for deserialization where we don't initialize fields
       this.robot_pose = null;
-      this.dig_zone = null;
+      this.target_zone = null;
       this.robot_speed = null;
     }
     else {
@@ -31,11 +31,11 @@ class Orientation_Vector {
       else {
         this.robot_pose = new Pose();
       }
-      if (initObj.hasOwnProperty('dig_zone')) {
-        this.dig_zone = initObj.dig_zone
+      if (initObj.hasOwnProperty('target_zone')) {
+        this.target_zone = initObj.target_zone
       }
       else {
-        this.dig_zone = new Location();
+        this.target_zone = new Location();
       }
       if (initObj.hasOwnProperty('robot_speed')) {
         this.robot_speed = initObj.robot_speed
@@ -50,8 +50,8 @@ class Orientation_Vector {
     // Serializes a message object of type Orientation_Vector
     // Serialize message field [robot_pose]
     bufferOffset = Pose.serialize(obj.robot_pose, buffer, bufferOffset);
-    // Serialize message field [dig_zone]
-    bufferOffset = Location.serialize(obj.dig_zone, buffer, bufferOffset);
+    // Serialize message field [target_zone]
+    bufferOffset = Location.serialize(obj.target_zone, buffer, bufferOffset);
     // Serialize message field [robot_speed]
     bufferOffset = _serializer.int64(obj.robot_speed, buffer, bufferOffset);
     return bufferOffset;
@@ -63,8 +63,8 @@ class Orientation_Vector {
     let data = new Orientation_Vector(null);
     // Deserialize message field [robot_pose]
     data.robot_pose = Pose.deserialize(buffer, bufferOffset);
-    // Deserialize message field [dig_zone]
-    data.dig_zone = Location.deserialize(buffer, bufferOffset);
+    // Deserialize message field [target_zone]
+    data.target_zone = Location.deserialize(buffer, bufferOffset);
     // Deserialize message field [robot_speed]
     data.robot_speed = _deserializer.int64(buffer, bufferOffset);
     return data;
@@ -81,14 +81,14 @@ class Orientation_Vector {
 
   static md5sum() {
     //Returns md5sum for a message object
-    return '09467e8e0e560bedfd1a1c32cc5278c6';
+    return '32c0233ad09fff327409092d7163201c';
   }
 
   static messageDefinition() {
     // Returns full string definition for message
     return `
     Pose robot_pose
-    Location dig_zone
+    Location target_zone
     int64 robot_speed
     ================================================================================
     MSG: rdt_localization/Pose
@@ -115,11 +115,11 @@ class Orientation_Vector {
       resolved.robot_pose = new Pose()
     }
 
-    if (msg.dig_zone !== undefined) {
-      resolved.dig_zone = Location.Resolve(msg.dig_zone)
+    if (msg.target_zone !== undefined) {
+      resolved.target_zone = Location.Resolve(msg.target_zone)
     }
     else {
-      resolved.dig_zone = new Location()
+      resolved.target_zone = new Location()
     }
 
     if (msg.robot_speed !== undefined) {

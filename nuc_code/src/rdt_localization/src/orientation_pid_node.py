@@ -50,7 +50,7 @@ def run_pid(data):
 
     # simulator.update_feedback(angle_error)
 
-    rospy.loginfo(offset)
+    rospy.loginfo(angle_error)
 
     # PID outputs in the following range:
     # [(G_KP*-180)-(G_KD*-360)-G_WINDUP, (G_KP*180)+(G_KD*360)+G_WINDUP]
@@ -80,8 +80,7 @@ def PID_error(data):
     desired_theta = math.degrees(math.atan2(displacement[0], displacement[1]))
     
     # Initial range of angle_error: [0, 360]
-    angle_error = abs(desired_theta - robot_orient)
-
+    angle_error = abs(desired_theta - robot_orient)%360
     # TODO: Determine if the directions need to be negated 
     # Determining whether we want to turn left
     turn_left = desired_theta > robot_orient

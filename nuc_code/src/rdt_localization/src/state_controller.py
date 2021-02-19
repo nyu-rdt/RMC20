@@ -8,7 +8,7 @@ robot's state constantly. This includes the robot's location, the position of it
 much load it is carrying.
 
 Completed states: 2, 4, 5, 14, 15, 19, 20, 24, 27(Ri5B)
-Tested states: 2
+Tested states: 2, 4
 """
 
 import rospy
@@ -34,7 +34,7 @@ ROSPY_LOOP_RATE = 20
 
 # Robot constants
 TARGET_TOLERANCE = 10                                   # Tolerance (cm) how far robot can stop from its target
-ROTATION_TOLERANCE                                      # Tolerance (deg) how close the robot should rotate to its target
+ROTATION_TOLERANCE = 3                                     # Tolerance (deg) how close the robot should rotate to its target
 TURN_IN_PLACE_SPEED = 50
 MANUAL_SPEED_FWD = 200
 MANUAL_SPEED_REVERSE = 0
@@ -55,7 +55,7 @@ TOPIC_TO_MANUAL_DRIVE = "server/manual_drive"           # Receives key presses/r
 # i.e. instead of if (robot_cannot_move), we might use something like if (motor_speed == 0)
 
 # Robot variables
-robot_state = 1
+robot_state = 4
 robot_pose = None
 robot_localized = False
 robot_cannot_move = False             # If the robot cannot move
@@ -84,7 +84,7 @@ lin_act_drive_config = False          # If the linear actuators are in drive con
 
 # Rest of the variables   
 e_stop = False                        # If the robot needs to emergency stop
-inc_obstacle = False                  # If there are incoming obstacle
+inc_obstacle = None                  # If there are incoming obstacle
 artag_seen = False                    # If April Tags can be located
 drum_turning = False                  # If drums are turning
 door_closed = False                   # If the door is closed
@@ -280,7 +280,7 @@ def main():
             if robot_localized: 
                 ros_log("DEBUG: ROBOT LOCALIZED")
                 curr_state_start_time = None
-                robot_state = 14
+                robot_state = 5
 
             # ERROR STATE: Ri4a
             elif current_time - curr_state_start_time > 30:
@@ -289,8 +289,7 @@ def main():
         # STATE 5: Nuc localizes robot
         elif robot_state == 5:
             ros_log("DEBUG: STATE 5")
-
-            if inc_obstacle.left or inc_obstacle.right:
+            if inc_obstacle is not None and (inc_obstacle.left or inc_obstacle.right):
                 robot_state = 27
 
             # Build Orientation_Vector consisting of bot and digging zone positions
@@ -565,7 +564,7 @@ def main():
 
         # STATE Ri5B: Error state of obstacle detected
         elif robot_state == 27:
-            ros.log(“DEBUG STATE 27”)
+            ros.log("DEBUG STATE 27")
             # If no more obstacle detected, transition back to state 5
             if (not (inc_obstacle.left or inc_obstacle.right)):
                 robot_state = 5
