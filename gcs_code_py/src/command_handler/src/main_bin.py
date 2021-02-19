@@ -34,11 +34,15 @@ def testCleanup(hello):
 
 def run(argc, argv): 
     #manager = GCSManager()
+    rospy.init_node('BIN_command_handler')
     manager = BINManager()
-    manager.commands.insert(1, [Key_library.W, Key_library.A, Key_library.S, Key_library.D], encoder_manual_drive, decoder_manual_drive, testSetup, testCleanup)
+    # manager.commands.insert(1, [Key_library.W, Key_library.A, Key_library.S, Key_library.D], encoder_manual_drive, decoder_manual_drive testSetup, testCleanup)
     
-    manager.commands.insert(1, [Key_library.M], encoder_emergency_stop, decoder_emergency_stop, testSetup, testCleanup)
+    # manager.commands.insert(1, [Key_library.M], encoder_emergency_stop, decoder_emergency_stop, testSetup, testCleanup)
 
+    manager.commands.insert(1, [Key_library.W, Key_library.A, Key_library.S, Key_library.D], encoder_manual_drive, decoder_manual_drive, testSetup, testCleanup, "manual_drive", Keyboard)
+    
+    manager.commands.insert(1, [Key_library.M], encoder_emergency_stop, decoder_emergency_stop, testSetup, testCleanup, "", Keyboard)
 
     manager.commandsRos.addBroadcast("slot1",None,None);
     manager.commandsRos.addBroadcast("slot2",None,None);

@@ -20,7 +20,7 @@ class BINManager:
         self.commandsRos = RosTable() 
         
         # ros init with command line arguments, needs to be finished. possible line of code:
-        rospy.init_node('bin_manager')
+        # rospy.init_node('bin_manager')
         self.width = width
         self.height = height
         self.keyCompressedPrev = 0

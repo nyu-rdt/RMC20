@@ -1,5 +1,5 @@
 keyboard = ['W','A','S','D', ' '] # this will be taken from the keyboard class  
-
+keyboard_move_status = [False for _ in range(0,4)] 
 
 def encoder(a):  
     # a is array of booleans; a: list[bool]
@@ -61,9 +61,11 @@ def decoder_emergency_stop(d):
     # if not, then don't emergency stop
     # replace print with function calls
     if d[0]:
-        print("emergency stop")
-    else:
-        print("no emergency stop")
+        return "stop"
+        #print("emergency stop")
+    #else:
+        #print("no emergency stop")
+        
 
 test_func([1], encoder_emergency_stop, decoder_emergency_stop)
 
@@ -132,15 +134,41 @@ def encoder_manual_drive(IIII):
 
 def decoder_manual_drive(d):
     # will recieve forward, left, back, reverse (WASD)
+    # TODO: change I variables to something normal
+    global keyboard_move_status
+    result = Keyboard()
     I = d[0] & 0b111000
     I = I >> 3
     II = d[0] & 0b000111
-    if I == 0: print( "go leftwards" )
-    if I == 2: print( "go rightwards" )
+    # result.a = False 
+    # result.d = False 
+    # result.s = False 
+    # result.w = False
+    # if I == 0: result.a = True  #print( "go leftwards" )
+    # elif I == 2: result.d = True  #print( "go rightwards" )
 
-    if II == 0: print( "go backwards" )
-    elif II == 2: print( "go frontwards")
-    print("decoder manual drive")
+    # if II == 0: result.s = True #print("go backwards" )
+    # elif II == 2: result.w = True   #print( "go frontwards")
+    # # print("decoder manual drive")
+    if I == 0:
+        #A 
+        keyboard_move_status[0] = True if keyboard_move_status[0] == False else False #print( "go leftwards")
+    elif I == 2: 
+        #D
+        keyboard_move_status[1] = True if keyboard_move_status[1] == False else False #print( "go rightwards")
+        #W
+    if II == 0: 
+        keyboard_move_status[2] = True if keyboard_move_status[2] == False else False #print( "go forward")
+        #S
+    elif II == 2:
+        keyboard_move_status[3] = True if keyboard_move_status[3] == False else False #print( "go frontwards")
+    # print("decoder manual drive")
+    result.a = keyboard_move_status[0]
+    result.d = keyboard_move_status[1]
+    result.s = keyboard_move_status[2]
+    result.w = keyboard_move_status[3]
+    return result
+    
 
 test_func(['w','a','s','d'], encoder_manual_drive, decoder_manual_drive)
 

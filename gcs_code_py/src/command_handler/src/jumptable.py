@@ -1,8 +1,11 @@
 from KeyMap import Key_library
 
+import  rospy 
+from std_msgs.msg import String
+
 class Functions:
     # constructor
-    def __init__(self, keyboard, encoder, decoder, setup, cleanup, num_bytes=0):
+    def __init__(self, keyboard, encoder, decoder, setup, cleanup, topic, return_type, num_bytes=0):
         self.num_bytes = num_bytes
         self.keyboard = keyboard
         
@@ -20,10 +23,16 @@ class Functions:
 
         # lst(tuple(chr, int))
         self.func_vector = None
+        
+
+        #ros topic we are publishing to
+        self.topic = topic
+
+        self.sendHandler = rospy.Publisher(topic, return_type, queue_size=10)
 
     
 class FunctionTable:
-    # constructor
+    # constructors
     def __init__(self):
         self.curr_index = 0
         self.compressed_used = 0
@@ -36,8 +45,10 @@ class FunctionTable:
         self.func_table = []
 
 
+
+
     # destructor
-    def __del__(self):
+    def __del__(self):s
         self.curr_index = None
         self.compressed_used = None
         self.manage = None
@@ -55,8 +66,8 @@ class FunctionTable:
         setup: func(bool) -> None
         cleanup: func(bool) -> None
     """
-    def insert(self, num_bytes, keyboard, encoder, decoder, setup, cleanup):
-        func = Functions(keyboard, encoder, decoder, setup, cleanup, num_bytes)
+    def insert(self, num_bytes, keyboard, encoder, decoder, setup, cleanup, topic, return_type)):
+        func = Functions(keyboard, encoder, decoder, setup, cleanup, topic, return_type, num_bytes)
         self.insert_function(func)
 
 
@@ -132,7 +143,8 @@ class FunctionTable:
 
                 curr += f.num_bytes
 
-                f.decoder(data)
+                f.sendHandler.publish(f.decoder(data))
+
 
 
     '''

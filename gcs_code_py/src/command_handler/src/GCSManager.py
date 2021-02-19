@@ -17,12 +17,11 @@ from ROSTable import *
 # green circle for good connection, red for bad
 class GCSManager:
     def __init__(self, title="  RDT Command Framework", width=640, height=480):
-        
+        # rospy.init_node('gcs_manager')
         self.commands = FunctionTable() 
         self.commandsRos = RosTable() 
         
         # ros init with command line arguments, needs to be finished. possible line of code:
-        rospy.init_node('gcs_manager')
         self.width = width
         self.height = height
         self.keyCompressedPrev = 0
@@ -120,11 +119,11 @@ class GCSManager:
             return 
         tmp1 = int(data[0]) 
         #might need to change the str part idk what htis does std::string(data.begin()+1,data.end())
-        self.commandsRos.decode(tmp1, "".join([chr(byte) for byte in data]) );
+        self.commandsRos.decode(tmp1, "".join([chr(byte) for byte in data]) )
         tmp2 = tmp1 >> 3 
         tmp1 -= tmp2 << 3  
 
-        self.commandsRos.nextSend[tmp2] &= ~(1<<tmp1);
+        self.commandsRos.nextSend[tmp2] &= ~(1<<tmp1)
 
     
     # initializes pygame object (sdl wrapper - sdl is the c++ equivalent)
