@@ -1,15 +1,13 @@
 /*
  * limbs_esp.ino
  * 
- * Code for the radio in the locomotion subsystem, particularly for a NodeMCU with an ESP8266 
- * module. Reads commands from the MQTT network and relays them to the locomotion subsystem
- * controller. Also provides ping functionality so the state controller can check that its
- * connection to the subsystem is established.
+ * Code for the radio in the limbs subsystem, particularly for a NodeMCU with an ESP8266 
+ * module. Reads 1 byte from the MQTT network and relays them to the locomotion subsystem
+ * controller. Publish ping byte so the state controller can check its connection when the
+ * leftmost bit is activated
  * 
  * See README for descriptions on the format of the command messages.
  * 
- * TODO:
- * - Implement handlers for special drive modes (>252)
  */
 
 #include <ESP8266WiFi.h>
@@ -30,11 +28,6 @@
 
 #define CMD_TIMEOUT 1000
 #define NEUTRAL_VAL 100
-
-char get_ping_bit(char byte_in);
-bool get_door_state(char byte_in);
-char get_lin_acts_speed(char byte_in);
-
 
 // Create MQTT client on the ESP
 WiFiClient client;
@@ -66,20 +59,19 @@ void loop() {
   // the end of the cycle
   if (millis() > timeLastRecv + CMD_TIMEOUT) cmdRecv = false;
 
-  checkConnection();
-  scanForCmd();
+  establish_connection();
+  publish_commands();
 
-  // Write zero values
+  // Write zero values when there's connection but can't receive commands
   if (!cmdRecv) {
     Serial.write(255);
-    Serial.write(NEUTRAL_VAL);
     Serial.write(NEUTRAL_VAL);
   }
 }
 
 
 // Constantly check the connection and reconnect if it is dropped
-void checkConnection(){
+void establish_connection(){
   if (mqtt.connected()) return;
 
   int8_t connectionStatus;
@@ -93,17 +85,17 @@ void checkConnection(){
 }
 // Scan for any incoming data on any topic. The `subPtr` object will have to be compared in
 // a switch case to determine the topic name.
-void scanForCmd(){
+void publish_commands(){
   Adafruit_MQTT_Subscribe* subPtr;
-  
+  //while subPtr isn't null I think
   while ((subPtr = mqtt.readSubscription(MQTT_READ_TIMEOUT))){
     if (subPtr == &inTopic){
       cmdRecv = true;
       timeLastRecv = millis();
 
-      // Read and translate the last incoming string of bytes
+      // Read and transmit bytes
       // Incoming bytes currently come in the following format:
-      //      0x00  0x00  robotSpeed  offsetNum
+      // byte byte byte byte
       char* command = (char*) inTopic.lastread; 
       char limb_cmds = command[0];
       if(get_ping_bit(limb_cmds))
@@ -114,11 +106,6 @@ void scanForCmd(){
       {
         Serial.write(255);
         Serial.write(limb_cmds);
-        //Serial.write(get_door_state(limb_cmds));
-        //Serial.write(get_lin_acts_speed(limb_cmds));
-        //Serial.write(get_arm_speed(limb_cmds));
-        //Serial.write(get_drum_speed(limb_cmds));
-        //
       }
     }
   }

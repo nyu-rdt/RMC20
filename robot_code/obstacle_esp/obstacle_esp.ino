@@ -1,15 +1,14 @@
 /*
  * obstacle_esp.ino
  * 
- * Code for the radio in the locomotion subsystem, particularly for a NodeMCU with an ESP8266 
- * module. Reads commands from the MQTT network and relays them to the locomotion subsystem
- * controller. Also provides ping functionality so the state controller can check that its
- * connection to the subsystem is established.
+ * Code for the radio in the obstacles subsystem, particularly for a NodeMCU with an ESP8266 
+ * module. Reads 4 LIDAR bytes from the obstacle subsystem and send it to the server through MQTT
+ * Expect synchronization byte of 0 from the obstacle subsystem prior to the 4 LIDAR values
  * 
  * See README for descriptions on the format of the command messages.
  * 
  * TODO:
- * - Implement handlers for special drive modes (>252)
+ * - Sending synchronization byte of 0 from the obstacle subsystem
  */
 
 #include <ESP8266WiFi.h>
@@ -35,19 +34,10 @@ WiFiClient client;
 Adafruit_MQTT_Client mqtt(&client, SERVER_ADDR, SERVER_PORT, "obstacleTopic", "");
 Adafruit_MQTT_Publish out_topic = Adafruit_MQTT_Publish(&mqtt, TOPIC_NAME_OUT);
 
-void checkConnection();
-void send_lidar_vals(char[] all_bytes);
-char get_the_byte();
-
-unsigned long timeLastRecv;   // Last time in milliseconds command was received
-bool cmdRecv;                 // Has a command been received this cycle
 
 void setup() {
   Serial.begin(115200);
   WiFi.begin(WIFI_SSID, WIFI_PASS, WIFI_CHANNEL);
-
-  timeLastRecv = 0;
-  cmdRecv = false;
 
   //  Wait until ESP is connected to wifi to proceed
   while (WiFi.status() != WL_CONNECTED) {
@@ -57,25 +47,38 @@ void setup() {
 }
 
 void loop() {
-  if (millis() > timeLastRecv + CMD_TIMEOUT) cmdRecv = false;
+  establish_connection();
+  read_and_publish();
+}
 
-  checkConnection();
-  //since we're not subscribing, we only need to publish lidar values
+// Constantly check the connection and reconnect if it is dropped
+void establish_connection(){
+  if (mqtt.connected()) return;
 
+  int8_t connectionStatus;
+  connectionStatus = mqtt.connect();
+  
+  while (connectionStatus != 0){
+    mqtt.disconnect();
+    delay(MQTT_RECONNECT_TIMEOUT);
+    connectionStatus = mqtt.connect();
+  }
+}
+
+void read_and_publish()
+{
   if (Serial.available() > 0) {
-    int inByte = Serial.read();
+    char inByte = Serial.read();
     Serial.println("received");
     Serial.println(inByte);
     //is there a synchro byte? ya it should be 0 according to dan i dont think
     //we coded it yet
     if (inByte == 0 ){ //synchro inByte
       char all_the_bytes[4];
-      int i;
-      for(i = 0; i < 4; i++)
+      for(int i = 0; i < 4; i++)
       {
         all_the_bytes[i] = get_the_byte();
       }
-      //forward(inByte2, inByte3);
       send_lidar_vals(all_the_bytes);
     }
   }
@@ -89,22 +92,7 @@ char get_the_byte()
 }
 
 void send_lidar_vals(char[] all_bytes){
-  int i; 
-  for(i = 0; i < 4; i++){
+  for(int i = 0; i < 4; i++){
     out_topic.publish(all_bytes[i]);
-  }
-}
-
-// Constantly check the connection and reconnect if it is dropped
-void checkConnection(){
-  if (mqtt.connected()) return;
-
-  int8_t connectionStatus;
-  connectionStatus = mqtt.connect();
-  
-  while (connectionStatus != 0){
-    mqtt.disconnect();
-    delay(MQTT_RECONNECT_TIMEOUT);
-    connectionStatus = mqtt.connect();
   }
 }
