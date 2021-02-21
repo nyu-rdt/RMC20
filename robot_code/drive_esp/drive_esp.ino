@@ -107,7 +107,7 @@ void scanForCmd(){
       
       //ESTOP. Speed limit of 0 mph.
       if(offsetNum == 255)
-        robotSpeed = 0;
+        robotSpeed = 100;
       // Check if last message was 'ping' byte; if it was, forward
       // response to ping channel
       if (offsetNum == 252) {
