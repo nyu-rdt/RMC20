@@ -1,36 +1,59 @@
 #!/usr/bin/env python
 
+"""
+send_drive_vector.py
+
+Node to relay drive commands from the state controller or the PID controller to the robot through 
+the MQTT network. For more information on the format of the drive commands, reference README.
+"""
+
 from std_msgs.msg import String
+from rdt_localization.msg import Drive_Vector
 
 import paho.mqtt.client as mqtt
 import rospy
+import struct
 
-# callback function gets executed when connection is made to server
+client = None
+
+'''
+Debug message for when the client connects successfully
+'''
 def on_connect(client, userdata, flags, rc):
-	rospy.loginfo("Connected: send drive vector")
+    rospy.loginfo("DEBUG: SEND_DRIVE_VECTOR CONNECTED")
 
-# callback function gets executed when topic "server/sendDriveVec" receives new drive_vector
+'''
+Relay the last received drive command to the robot
+data: rdt_localization/Drive_Vector
+'''
 def publish_drive_vector(data):
-	drive_vector = str(data.data)
-	client.publish("robotCmds/drive", drive_vector)
+    global client
 
-def state_controller_listener():
-	rospy.init_node("send_drive_vector")
-	rospy.Subscriber("server/sendDriveVec", String, publish_drive_vector)
-	
-	client = mqtt.Client()
-	client.on_connect = on_connect		
-	
-	# connects to the server on the NUC
-	client.connect("localhost", 1883)
+    # Drive commands are sent through the MQTT network in the following format:
+    #   0x00    0x00    rbt_offset  rbt_speed
+    rbt_spd = int(data.robot_spd)
+    rbt_offset = int(data.offset_driveMode)
+    rbt_spd = rbt_spd << 24
+    rbt_offset = rbt_offset << 16
+    rbt_data = rbt_spd + rbt_offset
 
-	# THIS LINE IS FOR TESTING, DELETE LATER
-	for i in range(0, 10):		
-		client.publish("robotCmds/drive", "00100000")
+    client.publish("robotCmds/drive", struct.pack('I', rbt_data))
 
-	#rospy.spin()
-	while not rospy.is_shutdown():
-		client.loop()
+def main():
+    global client
+
+    # Setup ROS node
+    rospy.init_node("send_drive_vector")
+    
+    # Setup MQTT client
+    client = mqtt.Client()
+    client.on_connect = on_connect
+    client.connect("localhost", 1883)
+    
+    rospy.Subscriber("server/send_drive_vec", Drive_Vector, publish_drive_vector)
+
+    while not rospy.is_shutdown():
+        client.loop()
 
 if __name__ == "__main__":
-	state_controller_listener()
+    main()

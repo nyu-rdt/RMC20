@@ -50,6 +50,11 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
   FILES
   Pose.msg
+  Location.msg
+  Orientation_Vector.msg
+  Drive_Vector.msg
+  Obstacle.msg
+  Limb_Vector.msg
 )
 
 ## Generate services in the 'srv' folder

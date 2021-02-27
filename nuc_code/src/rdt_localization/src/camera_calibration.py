@@ -1,3 +1,10 @@
+'''
+camera_calibration.py
+HELPER CODE
+
+Used for calibrating server camera.
+'''
+
 import numpy as np
 import cv2
 import glob

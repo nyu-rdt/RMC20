@@ -1,3 +1,3 @@
 Pose robot_pose
-Location dig_zone
+Location target_zone
 int64 robot_speed
