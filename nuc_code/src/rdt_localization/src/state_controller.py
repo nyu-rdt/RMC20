@@ -2,11 +2,9 @@
 
 """
 state_controller.py
-
 The 'main' node in the ROS network - it interfaces with several other nodes to keep track of the
 robot's state constantly. This includes the robot's location, the position of its limbs, and how
 much load it is carrying.
-
 Completed states: 2, 4, 5, 14, 15, 19, 20, 24, 27(Ri5B)
 Tested states: 2, 4
 """
@@ -305,7 +303,21 @@ def main():
 
         # STATE 6: Machine moves to digging area
         elif robot_state == 6:
-            pass
+            x_difference = abs(DIG_ZONE.x - robot_pose.x)
+            y_difference = abs(DIG_ZONE.y - robot_pose.y)
+
+            if x_difference < TARGET_TOLERANCE and y_difference < TARGET_TOLERANCE: #digging zone reached
+                robot_state = 7
+
+            if not robot_pose == None:
+                ros_log("DEBUG: PUBLISHING STATE 6")
+                
+                outvec = Orientation_Vector()
+                outvec.robot_pose = robot_pose
+                outvec.target_zone = DIG_ZONE
+                outvec.robot_speed = 200
+
+                pub_pid.publish(outvec)
 
         # STATE 7: Drum begins to turn
         elif robot_state == 7:
@@ -374,9 +386,15 @@ def main():
         elif robot_state == 13:
             if (arm_drive_config):
                 robot_state = 14
-            else:
-                # Continue lifting arms
-                pass
+            else: #continue digging
+                arm_vec = Limb_Vector()
+                arm_vec.linActs_speed = 0
+                arm_vec.arm_speed = 0
+                arm_vec.drum_speed = 0
+
+                arm_vec.door = False 
+
+                pub_limb_cmd.publish(arm_vec) 
 
         # STATE 14: Drum stops spinning
         elif robot_state == 14:
