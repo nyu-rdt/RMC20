@@ -326,7 +326,8 @@ def main():
                 robot_state = 8
             else:
                 # Start turning drums
-                pass
+                outvec = Limb_Vector(door = False, linActs_speed = 0, arm_speed = 0, drum_speed = 3)
+                pub_limb_cmd.publish(outvec)
 
         # STATE 8: Arms lower drum until contact
         elif robot_state == 8:
@@ -427,11 +428,21 @@ def main():
         # STATE 14: Drum stops spinning
         elif robot_state == 14:
             # Error checking
-            if (artag_seen == False):
-                # This is different from the first resolution for this problem
-                # Move robot slowly forward for 5 seconds
-                # If unsuccessful, switch to manual control
-                pass
+            #If AR Tag isn't seen, move forward until 5 seconds pass, then
+            #switch to manual control
+            if not artag_seen:
+                curr_state_start_time = rospy.get_time()
+                current_time = rospy.get_time()
+                while not artag_seen and current_time < curr_state_start_time + 5:
+                    drive_vector = Drive_Vector()
+                    drive_vector.robot_spd = 101
+                    drive_vector.offset_driveMode = 0
+                    pub_drive_cmd.publish(drive_vector)
+                    
+                    current_time = rospy.get_time()
+                if not artag_seen:
+                    robot_state = 0
+                
             ros_log("desired orient:" + str(((math.atan((robot_pose.x) / robot_pose.y)) * 180 / math.pi)+180))
             ros_log("orientation:" + str(robot_pose.orientation))
             ros_log("x:" + str(robot_pose.x))
