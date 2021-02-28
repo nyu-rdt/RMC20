@@ -79,6 +79,7 @@ lin_act_stuck = False                 # If the linear actuators are stuck
 lin_act_ext = False                   # If the linear actuators are fully extended
 lin_act_depo_ready = False            # If the linear actuators are in position to deposit
 lin_act_drive_config = False          # If the linear actuators are in drive configuration
+lin_act_ready = True                  # If the linear actuators are reset to original length
 
 # Rest of the variables   
 e_stop = False                        # If the robot needs to emergency stop
@@ -332,30 +333,57 @@ def main():
             # Error checking
             if (arm_gears_slip):
                 # Rotate in opposite direction and keep encoder rotation at 0
-                pass
+                outvec = Limb_Vector(door = False,
+                                     linActs_speed = 0,
+                                     arm_speed = -10,
+                                     drum_speed = 0)
 
-            if (arm_hit_surface or arm_min_extend):
+                pub_limb_cmd.publish(outvec)
+            elif (not lin_act_ready):
+                # Shorten the linear acuators so that the arms can lower as much as possible
+                outvec = Limb_Vector(door = False,
+                                     linActs_speed = -50,
+                                     arm_speed = 0,
+                                     drum_speed = 0)
+
+                pub_limb_cmd.publish(outvec)
+
+            elif (arm_hit_surface or arm_min_extend):
                 robot_state = 9
             else:
                 # Continue lowering arms
-                pass
+                outvec = Limb_Vector(door = False,
+                                     linActs_speed = 0,
+                                     arm_speed = 10,
+                                     drum_speed = 100)
+
+                pub_limb_cmd.publish(outvec)
 
         # STATE 8: Linear actuators push drum down to dig
         elif robot_state == 9:
             # Error checking
             if (lin_act_stuck):
                 # Shift around until there is movement
-                pass
+                outvec = Limb_Vector(door = False,
+                                     linActs_speed = -50,
+                                     arm_speed = 0,
+                                     drum_speed = 100)
 
-            if (bin_full or lin_act_ext):
+                pub_limb_cmd.publish(outvec)
+            elif (bin_full or lin_act_ext):
                 robot_state = 10
             else:
                 # Continue pushing drum down to dig
-                pass
+                outvec = Limb_Vector(door = False,
+                                     linActs_speed = 100,
+                                     arm_speed = 0,
+                                     drum_speed = 100)
+
+                pub_limb_cmd.publish(outvec)
 
         # STATE 9: Linear actuators lift drum
         elif robot_state == 10:
-            if (bin_full or lin_act_ext):
+            if (bin_full or arm_min_extend):
                 robot_state = 11
             else:
                 robot_state = 8
