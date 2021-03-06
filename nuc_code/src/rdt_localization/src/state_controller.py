@@ -63,7 +63,13 @@ robot_in_depo_dist = False            # If the robot is in distance to deposit
 robot_depo_fail = False               # If the robot crashes into the deposition bin or wall, or if the robot fails alignment
 robot_unstable = False                # If the robot becomes unstable while raising its frame
 robot_face_dig_zone = False           # If the robot is facing the digging zone
-    
+
+# deposition-navigation lidars & navigation (mounted on right side of bot)
+depo_dist = None  # smallest distance btwn a deposition-lidar and the deposition bin
+TARGET_DIST = 3  # cm
+TARGET_DIST_TOLERANCE = 1  # cm
+PARALLELISM_TOLERANCE = 0.5 # cm; difference between deposition-bin-distances of front-depo-lidar and back-depo-lidar
+
 # Arm variables       
 arm_deployed = False                  # If the arms have been initially deployed
 arm_stuck = False                     # If the arms are not being deployed despite being told to do so
@@ -83,7 +89,7 @@ lin_act_ready = True                  # If the linear actuators are reset to ori
 
 # Rest of the variables   
 e_stop = False                        # If the robot needs to emergency stop
-inc_obstacle = None                  # If there are incoming obstacle
+lidar_data = None                  # If there are incoming obstacle
 artag_seen = False                    # If April Tags can be located
 drum_turning = False                  # If drums are turning
 door_closed = False                   # If the door is closed
@@ -130,8 +136,8 @@ data: TBD
 '''
 def get_obstacle_data(data):
     global obstacle_connected
-    global inc_obstacle
-    inc_obstacle = data
+    global lidar_data
+    lidar_data = data
     obstacle_connected = True
 
 '''
@@ -288,7 +294,7 @@ def main():
         # STATE 5: Nuc localizes robot
         elif robot_state == 5:
             ros_log("DEBUG: STATE 5")
-            if inc_obstacle is not None and (inc_obstacle.left or inc_obstacle.right):
+            if lidar_data is not None and (lidar_data.left or lidar_data.right):
                 robot_state = 27
 
             # Build Orientation_Vector consisting of bot and digging zone positions
@@ -400,7 +406,7 @@ def main():
         # STATE 12: Move forward until all wheels are in front of the hole
         elif robot_state == 12:
             # Error checking
-            if (inc_obstacle):
+            if (lidar_data):
                 # Move around the obstacle using sensors
                 # If unsuccessful, switch to manual control
                 pass
@@ -485,7 +491,7 @@ def main():
                 # Find reverse of drive vector and input (backtrack)
                 # If unsuccessful, switch to manual control
                 pass
-            elif (inc_obstacle):
+            elif (lidar_data):
                 # Move around the obstacle using sensors
                 # If unsuccessful, switch to manual control
                 pass
@@ -501,18 +507,81 @@ def main():
                 pass
 
         # STATE 17: Orient with deposition bin
-        # test comment
-        elif robot_state == 17:
+        elif robot_state == 16:
+            ros_log("DEBUG: STATE 16")
             # Error checking
-            if (robot_depo_fail):
-                # Switch to manual control
+            if robot_cannot_move:  # temp variable
+                # Find reverse of drive vector and input (backtrack)
+                # If unsuccessful, switch to manual control
+                pass
+            elif lidar_data:
+                # Move around the obstacle using sensors
+                # If unsuccessful, switch to manual control
                 pass
 
-            if (robot_face_depo):
-                robot_state = 18
+            if robot_face_depo and robot_in_depo_dist:
+                robot_state = 17
             else:
-                # Continue orientating the robot
-                pass
+                # Continue navigating to correct distance from deposition zone
+
+                # 1. Set up navigation with lidars
+                # smallest distance btwn a deposition-lidar and the deposition bin
+                depo_dist = lidar_data.depo_front if lidar_data.depo_front < lidar_data.depo_back else lidar_data.depo_back
+                diff_btw_depo_lidar_readings = abs(lidar_data.depo_front - lidar_data.depo_back)
+                facing_toward = True if lidar_data.depo_front < lidar_data.depo_back else False
+
+                # 2. Pull up alongside depo bin
+                # CASE 1: bot is in correct place
+                # bot is close enough
+                if ((abs(depo_dist - TARGET_DIST) < TARGET_DIST_TOLERANCE)
+                        and (diff_btw_depo_lidar_readings < PARALLELISM_TOLERANCE)):  # bot is parallel to depo bin
+                    robot_face_depo, robot_in_depo_dist = True, True
+
+                # CASE 2: within dist, but not parallel
+                elif (abs(depo_dist - TARGET_DIST) < TARGET_DIST_TOLERANCE):
+                    # determine which is too far away: front or back?
+                    if facing_toward:
+                        # rotate CW small amount
+                        # TODO: identify which direction is cw and which is ccw below
+                        outmsg = Drive_Vector()
+                        outmsg.offset_driveMode = 254  # Turn in place
+                        # 10-15% speed forward rotation (CW?). Need to check the value 110
+                        outmsg.robot_spd = 110
+                        pub_drive_cmd.publish(outmsg)
+                    else:
+                        # rotate CCW small amount
+                        outmsg = Drive_Vector()
+                        outmsg.offset_driveMode = 254  # Turn in place
+                        # 10-15% speed backward rotation (CCW?). Need to check the value 110
+                        outmsg.robot_spd = 90
+                        pub_drive_cmd.publish(outmsg)
+
+                # CASE 3: parallel, but not within dist
+                elif (diff_btw_depo_lidar_readings < PARALLELISM_TOLERANCE):
+                    # rotate front closer to depo
+                    # rotate CW small amount
+                    # TODO: identify which direction is cw and which is ccw below
+                    outmsg = Drive_Vector()
+                    outmsg.offset_driveMode = 254  # Turn in place
+                    # 10-15% speed forward rotation (CW?). Need to check the value 110
+                    outmsg.robot_spd = 110
+                    pub_drive_cmd.publish(outmsg)
+
+                    # TODO: INSERT SOME SORT OF PAUSE OR DELAY HERE
+
+                    # drive fwd a lil (TODO: but dont collide)
+                    outmsg.offset_driveMode = 100
+                    outmsg.robot_spd = 110  # 10-15% speed forward
+                    pub_drive_cmd.publish(outmsg)
+
+                    # rotate rear closer to depo
+                    # reverse a lil (if needed)
+
+                # CASE 4: not parallel and not within dist
+                else:
+                    # drive fwd until within dist
+                    # (will then be in case 1)
+                    pass
 
         # STATE 18: Arms raise frame to upper limit
         elif robot_state == 18:
@@ -624,11 +693,11 @@ def main():
         elif robot_state == 27:
             ros.log("DEBUG STATE 27")
             # If no more obstacle detected, transition back to state 5
-            if (not (inc_obstacle.left or inc_obstacle.right)):
+            if (not (lidar_data.left or lidar_data.right)):
                 robot_state = 5
             else:
                 # Turn left if obstacle to the right, & vice versa
-                if (inc_obstacle.left):
+                if (lidar_data.left):
                     speed = TURN_IN_PLACE_SPEED
                 else:
                     speed = 200 - TURN_IN_PLACE_SPEED
