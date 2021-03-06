@@ -501,6 +501,7 @@ def main():
                 pass
 
         # STATE 17: Orient with deposition bin
+        # test comment
         elif robot_state == 17:
             # Error checking
             if (robot_depo_fail):
