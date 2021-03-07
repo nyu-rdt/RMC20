@@ -419,17 +419,15 @@ def main():
 
         # STATE 13: Lift arms into driving configuration
         elif robot_state == 13:
-            if (arm_drive_config):
-                robot_state = 14
-            else: #continue digging
-                arm_vec = Limb_Vector()
-                arm_vec.linActs_speed = 0
-                arm_vec.arm_speed = 0
-                arm_vec.drum_speed = 0
+            #stop spinning
+            arm_vec = Limb_Vector()
+            arm_vec.linActs_speed = 0
+            arm_vec.arm_speed = 0
+            arm_vec.drum_speed = 0
+            arm_vec.door = False 
 
-                arm_vec.door = False 
-
-                pub_limb_cmd.publish(arm_vec) 
+            pub_limb_cmd.publish(arm_vec)
+            robot_state = 14 
 
         # STATE 14: Drum stops spinning
         elif robot_state == 14:
