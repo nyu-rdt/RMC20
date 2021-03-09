@@ -1,3 +1,4 @@
+import  rospy 
 keyboard = ['W','A','S','D', ' '] # this will be taken from the keyboard class  
 keyboard_move_status = [False for _ in range(0,4)] 
 
@@ -113,7 +114,8 @@ def decoder_actuator(d):
         
 test_func([1,1], encoder_actuator, decoder_actuator)
 
-
+manual_drive_topic = "manual_drive"
+manual_drive_sendHandler = rospy.Publisher(manual_drive_topic, Keyboard, queue_size=10)
 
 def encoder_manual_drive(IIII):
     # should recieve wasd
@@ -167,6 +169,7 @@ def decoder_manual_drive(d):
     result.d = keyboard_move_status[1]
     result.s = keyboard_move_status[2]
     result.w = keyboard_move_status[3]
+    manual_drive_sendHandler.publish(result)
     return result
     
 

@@ -26,9 +26,9 @@ class Functions:
         
 
         #ros topic we are publishing to
-        self.topic = topic
+        # self.topic = topic
 
-        self.sendHandler = rospy.Publisher(topic, return_type, queue_size=10)
+        # self.sendHandler = rospy.Publisher(topic, return_type, queue_size=10)
 
     
 class FunctionTable:
@@ -143,7 +143,8 @@ class FunctionTable:
 
                 curr += f.num_bytes
 
-                f.sendHandler.publish(f.decoder(data))
+                f.decoder(data)
+                # f.sendHandler.publish(f.decoder(data))
 
 
 
