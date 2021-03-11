@@ -48,7 +48,7 @@ class FunctionTable:
 
 
     # destructor
-    def __del__(self):s
+    def __del__(self):
         self.curr_index = None
         self.compressed_used = None
         self.manage = None
@@ -66,7 +66,7 @@ class FunctionTable:
         setup: func(bool) -> None
         cleanup: func(bool) -> None
     """
-    def insert(self, num_bytes, keyboard, encoder, decoder, setup, cleanup, topic, return_type)):
+    def insert(self, num_bytes, keyboard, encoder, decoder, setup, cleanup, topic, return_type):
         func = Functions(keyboard, encoder, decoder, setup, cleanup, topic, return_type, num_bytes)
         self.insert_function(func)
 
