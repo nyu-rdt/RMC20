@@ -114,7 +114,7 @@ def decoder_actuator(d):
         
 test_func([1,1], encoder_actuator, decoder_actuator)
 
-manual_drive_topic = "manual_drive"
+manual_drive_topic = "TOPIC_TO_MANUAL_DRIVE"
 manual_drive_sendHandler = rospy.Publisher(manual_drive_topic, Keyboard, queue_size=10)
 
 def encoder_manual_drive(IIII):

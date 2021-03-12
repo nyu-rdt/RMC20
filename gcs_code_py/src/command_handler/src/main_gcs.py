@@ -4,7 +4,8 @@ import rospy, sys
 from GCSManager import GCSManager
 from BINManager import BINManager
 from KeyMap import *
-
+from funcs import *
+from command_handler.msg import *
 
 def movementEncoder(inp): 
     out = []
