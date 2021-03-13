@@ -1,0 +1,8 @@
+prefix=/home/dan/Desktop/RMC20/nuc_code/devel
+
+Name: socket
+Description: Description of socket
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

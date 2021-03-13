@@ -24,22 +24,42 @@ struct Obstacle_
   typedef Obstacle_<ContainerAllocator> Type;
 
   Obstacle_()
-    : left(false)
-    , right(false)  {
+    : front_left(0)
+    , front_right(0)
+    , front_left_mid(0)
+    , front_right_mid(0)
+    , depo_front(0)
+    , depo_back(0)  {
     }
   Obstacle_(const ContainerAllocator& _alloc)
-    : left(false)
-    , right(false)  {
+    : front_left(0)
+    , front_right(0)
+    , front_left_mid(0)
+    , front_right_mid(0)
+    , depo_front(0)
+    , depo_back(0)  {
   (void)_alloc;
     }
 
 
 
-   typedef uint8_t _left_type;
-  _left_type left;
+   typedef int64_t _front_left_type;
+  _front_left_type front_left;
 
-   typedef uint8_t _right_type;
-  _right_type right;
+   typedef int64_t _front_right_type;
+  _front_right_type front_right;
+
+   typedef int64_t _front_left_mid_type;
+  _front_left_mid_type front_left_mid;
+
+   typedef int64_t _front_right_mid_type;
+  _front_right_mid_type front_right_mid;
+
+   typedef int64_t _depo_front_type;
+  _depo_front_type depo_front;
+
+   typedef int64_t _depo_back_type;
+  _depo_back_type depo_back;
 
 
 
@@ -70,8 +90,12 @@ return s;
 template<typename ContainerAllocator1, typename ContainerAllocator2>
 bool operator==(const ::rdt_localization::Obstacle_<ContainerAllocator1> & lhs, const ::rdt_localization::Obstacle_<ContainerAllocator2> & rhs)
 {
-  return lhs.left == rhs.left &&
-    lhs.right == rhs.right;
+  return lhs.front_left == rhs.front_left &&
+    lhs.front_right == rhs.front_right &&
+    lhs.front_left_mid == rhs.front_left_mid &&
+    lhs.front_right_mid == rhs.front_right_mid &&
+    lhs.depo_front == rhs.depo_front &&
+    lhs.depo_back == rhs.depo_back;
 }
 
 template<typename ContainerAllocator1, typename ContainerAllocator2>
@@ -128,12 +152,12 @@ struct MD5Sum< ::rdt_localization::Obstacle_<ContainerAllocator> >
 {
   static const char* value()
   {
-    return "0544cac0b98e92509d14f758d50cf24b";
+    return "8b91b992300f93c3e218076979730b49";
   }
 
   static const char* value(const ::rdt_localization::Obstacle_<ContainerAllocator>&) { return value(); }
-  static const uint64_t static_value1 = 0x0544cac0b98e9250ULL;
-  static const uint64_t static_value2 = 0x9d14f758d50cf24bULL;
+  static const uint64_t static_value1 = 0x8b91b992300f93c3ULL;
+  static const uint64_t static_value2 = 0xe218076979730b49ULL;
 };
 
 template<class ContainerAllocator>
@@ -152,8 +176,12 @@ struct Definition< ::rdt_localization::Obstacle_<ContainerAllocator> >
 {
   static const char* value()
   {
-    return "bool left\n"
-"bool right\n"
+    return "int64 front_left\n"
+"int64 front_right\n"
+"int64 front_left_mid\n"
+"int64 front_right_mid\n"
+"int64 depo_front\n"
+"int64 depo_back\n"
 ;
   }
 
@@ -172,8 +200,12 @@ namespace serialization
   {
     template<typename Stream, typename T> inline static void allInOne(Stream& stream, T m)
     {
-      stream.next(m.left);
-      stream.next(m.right);
+      stream.next(m.front_left);
+      stream.next(m.front_right);
+      stream.next(m.front_left_mid);
+      stream.next(m.front_right_mid);
+      stream.next(m.depo_front);
+      stream.next(m.depo_back);
     }
 
     ROS_DECLARE_ALLINONE_SERIALIZER
@@ -192,10 +224,18 @@ struct Printer< ::rdt_localization::Obstacle_<ContainerAllocator> >
 {
   template<typename Stream> static void stream(Stream& s, const std::string& indent, const ::rdt_localization::Obstacle_<ContainerAllocator>& v)
   {
-    s << indent << "left: ";
-    Printer<uint8_t>::stream(s, indent + "  ", v.left);
-    s << indent << "right: ";
-    Printer<uint8_t>::stream(s, indent + "  ", v.right);
+    s << indent << "front_left: ";
+    Printer<int64_t>::stream(s, indent + "  ", v.front_left);
+    s << indent << "front_right: ";
+    Printer<int64_t>::stream(s, indent + "  ", v.front_right);
+    s << indent << "front_left_mid: ";
+    Printer<int64_t>::stream(s, indent + "  ", v.front_left_mid);
+    s << indent << "front_right_mid: ";
+    Printer<int64_t>::stream(s, indent + "  ", v.front_right_mid);
+    s << indent << "depo_front: ";
+    Printer<int64_t>::stream(s, indent + "  ", v.depo_front);
+    s << indent << "depo_back: ";
+    Printer<int64_t>::stream(s, indent + "  ", v.depo_back);
   }
 };
 

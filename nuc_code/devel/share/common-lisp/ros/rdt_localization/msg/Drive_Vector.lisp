@@ -97,10 +97,10 @@
   "9bb2e6492d363aa84cce71e895f95bc0")
 (cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql '<Drive_Vector>)))
   "Returns full string definition for message of type '<Drive_Vector>"
-  (cl:format cl:nil "int64 robot_spd~%int64 offset_driveMode~%~%"))
+  (cl:format cl:nil "int64 robot_spd~%int64 offset_driveMode~%~%"))
 (cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql 'Drive_Vector)))
   "Returns full string definition for message of type 'Drive_Vector"
-  (cl:format cl:nil "int64 robot_spd~%int64 offset_driveMode~%~%"))
+  (cl:format cl:nil "int64 robot_spd~%int64 offset_driveMode~%~%"))
 (cl:defmethod roslisp-msg-protocol:serialization-length ((msg <Drive_Vector>))
   (cl:+ 0
      8

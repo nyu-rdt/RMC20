@@ -1,0 +1,8 @@
+prefix=/home/dan/Desktop/RMC20/nuc_code/devel
+
+Name: command_handler
+Description: Description of command_handler
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

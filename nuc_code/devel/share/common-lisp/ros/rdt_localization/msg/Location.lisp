@@ -79,10 +79,10 @@
   "ff8d7d66dd3e4b731ef14a45d38888b6")
 (cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql '<Location>)))
   "Returns full string definition for message of type '<Location>"
-  (cl:format cl:nil "float32 x~%float32 y~%~%"))
+  (cl:format cl:nil "float32 x~%float32 y~%~%"))
 (cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql 'Location)))
   "Returns full string definition for message of type 'Location"
-  (cl:format cl:nil "float32 x~%float32 y~%~%"))
+  (cl:format cl:nil "float32 x~%float32 y~%~%"))
 (cl:defmethod roslisp-msg-protocol:serialization-length ((msg <Location>))
   (cl:+ 0
      4
