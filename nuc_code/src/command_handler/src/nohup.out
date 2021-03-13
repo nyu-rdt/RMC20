@@ -1,0 +1,87 @@
+pygame 1.9.5
+Hello from the pygame community. https://www.pygame.org/contribute.html
+('id map', {'my function identifier': 0})
+('next send', [])
+0
+0
+after set
+0123
+
+-------
+1
+-------
+
+No door action
+-------
+1
+open door
+-------
+1
+close door
+-------
+11
+No door action
+-------
+
+Stop actuator
+-------
+1
+Move linear actuator forward
+-------
+1
+Move linear actuator backward
+-------
+11
+Stop actuator
+-------
+
+-------
+w
+go rightwards
+-------
+a
+go leftwards
+-------
+wa
+-------
+s
+go forward
+-------
+ws
+go rightwards
+go forward
+-------
+as
+go leftwards
+go forward
+-------
+was
+go forward
+-------
+d
+go frontwards
+-------
+wd
+go rightwards
+go frontwards
+-------
+ad
+go leftwards
+go frontwards
+-------
+wad
+go frontwards
+-------
+sd
+-------
+wsd
+go rightwards
+-------
+asd
+go leftwards
+-------
+wasd
+-------
+adding ros buffer
+0
+1

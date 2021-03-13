@@ -36,16 +36,16 @@ imgpoints = [] # 2d points in image plane.
 images = glob.glob('*.jpg')
 #change number in while loop to adjust # of calibrations (the more the better)
 #check quality of calibration by entering values into apriltag file and looking at the quality of the 3-d overlay and angles
-while len(objpoints) < 20:
+while len(objpoints) < 5:
     #img = cv2.imread(fname)
     img = cam.read()[1]
     gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-    cv2.imshow('img',gray)
     # Find the chess board corners
     ret, corners = cv2.findChessboardCorners(gray, (7,6),None)
 
     # If found, add object points, image points (after refining them)
     if ret == True:
+        print("found")
         objpoints.append(objp)
 
         corners2 = cv2.cornerSubPix(gray,corners,(11,11),(-1,-1),criteria)
@@ -53,8 +53,10 @@ while len(objpoints) < 20:
 
         # Draw and display the corners
         img = cv2.drawChessboardCorners(img, (7,6), corners2,ret)
-        cv2.imshow('img',img)
-        cv2.waitKey(500)
+
+    cv2.imshow("test", img)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
 
 cv2.destroyAllWindows()
 
