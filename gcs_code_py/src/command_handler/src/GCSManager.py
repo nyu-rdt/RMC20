@@ -71,7 +71,7 @@ class GCSManager:
                     self.send(currentData)
                     threshold = curr+delta
                 
-            # if there is no keyboard command for threshold length (currently 1 second) delta variable, send the ROStable info
+           # if there is no keyboard command for threshold length (currently 1 second) delta variable, send the ROStable info
             if(threshold<curr): 
                 threshold = curr+delta 
                 #4 is the size of an integer in bytes 
@@ -81,10 +81,9 @@ class GCSManager:
                     curr = curr >> 8 
                 for i in range(len(self.commandsRos.nextSend)): 
                     header[4+i] = self.commandsRos.nextSend[i]
-                self.send(header);
-
+                self.send(header)
     
-        #https://www.pygame.org/docs/ref/event.html#pygame.event.get
+       #https://www.pygame.org/docs/ref/event.html#pygame.event.get
                 
 
         
@@ -94,6 +93,7 @@ class GCSManager:
         #this will only work for 71582 minutes before conflicts or 2^32 miliseconds 
         # original: sendSend()
         if(self.commands.has_update(self.keyCompressed ^ self.keyCompressedPrev)): 
+	    print("key changed:", self.keyCompressed)
             header = [] 
             tick = pygame.time.get_ticks()  
             shift = 4 #size of tick in bytes. Tick is an int so 4 bytes
@@ -114,18 +114,19 @@ class GCSManager:
             
 
     def gcsRecv(self, data):
-        # original: sendRecv()
-        if(len(data) == 0):
-            return 
-        tmp1 = int(data[0]) 
-        #might need to change the str part idk what htis does std::string(data.begin()+1,data.end())
-        self.commandsRos.decode(tmp1, "".join([chr(byte) for byte in data]) )
-        tmp2 = tmp1 >> 3 
-        tmp1 -= tmp2 << 3  
+    #    # original: sendRecv()
+    #    if(len(data) == 0):
+    #        return 
+    #    tmp1 = int(data[0]) 
+    #    #might need to change the str part idk what htis does std::string(data.begin()+1,data.end())
+    #    self.commandsRos.decode(tmp1, "".join([chr(byte) for byte in data]) )
+    #    tmp2 = tmp1 >> 3 
+    #    tmp1 -= tmp2 << 3  
 
-        self.commandsRos.nextSend[tmp2] &= ~(1<<tmp1)
+    #    self.commandsRos.nextSend[tmp2] &= ~(1<<tmp1)
+	pass
 
-    
+    #
     # initializes pygame object (sdl wrapper - sdl is the c++ equivalent)
     # creating a pygame screen, which is where the user input will go and the robot graphics will be shown
     def gl_setup(self, title, width, height): 
@@ -171,12 +172,12 @@ class GCSManager:
     # data:str[] and data:str
     def send(self, data):
         #rospy.loginfo(data)
-        print("raw_data: ", data)
+	#print("raw data:", data)
         data_to_send = "".join([chr(byte) for byte in data])
-        print("send_data: ", data_to_send)
+	#print("send data:", data_to_send)
         self.sendHandler.publish(data_to_send)
         
     def recv(self, data):
-        self.gcsSend(data)
+        self.gcsRecv(data)
 
 

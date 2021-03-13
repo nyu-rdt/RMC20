@@ -193,4 +193,5 @@ class FunctionTable:
         compressed: int
     '''
     def has_update(self, compressed):
+	#print((self.compressed_used & compressed) != 0)
         return (self.compressed_used & compressed) != 0

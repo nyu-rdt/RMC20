@@ -114,8 +114,8 @@ def decoder_actuator(d):
         
 test_func([1,1], encoder_actuator, decoder_actuator)
 
-manual_drive_topic = "TOPIC_TO_MANUAL_DRIVE"
-manual_drive_sendHandler = rospy.Publisher(manual_drive_topic, Keyboard, queue_size=10)
+#manual_drive_topic = "TOPIC_TO_MANUAL_DRIVE"
+#manual_drive_sendHandler = rospy.Publisher(manual_drive_topic, Keyboard, queue_size=10)
 
 def encoder_manual_drive(IIII):
     # should recieve wasd
@@ -131,6 +131,8 @@ def encoder_manual_drive(IIII):
     if IIII[1]: II -= 1
     II = II << 3
     I = I | II
+    print([I])
+    print("decoder manual drive:", decoder_manual_drive([I]))
     return [I]
 
 
@@ -138,7 +140,7 @@ def decoder_manual_drive(d):
     # will recieve forward, left, back, reverse (WASD)
     # TODO: change I variables to something normal
     global keyboard_move_status
-    result = Keyboard()
+#    result = Keyboard()
     I = d[0] & 0b111000
     I = I >> 3
     II = d[0] & 0b000111
@@ -165,12 +167,13 @@ def decoder_manual_drive(d):
     elif II == 2:
         keyboard_move_status[3] = True if keyboard_move_status[3] == False else False #print( "go frontwards")
     # print("decoder manual drive")
-    result.a = keyboard_move_status[0]
-    result.d = keyboard_move_status[1]
-    result.s = keyboard_move_status[2]
-    result.w = keyboard_move_status[3]
-    manual_drive_sendHandler.publish(result)
-    return result
+#    result.a = keyboard_move_status[0]
+#    result.d = keyboard_move_status[1]
+#    result.s = keyboard_move_status[2]
+#    result.w = keyboard_move_status[3]
+#    manual_drive_sendHandler.publish(result)
+#    return result
+    print(keyboard_move_status)
     
 
 test_func(['w','a','s','d'], encoder_manual_drive, decoder_manual_drive)
