@@ -32,7 +32,7 @@ ROSPY_LOOP_RATE = 20
 
 # Robot constants
 TARGET_TOLERANCE = 10                                   # Tolerance (cm) how far robot can stop from its target
-ROTATION_TOLERANCE = 3                                     # Tolerance (deg) how close the robot should rotate to its target
+ROTATION_TOLERANCE = 3                                  # Tolerance (deg) how close the robot should rotate to its target
 TURN_IN_PLACE_SPEED = 50
 MANUAL_SPEED_FWD = 200
 MANUAL_SPEED_REVERSE = 0
@@ -89,7 +89,7 @@ lin_act_ready = True                  # If the linear actuators are reset to ori
 
 # Rest of the variables   
 e_stop = False                        # If the robot needs to emergency stop
-lidar_data = None                  # If there are incoming obstacle
+lidar_data = None                     # If there are incoming obstacle
 artag_seen = False                    # If April Tags can be located
 drum_turning = False                  # If drums are turning
 door_closed = False                   # If the door is closed
@@ -527,59 +527,63 @@ def main():
                 depo_dist = lidar_data.depo_front if lidar_data.depo_front < lidar_data.depo_back else lidar_data.depo_back
                 diff_btw_depo_lidar_readings = abs(lidar_data.depo_front - lidar_data.depo_back)
                 facing_toward = True if lidar_data.depo_front < lidar_data.depo_back else False
+                # potentially create Drive_Vector() here
 
                 # 2. Pull up alongside depo bin
                 # CASE 1: bot is in correct place
-                # bot is close enough
-                if ((abs(depo_dist - TARGET_DIST) < TARGET_DIST_TOLERANCE)
+                if ((abs(depo_dist - DEPO_TARGET_DIST) < DEPO_TARGET_DIST_TOLERANCE) # bot is close enough
                         and (diff_btw_depo_lidar_readings < PARALLELISM_TOLERANCE)):  # bot is parallel to depo bin
                     robot_face_depo, robot_in_depo_dist = True, True
 
                 # CASE 2: within dist, but not parallel
-                elif (abs(depo_dist - TARGET_DIST) < TARGET_DIST_TOLERANCE):
+                # TODO LATER: define global variables is_parallel and is_close
+                elif abs(depo_dist - DEPO_TARGET_DIST) < DEPO_TARGET_DIST_TOLERANCE:
                     # determine which is too far away: front or back?
                     if facing_toward:
-                        # rotate CW small amount
-                        # TODO: identify which direction is cw and which is ccw below
+                        # turn left small amount
+                        # TODO: make a function to abstract away the following 4 lines. will take 2 parameters. send_drive_command(254, 90)
                         outmsg = Drive_Vector()
                         outmsg.offset_driveMode = 254  # Turn in place
-                        # 10-15% speed forward rotation (CW?). Need to check the value 110
-                        outmsg.robot_spd = 110
+                        outmsg.robot_spd = 90 # 10% speed leftward rotation (counter-clockwise)
                         pub_drive_cmd.publish(outmsg)
-                    else:
-                        # rotate CCW small amount
+                    else: # facing away
+                        # turn right small amount
                         outmsg = Drive_Vector()
                         outmsg.offset_driveMode = 254  # Turn in place
-                        # 10-15% speed backward rotation (CCW?). Need to check the value 110
-                        outmsg.robot_spd = 90
+                        outmsg.robot_spd = 110 # 10% speed rotation to the right (clockwise)
                         pub_drive_cmd.publish(outmsg)
 
                 # CASE 3: parallel, but not within dist
-                elif (diff_btw_depo_lidar_readings < PARALLELISM_TOLERANCE):
-                    # rotate front closer to depo
-                    # rotate CW small amount
-                    # TODO: identify which direction is cw and which is ccw below
+                elif diff_btw_depo_lidar_readings < PARALLELISM_TOLERANCE:
+                    # rotate front closer to depo (turn right)
                     outmsg = Drive_Vector()
                     outmsg.offset_driveMode = 254  # Turn in place
-                    # 10-15% speed forward rotation (CW?). Need to check the value 110
-                    outmsg.robot_spd = 110
+                    outmsg.robot_spd = 110 # 10% speed rotation to the right (clockwise)
                     pub_drive_cmd.publish(outmsg)
+                    # TODO: stop turning when certain target angle is reached, change "angle_good"
+                    if angle_good:# drive forward until within range
+                        outmsg = Drive_Vector()
+                        outmsg.offset_driveMode = 100
+                        outmsg.robot_spd = 110  # 10% speed forward
+                        pub_drive_cmd.publish(outmsg)     
 
-                    # TODO: INSERT SOME SORT OF PAUSE OR DELAY HERE
+                # CASE 4: Too far forward 
+                elif diff_btw_depo_lidar_readings > FORWARD_DIST_TOLERANCE:    
+                    # reverse until next to depo bin
+                    outmsg = Drive_Vector()
+                    outmsg.offset_driveMode = 90
+                    outmsg.robot_spd = 90  # 10% speed backward
+                    pub_drive_cmd.publish(outmsg) 
 
-                    # drive fwd a lil (TODO: but dont collide)
-                    outmsg.offset_driveMode = 100
-                    outmsg.robot_spd = 110  # 10-15% speed forward
-                    pub_drive_cmd.publish(outmsg)
-
-                    # rotate rear closer to depo
-                    # reverse a lil (if needed)
-
-                # CASE 4: not parallel and not within dist
+                # CASE 5: not parallel and not within dist
                 else:
-                    # drive fwd until within dist
-                    # (will then be in case 1)
-                    pass
+                    # drive fwd until within dist                    
+                    if facing_toward:
+                        # drive forward until within range
+                        outmsg = Drive_Vector()
+                        outmsg.offset_driveMode = 100
+                        outmsg.robot_spd = 110  # 10% speed forward
+                        pub_drive_cmd.publish(outmsg)           
 
         # STATE 18: Arms raise frame to upper limit
         elif robot_state == 18:
