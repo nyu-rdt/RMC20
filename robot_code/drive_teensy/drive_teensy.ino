@@ -209,8 +209,10 @@ void loop() {
       int inByte3= Serial1.read();
       forward(inByte2, inByte3);
 
+      // read from Serial1, write to Serial, might be wrong
+      Serial.write(255); // ackowledgement byte
+      // don't need loop because this is in loop()
     }
-    
       
   }
 

@@ -117,9 +117,16 @@ void scanForCmd(){
       // send the command to the controller. The header byte 255 is used for synchronizing 
       // Tx and Rx.
       else {
-        Serial.write(255);
-        Serial.write(robotSpeed);
-        Serial.write(offsetNum);
+        bool ack = false; // ackowledgement from teensy for loop condition
+        while (!ack){
+          Serial.write(255); // synchro byte
+          Serial.write(robotSpeed);
+          Serial.write(offsetNum);
+
+          // wait for ackowledgement byte
+          while(!(Serial1.available())){} // not sure if this is needed, it's part of the other one
+          if (Serial1.read() == 255) ack = true;
+        }
       }
     }
   }
