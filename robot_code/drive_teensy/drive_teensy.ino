@@ -14,6 +14,7 @@
 #include <Servo.h>
 
 #define TEST_MOTOR_SPEED 70
+#define CMD_RECV_TIMEOUT 100
 
 // Wheels 
 Servo Brown;
@@ -24,6 +25,9 @@ Servo Orange;
 // Arms
 Servo FrontArm;
 Servo BackArm;
+
+// Time the last command was received
+long lastCmdTime;
 
 void setup(){
   Serial1.begin(115200);  // Connection to ESP8266
@@ -199,9 +203,10 @@ void blue(){
  */
 void loop() {
   if (Serial1.available() > 0) {
+    lastCmdTime = millis();
     int inByte = Serial1.read();
-    Serial.println("received");
-    Serial.println(inByte);
+//    Serial.println("received");
+//    Serial.println(inByte);
     if (inByte == 255 ){ //synchro byte
       while(!(Serial1.available())){}
       int inByte2 = Serial1.read();
@@ -213,7 +218,9 @@ void loop() {
       Serial.write(255); // ackowledgement byte
       // don't need loop because this is in loop()
     }
-      
+    else if (millis() - lastCmdTime >= CMD_RECV_TIMEOUT) {
+      forward(100, 100);
+    }      
   }
 
 }

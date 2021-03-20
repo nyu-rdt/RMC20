@@ -28,7 +28,8 @@
 #define MQTT_RECONNECT_TIMEOUT 200
 #define MQTT_READ_TIMEOUT 50
 
-#define CMD_TIMEOUT 1000
+#define CMD_RECV_TIMEOUT 1000
+#define CMD_SEND_TIMEOUT 500
 #define NEUTRAL_VAL 100
 
 // Create MQTT client on the ESP
@@ -39,6 +40,7 @@ Adafruit_MQTT_Publish pingTopic = Adafruit_MQTT_Publish(&mqtt, TOPIC_NAME_OUT);
 
 unsigned long timeLastRecv;   // Last time in milliseconds command was received
 bool cmdRecv;                 // Has a command been received this cycle
+long lastAckTime;
 
 void setup() {
   Serial.begin(115200);
@@ -59,7 +61,7 @@ void setup() {
 void loop() {
   // If no command received for CMD_TIMEOUT ms, start writing zero values to the motors at 
   // the end of the cycle
-  if (millis() > timeLastRecv + CMD_TIMEOUT) cmdRecv = false;
+  if (millis() > timeLastRecv + CMD_RECV_TIMEOUT) cmdRecv = false;
 
   checkConnection();
   scanForCmd();
@@ -84,6 +86,13 @@ void checkConnection(){
     mqtt.disconnect();
     delay(MQTT_RECONNECT_TIMEOUT);
     connectionStatus = mqtt.connect();
+  }
+}
+
+// read() only "gets rid of" 1 byte, so flush gets rid of all of them
+void serialFlush(){
+  while(Serial.available() > 0) {
+    Serial.read();
   }
 }
     
@@ -117,15 +126,19 @@ void scanForCmd(){
       // send the command to the controller. The header byte 255 is used for synchronizing 
       // Tx and Rx.
       else {
-        bool ack = false; // ackowledgement from teensy for loop condition
-        while (!ack){
+        while(!(Serial.available()) && (millis() - lastAckTime < CMD_SEND_TIMEOUT)) {
           Serial.write(255); // synchro byte
           Serial.write(robotSpeed);
           Serial.write(offsetNum);
-
-          // wait for ackowledgement byte
-          while(!(Serial1.available())){} // not sure if this is needed, it's part of the other one
-          if (Serial1.read() == 255) ack = true;
+        }
+        if (Serial.available()) {
+          serialFlush();
+          lastAckTime = millis();
+        }
+        else {
+          Serial.write(255); // synchro byte
+          Serial.write(100); // 100 is neutral, so basically estop
+          Serial.write(100);
         }
       }
     }
