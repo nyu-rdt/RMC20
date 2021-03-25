@@ -62,13 +62,13 @@ void loop() {
     if (IS_OK(lidar.waitPoint())) {
     float distance = lidar.getCurrentPoint().distance; //distance value in mm unit
     // offset the angle by the middle angle
-    float angle    = lidar.getCurrentPoint().angle - angleMid; //anglue value in degree
+    float angle    = lidar.getCurrentPoint().angle; //angle value in degree
     // bool  startBit = lidar.getCurrentPoint().startBit; //whether this point is belong to a new scan
     // byte  quality  = lidar.getCurrentPoint().quality; //quality of the current measurement
 
     // debugging codes
-    Serial.print("Count: ");
-    Serial.println(count);
+    //Serial.print("Count: ");
+    //Serial.println(count);
 
     //perform data processing here... 
     if (lidar.getCurrentPoint().startBit) {
@@ -76,11 +76,11 @@ void loop() {
       // a new scan, send the previous result
       // set a thr of 5 in case of noise
       if (abs(count) < 5) {
-        Serial2.write(1);
+        Serial1.write(1);
       } else if (count > 0) {
-        Serial2.write(0);          // obstacles on right, turn left
+        Serial1.write(0);          // obstacles on right, turn left
       } else {
-        Serial2.write(2);          // obstacles on left, turn right
+        Serial1.write(2);          // obstacles on left, turn right
       }
       // reset count variable
       count = 0;
@@ -94,7 +94,7 @@ void loop() {
         Serial.print("min distance: ");
         Serial.print(minDistance);
         Serial.print(" the angle:");
-        Serial.println(angleMid);
+        Serial.println(angle);
       }
 
       float actualDistance = calculateDistance(angle, distance);

@@ -15,7 +15,7 @@
 #include "Adafruit_MQTT.h"
 #include "Adafruit_MQTT_Client.h"
 
-#define WIFI_SSID "Team_15"
+#define WIFI_SSID "Team_16"
 #define WIFI_PASS "lunabots"
 #define WIFI_CHANNEL 1
 
@@ -47,6 +47,7 @@ void setup() {
 }
 
 void loop() {
+  Serial.println("Looping");
   establish_connection();
   read_and_publish();
 }
@@ -91,7 +92,7 @@ char get_the_byte()
   return Serial.read();
 }
 
-void send_lidar_vals(char[] all_bytes){
+void send_lidar_vals(char all_bytes[]){
   for(int i = 0; i < 4; i++){
     out_topic.publish(all_bytes[i]);
   }
