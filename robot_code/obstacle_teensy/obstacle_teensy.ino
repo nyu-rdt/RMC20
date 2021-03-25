@@ -63,7 +63,7 @@ void loop() {
     float distance = lidar.getCurrentPoint().distance; //distance value in mm unit
     // offset the angle by the middle angle
     float angle    = lidar.getCurrentPoint().angle - angleMid; //anglue value in degree
-    bool  startBit = lidar.getCurrentPoint().startBit; //whether this point is belong to a new scan
+    // bool  startBit = lidar.getCurrentPoint().startBit; //whether this point is belong to a new scan
     // byte  quality  = lidar.getCurrentPoint().quality; //quality of the current measurement
 
     // debugging codes
@@ -100,7 +100,7 @@ void loop() {
       float actualDistance = calculateDistance(angle, distance);
       if (abs(actualDistance - minDistance) > THR_OBSTACLE) {     // if detecting a hill or hole
         Serial.print("Obstacle detect at ");
-        Seiral.print(angle);
+        Serial.print(angle);
         Serial.print(" actual dist diff: ");
         Serial.println(actualDistance - minDistance);
         // if angle smaller than 0, assuming obstacles on the left and vice versa
@@ -112,12 +112,14 @@ void loop() {
       }
 
       // for debug purpose only
-      if (angle % 10 < 0.5) {
+      //no lol you can't % float 
+      /*if (angle % 10 < 0.5) {
         Serial.print("Distance at ");
         Serial.print(angle);
         Seiral.print(" distance: ");
         Serial.println(distances);
       }
+      */
     }
     
   } else {
