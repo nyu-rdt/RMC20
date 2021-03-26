@@ -58,21 +58,22 @@ robot_pose = None
 robot_localized = False
 robot_cannot_move = False             # If the robot cannot move
 robot_exited_hole = False             # If the robot is out of the hole that it just dug
-robot_face_depo = False               # If the robot is facing the deposition zone
-robot_in_depo_dist = False            # If the robot is in distance to deposit
 robot_depo_fail = False               # If the robot crashes into the deposition bin or wall, or if the robot fails alignment
 robot_unstable = False                # If the robot becomes unstable while raising its frame
 robot_face_dig_zone = False           # If the robot is facing the digging zone
 
 # Deposition variables
-depo_dist = None                      # smallest distance btwn a deposition-lidar and the deposition bin
-DEPO_TARGET_DIST = 3                  # in cm
-DEPO_TARGET_DIST_TOLERANCE = 1        # in cm
+DEPO_TARGET_DIST = 3                  # in cm; target distance of the deposition bin
+DEPO_TARGET_DIST_TOLERANCE = 1        # in cm; tolerance
 PARALLEL_TOLERANCE = 5                # in degrees
-DEPO_APPR_ANGLE = 30                  # in degrees
+"""
+TODO: the following line is needed if we want to have a target "angle of approach" for the bot to drive toward the depo bin
+DEPO_APPR_ANGLE = 30                  # in degrees; angle between the robot and the depo bin that we want when bot approaches depo bin
 DEPO_APPR_ANGLE_TOLERANCE = 5         # in degrees
+"""
 DEPO_LIDAR_MOUNT_DIST = 50            # in cm    TODO: measure the distance between the mount points of the 2 depo lidars and replace the placeholder value of "50"
 FORWARD_DIST_TOLERANCE = 10           # in cm; by how much is the robot too far forward?
+depo_dist = None                      # smallest distance btwn a deposition-lidar and the deposition bin
 depo_is_close = False                 # in cm
 depo_is_parallel = False              # bot is parallel to depo bin
 depo_current_angle = None             # in degrees
@@ -517,7 +518,7 @@ def main():
                 # If unsuccessful, switch to manual control
                 pass
 
-            if (robot_face_depo and robot_in_depo_dist):
+            if (depo_is_parallel and depo_is_close):
                 robot_state = 17
             else:
                 # Continue navigating to correct distance from deposition zone
@@ -525,7 +526,22 @@ def main():
 
         # STATE 17: Orient with deposition bin
         elif robot_state == 16:
+            # if robot is toward depo, current angle is positive; if facing away, is negative
+            depo_current_angle = math.degrees(math.asin((depo_back_lidar_dist - depo_front_lidar_dist) / DEPO_LIDAR_MOUNT_DIST)) 
+            """
+            TODO: the following line is needed if we want to have a target "angle of approach" for the bot to drive toward the depo bin
+            depo_angle_ready = True if (DEPO_APPR_ANGLE - depo_current_angle) < DEPO_APPR_ANGLE_TOLERANCE else False
+            """
+
+            # other variables
+            depo_front_lidar_dist = lidar_data.depo_front
+            depo_back_lidar_dist = lidar_data.depo_back
+            depo_dist = depo_front_lidar_dist if depo_front_lidar_dist < depo_back_lidar_dist else depo_back_lidar_dist
+            facing_toward = True if depo_front_lidar_dist < depo_back_lidar_dist else False
+            depo_is_close = True if abs(depo_dist - DEPO_TARGET_DIST) < DEPO_TARGET_DIST_TOLERANCE else False
+            depo_is_parallel = True if abs(depo_current_angle) < PARALLEL_TOLERANCE else False
             ros_log("DEBUG: STATE 16")
+            
             # Error checking
             if robot_cannot_move:  # temp variable
                 # Find reverse of drive vector and input (backtrack)
@@ -536,39 +552,24 @@ def main():
                 # If unsuccessful, switch to manual control
                 pass
 
-            if robot_face_depo and robot_in_depo_dist:
+            if depo_is_parallel and depo_is_close:
                 robot_state = 17
-            else:
-                # Continue navigating to correct distance from deposition zone
-                depo_front_lidar_dist = lidar_data.depo_front
-                depo_back_lidar_dist = lidar_data.depo_back
-                depo_dist = depo_front_lidar_dist if depo_front_lidar_dist < depo_back_lidar_dist else depo_back_lidar_dist
-                facing_toward = True if depo_front_lidar_dist < depo_back_lidar_dist else False
-                depo_is_close = True if abs(depo_dist - DEPO_TARGET_DIST) < DEPO_TARGET_DIST_TOLERANCE else False
-                depo_is_parallel = True if abs(depo_current_angle) < PARALLEL_TOLERANCE else False
-                
-                # if robot is facing toward depo, current angle is positive; if robot facing away from depo, current angle is negative
-                depo_current_angle = math.degrees(math.asin((depo_back_lidar_dist - depo_front_lidar_dist) / DEPO_LIDAR_MOUNT_DIST)) 
-                depo_angle_ready = True if (DEPO_APPR_ANGLE - depo_current_angle) < DEPO_APPR_ANGLE_TOLERANCE else False
-                
-                # CASE 1: bot is in correct place
-                if depo_is_close and depo_is_parallel:
-                    # CASE 1A: too far forward
-                    # TODO: define the variable below, "how_far_forward"; figure out how the robot will know that it is too far forward, and code that
-                    if how_far_forward > FORWARD_DIST_TOLERANCE:    
-                        send_drive_command(0, 90) # 10% speed backward
-
-                    #TODO: optional: rethink the following variables since they seem redundant with depo_is_close and depo_is_parallel
-                    robot_face_depo, robot_in_depo_dist = True, True
+            else: # Continue navigating to correct distance from deposition zone
+                """
+                # CASE 0: too far forward
+                # TODO: if the too far forward case is needed: define the variable below, "how_far_forward"; figure out how the robot will know that it is too far forward, and code that
+                if how_far_forward > FORWARD_DIST_TOLERANCE:    
+                    send_drive_command(0, 90) # 10% speed backward
+                """
                     
-                # CASE 2: within dist, but not parallel
-                elif depo_is_close:
+                # CASE 1: within dist, but not parallel
+                if depo_is_close:
                     if facing_toward:
                         send_drive_command(254, 90) # turn left at 10% speed
                     else: # facing away
                         send_drive_command(254, 110) # turn right at 10% speed
 
-                # CASE 3: not within dist
+                # CASE 2: not within dist
                 else:
                     if depo_angle_ready:
                         send_drive_command(0, 110) # 10% speed forward
