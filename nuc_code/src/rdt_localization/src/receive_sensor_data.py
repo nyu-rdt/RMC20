@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 """
 receive_sensor_data.py
 
@@ -20,12 +22,13 @@ def on_connect(client, userdata, flags, rc):
 Function called each time a message is received
 '''
 def on_message(client, userdata, msg): 
-	# Getting 3 bytes and 2 bits
+	# Getting 3 bytes and 3 bits
     data = msg.payload
     arm_pos = data >> 16
     lin_act = (data >> 8) ^ (arm_pos << 8)
     drum_cont = (data >> 7) & 1
     drum_turn = (data >> 6) & 1
+    reed_swt = (data >> 5) & 1
     
 	# Publishing data to server/sensor_data
     out_msg = Sensor_Data()
@@ -33,6 +36,7 @@ def on_message(client, userdata, msg):
     out_msg.lin_act = lin_act
     out_msg.drum_cont = drum_cont
     out_msg.drum_turn = drum_turn
+    out_msg.reed_swt = reed_swt
 
     rospy.publish("server/sensor_data", Sensor_Data, out_msg)
 

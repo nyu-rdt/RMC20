@@ -1,4 +1,6 @@
-int64 arm_pos
-int64 lin_act
-bool drum_cont
-bool drum_turn
+int64 front_left
+int64 front_right
+int64 front_left_mid
+int64 front_right_mid
+int64 depo_front
+int64 depo_back
