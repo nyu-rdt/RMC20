@@ -16,6 +16,7 @@
  * - detemine parameter values in the code (Search TODO in the code)
  */
 
+const int lidar_pins[4] = {22,24,26,28};
 
 #include "RPLidar.h"
 
@@ -34,7 +35,7 @@ RPLidar lidar;
 
 // angles (unit: degree)
 // TODO: determine the range of interested angles
-float angleRange = 40;                   // The range of the interested angle relatively to the mid angle
+float angleRange = 90;                   // The range of the interested angle relatively to the mid angle
 // TODO: determine the init middl angle
 float angleMid = 10;                     // The middle angle pointing to the ground with shortest distance
 float minDistance = 0;                   // To compare the standard distance to the ground
@@ -50,6 +51,9 @@ void setup() {
     
     // set pin modes
     pinMode(RPLIDAR_MOTOR, OUTPUT);
+    for (int i = 0; i < 4; i++){
+      pinMode(INPUT, lidar_pins[i]);
+    }
 }
 
 // Calculate the distance using angle
@@ -58,8 +62,32 @@ float calculateDistance(float angle, float distance) {
   return cos(angle / 180 * 3.1415926) * distance;
 }
 
+//read from small lidar by varying the voltage
+double read_lidar (int i)
+{
+  digitalWrite(i,HIGH);
+  delayMicroseconds(2);
+  digitalWrite(i,LOW);
+  double duration = pulseIn(i, HIGH);
+  //this converts the duration variable into meters
+  return (duration * 171.5)/1000000;
+}
+
 void loop() {
-    if (IS_OK(lidar.waitPoint())) {
+  Serial.println("Looping");
+  //declares two arrays, each with 4 values, to store the measurement to compare later
+  double dists_initial[4];
+  double dists_post[4];
+
+  //measures each lidar pin using the read_lidar function and stores the measurement in dists_initial
+  for (int i = 0; i < 4; i++){
+    double val = read_lidar(lidar_pins[i]);
+    dists_initial[i] = val;
+    delayMicroseconds(65); // 65 milliseconds if things get fucky
+    Serial.println("Small Lidar: "+String(i) + ": " + String(dists_initial[i]) +",    ");
+  }
+  Serial.println();
+  if (IS_OK(lidar.waitPoint())) {
     float distance = lidar.getCurrentPoint().distance; //distance value in mm unit
     // offset the angle by the middle angle
     float angle    = lidar.getCurrentPoint().angle; //angle value in degree
@@ -133,7 +161,7 @@ void loop() {
        
        // start motor rotating at max allowed speed
        analogWrite(RPLIDAR_MOTOR, ROT_SPEED);
-       delay(1000);
+       delay(100);
     }
   }
 }
