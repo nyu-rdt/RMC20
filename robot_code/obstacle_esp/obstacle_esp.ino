@@ -1,12 +1,12 @@
 /*
  * obstacle_esp.ino
- * 
- * Code for the radio in the obstacles subsystem, particularly for a NodeMCU with an ESP8266 
+ *
+ * Code for the radio in the obstacles subsystem, particularly for a NodeMCU with an ESP8266
  * module. Reads 4 LIDAR bytes from the obstacle subsystem and send it to the server through MQTT
  * Expect synchronization byte of 0 from the obstacle subsystem prior to the 4 LIDAR values
- * 
+ *
  * See README for descriptions on the format of the command messages.
- * 
+ *
  * TODO:
  * - Sending synchronization byte of 0 from the obstacle subsystem
  */
@@ -19,7 +19,7 @@
 #define WIFI_PASS "lunabots"
 #define WIFI_CHANNEL 1
 
-#define SERVER_ADDR "192.168.43.201"
+#define SERVER_ADDR "192.168.1.10"
 #define SERVER_PORT 1883
 
 #define TOPIC_NAME_OUT "robotState/obstacleData" //Only publishing
@@ -42,12 +42,13 @@ void setup() {
   //  Wait until ESP is connected to wifi to proceed
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
-  }
-  
+		Serial.println("connecting to wifi");
+	}
+	Serial.println("connected to wifi");
+
 }
 
 void loop() {
-  Serial.println("Looping");
   establish_connection();
   read_and_publish();
 }
@@ -58,9 +59,10 @@ void establish_connection(){
 
   int8_t connectionStatus;
   connectionStatus = mqtt.connect();
-  
+
   while (connectionStatus != 0){
-    mqtt.disconnect();
+		Serial.println("connecting to mqtt");
+		mqtt.disconnect();
     delay(MQTT_RECONNECT_TIMEOUT);
     connectionStatus = mqtt.connect();
   }
