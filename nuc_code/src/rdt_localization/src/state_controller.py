@@ -26,7 +26,7 @@ DEPOSITION_ZONE.y = 0
 
 # Digging zones
 DIG_ZONE = Location()
-DIG_ZONE.x = -2.5
+DIG_ZONE.x = 0.0
 DIG_ZONE.y = 2.7
 ROSPY_LOOP_RATE = 20
 

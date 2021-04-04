@@ -26,7 +26,7 @@ from pid_controller import PID
 
 # TODO: Tune P, I, D constants
 #Global Variables
-G_KP = 0.5
+G_KP = 10
 G_KI = 0.0
 G_KD = 0.0
 G_WINDUP = 360.0

@@ -19,7 +19,7 @@ class PID:
     PID Controller Initialization
     Has P, I, D constants, windup constant, and current_time
     """
-    def __init__(self, P=0.2, I=0.0, D=0.0, windup=360.0, current_time=None):
+    def __init__(self, P=0.1, I=0.0, D=0.0, windup=360.0, current_time=None):
         
         # Setting controller constants
         self.Kp = P
