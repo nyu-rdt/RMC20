@@ -12,7 +12,11 @@ try:
     from catkin.environment_cache import generate_environment_script
 except ImportError:
     # search for catkin package in all workspaces and prepend to path
+<<<<<<< HEAD
     for workspace in '/home/rdt/RMC20/nuc_code/devel;/opt/ros/melodic'.split(';'):
+=======
+    for workspace in '/opt/ros/melodic'.split(';'):
+>>>>>>> a641f858c034c440ffc04236bc1b45cf3c6ec84d
         python_path = os.path.join(workspace, 'lib/python2.7/dist-packages')
         if os.path.isdir(os.path.join(python_path, 'catkin')):
             sys.path.insert(0, python_path)

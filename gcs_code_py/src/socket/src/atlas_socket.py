@@ -119,7 +119,7 @@ class AtlasSocket(threading.Thread):
             # Get new command from queue
             else:
                 self.last_data = self.input_buffer.get()
-            print(len(self.last_data), self.last_data)
+            #print(len(self.last_data), self.last_data)
             self.conn.sendto(self.last_data, (self.target_ip, self.target_port))
         # Send the heartbeat package if there is not data needed to be sent
         else: 

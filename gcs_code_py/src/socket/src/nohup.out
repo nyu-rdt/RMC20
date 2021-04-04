@@ -115359,6 +115359,7 @@ shutdown request: [/atlas_socket] Reason: new node registered with same name
 [INFO] [1615617907.111423]: ====== CONNECTION BROKE =====
 [INFO] [1615617910.111501]: ====== CONNECTION BROKE =====
 [INFO] [1615617913.111423]: ====== CONNECTION BROKE =====
+<<<<<<< HEAD
 [INFO] [1615617916.111427]: ====== CONNECTION BROKE =====
 [INFO] [1615617919.111612]: ====== CONNECTION BROKE =====
 [INFO] [1615617922.111429]: ====== CONNECTION BROKE =====
@@ -117892,3 +117893,6 @@ Traceback (most recent call last):
   File "atlas_socket.py", line 126, in send_data
     self.conn.sendto(self.HEARTBEAT_PACKAGE, (self.target_ip, self.target_port))
 socket.error: [Errno 101] Network is unreachable
+=======
+[INFO] [1615617916.111427]: 
+>>>>>>> a641f858c034c440ffc04236bc1b45cf3c6ec84d
