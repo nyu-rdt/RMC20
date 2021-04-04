@@ -1,2 +1,2 @@
 command_handler:socket
--DCATKIN_DEVEL_PREFIX=/home/dan/Desktop/RMC20/gcs_code_py/devel -DCMAKE_INSTALL_PREFIX=/home/dan/Desktop/RMC20/gcs_code_py/install -G Unix Makefiles
+-DCATKIN_DEVEL_PREFIX=/home/rdt/Desktop/RMC20-git/gcs_code_py/devel -DCMAKE_INSTALL_PREFIX=/home/rdt/Desktop/RMC20-git/gcs_code_py/install -G Unix Makefiles

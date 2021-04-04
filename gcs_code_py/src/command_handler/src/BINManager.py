@@ -47,8 +47,8 @@ class BINManager:
         sizeOfInt = 4 
         if(len(data) < sizeOfC + sizeOfInt): 
             return
-        for i in range(len(data)):
-            print("%d ", ord(data[i]))
+#        for i in range(len(data)):
+            #print("%d ", ord(data[i]))
 
         self.commands.parse(data, sizeOfInt + sizeOfC);
 
@@ -115,7 +115,8 @@ class BINManager:
     # data:str[] and data:str
     def send(self, data):
         #rospy.loginfo(data)
-        self.sendHandler.publish("".join(data))
+        #self.sendHandler.publish("".join(data))
+	pass
         
     def recv(self, data):
         self.binRecv(data)

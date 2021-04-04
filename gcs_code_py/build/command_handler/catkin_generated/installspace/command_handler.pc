@@ -1,8 +1,0 @@
-prefix=/home/dan/Desktop/RMC20/gcs_code_py/install
-
-Name: command_handler
-Description: Description of command_handler
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 

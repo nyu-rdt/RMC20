@@ -7,7 +7,7 @@
 # new environment variables
 
 # modified environment variables
-export CMAKE_PREFIX_PATH='/home/dan/Desktop/RMC20/gcs_code_py/devel:/opt/ros/melodic:/home/dan/Desktop/RMC20/nuc_code/devel'
-export LD_LIBRARY_PATH='/home/dan/Desktop/RMC20/gcs_code_py/devel/lib:/opt/ros/melodic/lib:/home/dan/Desktop/RMC20/nuc_code/devel/lib'
-export PWD='/home/dan/Desktop/RMC20/gcs_code_py/build'
-export PYTHONPATH='/opt/ros/melodic/lib/python2.7/dist-packages:/home/dan/Desktop/RMC20/nuc_code/devel/lib/python2.7/dist-packages'
+export CMAKE_PREFIX_PATH="/home/rdt/Desktop/RMC20-git/gcs_code_py/devel:$CMAKE_PREFIX_PATH"
+export PWD='/home/rdt/Desktop/RMC20-git/gcs_code_py/build'
+export ROSLISP_PACKAGE_DIRECTORIES="/home/rdt/Desktop/RMC20-git/gcs_code_py/devel/share/common-lisp:$ROSLISP_PACKAGE_DIRECTORIES"
+export ROS_PACKAGE_PATH="/home/rdt/Desktop/RMC20-git/gcs_code_py/src:$ROS_PACKAGE_PATH"

@@ -20,13 +20,13 @@ import threading, Queue
 import struct
 
 # Global constants
-# G_TARGET_IP = "192.168.1.2"
-G_TARGET_IP = "127.0.0.1"
+G_TARGET_IP = "192.168.1.10"
+#G_TARGET_IP = "127.0.0.1"
 G_TARGET_PORT = 10010
-# G_LOCAL_IP = "192.168.1.15"
-G_LOCAL_IP = "127.0.0.1"
+G_LOCAL_IP = "192.168.1.11"
+#G_LOCAL_IP = "127.0.0.1"
 G_LOCAL_PORT = 10010
-G_REPORT_RATE = 20                # Rate (in Hz) that connection is checked 
+G_REPORT_RATE = 5                # Rate (in Hz) that connection is checked 
 G_FAILSAFE_THRESHOLD = 60         # How many failed connections until ESTOP is triggered
 
 # Maxsize <= 0 means infinite queue size
@@ -34,7 +34,7 @@ input_buffer = Queue.Queue(maxsize = -1)
 output_buffer = Queue.Queue(maxsize = -1)
 
 # Publishes output data
-pub = rospy.Publisher("recv_buffer", String, queue_size=10)
+pub = rospy.Publisher("RecvBuffer", String, queue_size=10)
 
 """
 Puts data from incoming ROS topic to input buffer; callback
@@ -45,7 +45,7 @@ def send_buffer(data):
         input_buffer.put(data.data)
 
 # Subscribes to input data
-rospy.Subscriber("send_buffer", String, send_buffer)
+rospy.Subscriber("SendBuffer", String, send_buffer)
 
 ros_dead = False 
 
@@ -54,7 +54,7 @@ class AtlasSocket(threading.Thread):
     Socket class initialization
     Has I/O buffers, target ip/port, local ip/port, report rate, failsafe threshold
     """
-    def __init__(self, threadName, input_buffer, output_buffer, target_ip = '127.0.0.1', target_port = 10010, local_ip = '127.0.0.1', local_port = 10010, report_rate = 20, failsafe_th = 60):
+    def __init__(self, threadName, input_buffer, output_buffer, target_ip = '127.0.0.1', target_port = 10010, local_ip = '127.0.0.1', local_port = 10010, report_rate = 10, failsafe_th = 60):
         self.input_buffer = input_buffer
         self.output_buffer = output_buffer
         self.target_ip = target_ip
@@ -99,7 +99,7 @@ class AtlasSocket(threading.Thread):
         else:	
             self.no_response_counter = 0	
             self.conn_break = False
-            print("Recieved", receive_data[0:receive_nbytes])
+            #print("Recieved", receive_data[0:receive_nbytes])
             self.output_buffer.put(receive_data[0:receive_nbytes])
     
     """
