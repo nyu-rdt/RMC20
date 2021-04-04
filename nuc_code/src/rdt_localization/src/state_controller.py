@@ -113,6 +113,27 @@ sensor_connected = False
 obstacle_connected = False
 
 
+class Keyboard:
+    def __init__(self, data):
+	self.w = False
+	self.a = False
+	self.s = False
+	self.d = False
+	self.data = data
+	self.parse_data(data)
+
+    def parse_data(self, data):
+	self.w = data[0] == "T"
+	self.a = data[1] == "T"
+	self.s = data[2] == "T"
+	self.d = data[3] == "T"
+
+    def __repr__(self):
+	return self.data
+
+# Setting up last keys for manual drive
+last_keys = Keyboard("FFFF") 
+
 # ROS callback functions
 '''
 Gets the last set of key presses/releases from the GCS.
@@ -121,8 +142,8 @@ data: rdt_localization/Keyboard
 def manualDriveRecieve(data): 
     global last_keys
     previous = last_keys
-    last_keys = data 
-
+    keyboard_status = data.data
+    last_keys = Keyboard(keyboard_status)
 '''
 Gets response from ping_drive_limb node to ensure that the locomotion and limbs subsystems are 
 active and connected.
