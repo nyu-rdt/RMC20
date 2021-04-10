@@ -205,3 +205,67 @@ def encoder_arm(a):
 def decoder_arm(d):
     if d[0] & 0b1000: pass
     elif d[0] & 0b0010: pass
+
+limb_topic = "server/limb_manual"
+limb_sendHandler = rospy.Publisher(manual_drive_topic, String, queue_size=10)
+
+def encoder_limb(keyboard_data): 
+    """
+    return: Encrypted data sent over the net work as a byte 
+    keyboard_data: An array where each index reprsents if a key is being pressed 
+    [U, J, I, K, O, L, P]
+    U,J: Drum foward, Drum Backward 
+    I,K: Linear Actuator Up, Linear Actuator Down 
+    O,L: Arms Up, Arms Down 
+    P: Door toggle(open, close)
+    """
+    out = [0]
+    #translate keyboard_data into a byte 
+    for i in range(len(keyboard_data)):
+        if(keyboard_data[i]): 
+            out[0] |= (2**i) 
+    return out
+
+
+def decoder_limb(encode_data): 
+    """
+    Encode_data: A byte of data that represents key prersseds 
+    0 0 0 0 0  0  0  0
+    1 2 4 8 16 32 64 128
+    U J I K O  L  P  NULL 
+    """
+    data = encode_data[0]
+    #Drum 
+
+    #takes the first 2 bits
+    current = data % 4 
+    #deletes the first 2 bits 
+    data/4 
+
+    if(current == 1): 
+        print("Drum Foward")
+    elif(current == 2):
+        print("Drum Backward")
+    #Linear Actuator 
+    current = data % 4 
+    data/4 
+    if(current == 1): 
+        print("Linear Actuator Up")
+    elif(current == 2): 
+        print("Linear Actuator Down")
+    #Arms
+    current = data % 4 
+    data/4 
+    if(current == 1): 
+        print("Arm Up")
+    elif(current == 2): 
+        print("Arm Down")
+    
+    #door 
+    current = data % 4 
+    data/4 
+    if(current == 1): 
+        print("Door Toggle")
+
+
+

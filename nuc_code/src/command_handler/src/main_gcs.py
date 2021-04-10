@@ -35,10 +35,10 @@ def run(argc, argv):
     manager = GCSManager()
     #manager = BINManager()
     #manager.commands.insert(1, [Key_library.W, Key_library.A, Key_library.S, Key_library.D], movementEncoder, movementDecoder, testSetup, testCleanup);
-    manager.commands.insert(1, [Key_library.W, Key_library.A, Key_library.S, Key_library.D], encoder_manual_drive, decoder_manual_drive, testSetup, testCleanup, "manual_drive", Keyboard)
+    manager.commands.insert(1, [Key_library.W, Key_library.A, Key_library.S, Key_library.D], encoder_manual_drive, decoder_manual_drive, testSetup, testCleanup)
     
-    manager.commands.insert(1, [Key_library.M], encoder_emergency_stop, decoder_emergency_stop, testSetup, testCleanup, "manual_drive", Keyboard)
-
+    manager.commands.insert(1, [Key_library.M], encoder_emergency_stop, decoder_emergency_stop, testSetup, testCleanup)
+    manager.commands.insert(1, [Key_library.U, Key_library.J, Key_library.I, Key_library.K,Key_library.O, Key_library.L, Key_library.P ],encoder_limb, decoder_limb, None, None)
     manager.commandsRos.addBroadcast("slot1",None,None);
     manager.commandsRos.addBroadcast("slot2",None,None);
     manager.commandsRos.addBroadcast("slot3",None,None);

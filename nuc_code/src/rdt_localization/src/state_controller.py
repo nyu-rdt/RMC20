@@ -249,6 +249,9 @@ def process_manual_cmd(drive_vec):
 
     return drive_vec
 
+def process_limb_cmd(limb_vec): 
+    
+
 '''
 Creates Drive_Vector() object with given driveMode and speed
 data: rdt_localization/msg/Drive_Vector

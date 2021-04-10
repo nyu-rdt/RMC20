@@ -66,8 +66,8 @@ class FunctionTable:
         setup: func(bool) -> None
         cleanup: func(bool) -> None
     """
-    def insert(self, num_bytes, keyboard, encoder, decoder, setup, cleanup, topic, return_type):
-        func = Functions(keyboard, encoder, decoder, setup, cleanup, topic, return_type, num_bytes)
+    def insert(self, num_bytes, keyboard, encoder, decoder, setup, cleanup):
+        func = Functions(keyboard, encoder, decoder, setup, cleanup, num_bytes)
         self.insert_function(func)
 
 
