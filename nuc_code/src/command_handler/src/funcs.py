@@ -226,6 +226,7 @@ def encoder_limb(keyboard_data):
             out[0] |= (2**i) 
     return out
 
+keyboard_limb_status = [False for i in range(7)]
 
 def decoder_limb(encode_data): 
     """
@@ -235,13 +236,53 @@ def decoder_limb(encode_data):
     U J I K O  L  P  NULL 
     """
     data = encode_data[0]
+    currnet = data 
+    vector = ""
+    for i in range(7): 
+        #takes the first bit 
+        status = current%2
+        if(status == 1): keyboard_limb_status[i] = not keyboard_limb_status[i]
+        current /= 2 
+    #Drum
+    if(keyboard_limb_status[0]): 
+        vector += "1"
+    elif(keyboard_limb_status[1]): 
+        vector += "-1"
+    else: 
+        vector += "0"
+    vector " "
+    #Linear Actuator 
+    if(keyboard_limb_status[2]): 
+        vector += "1"
+    elif(keyboard_limb_status[3]): 
+        vector += "-1"
+    else:
+        vector += "0"
+    vector " "
+    #Arms
+    if(keyboard_limb_status[4]): 
+        vector += "1"
+    elif(keyboard_limb_status[5]): 
+        vector += "-1"
+    else:
+        vector += "0"
+    vector " "
+    #Door 
+    if(keyboard_limb_status[6]): 
+        vector += "1"
+    else: 
+        vector += "0"
+    limb_sendHandler.publish(vector)
+    print_test_limb(data,vector)
+
+def print_test_limb(data, vector):
+    print(vector)
     #Drum 
 
     #takes the first 2 bits
     current = data % 4 
     #deletes the first 2 bits 
     data/4 
-
     if(current == 1): 
         print("Drum Foward")
     elif(current == 2):
