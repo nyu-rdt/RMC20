@@ -47,6 +47,7 @@ TOPIC_TO_PID_CONTROLLER_NODE = "server/orient_vector"   # Passes pose/location t
 TOPIC_TO_DRIVE_NODE = "server/send_drive_vec"           # Passes drive vector to send to bot
 TOPIC_TO_LIMB_NODE = "server/send_limb_vec"             # Passes limb vector to send to bot
 TOPIC_TO_MANUAL_DRIVE = "server/manual_drive"           # Receives key presses/releases from command handler
+TOPIC_FROM_LIMB_DRIVE = "server/manual_limb"
 
 # Most variables are open to being replaced
 # (I mean this in the sense that we can replace these variables with tangible conditions)
@@ -133,11 +134,18 @@ class Keyboard:
 
 # Setting up last keys for manual drive
 last_keys = Keyboard("FFFF") 
-
+last_limb_keys = "0 0 0 0"
 # ROS callback functions
 '''
-Gets the last set of key presses/releases from the GCS.
-data: rdt_localization/Keyboard
+Gets the last set of key presses/releases from the GCS for limb.
+data: "server/manual_limb" 
+'''
+def manualLimbRecieve(data): 
+    global last_limb_keys
+    last_limb_keys = data.data
+'''
+Gets the last set of key presses/releases from the GCS for moving.
+data: "server/manual_drive" 
 '''
 def manualDriveRecieve(data): 
     global last_keys
@@ -250,7 +258,14 @@ def process_manual_cmd(drive_vec):
     return drive_vec
 
 def process_limb_cmd(limb_vec): 
-    
+    global last_limb_keys
+    vector = last_limb_keys.split(" ")
+    speeds = [100,50,10,1]
+    for i in range(4): 
+        speeds[i] *= int(vector[i])
+
+    outvec = Limb_Vector(door = (speeds[3] == 1), linActs_speed = speeds[1],arm_speed = speeds[2], drum_speed = speeds[0])
+    return outvec
 
 '''
 Creates Drive_Vector() object with given driveMode and speed
@@ -292,12 +307,15 @@ def main():
     while not rospy.is_shutdown():
         # STATE 0: Manual state
         if robot_state == 0:
+            global last_limb_keys
             global last_keys 
 
             # Process the last received manual commands and send them
             drive_vec = Drive_Vector() 
             process_manual_cmd(drive_vec)
             pub_drive_cmd.publish(drive_vec)
+            limb_vec = process_limb_cmd()
+            pub_limb_cmd.publsh(limb_vec)
             
         # STATE 1: Competition starts
         elif robot_state == 1:

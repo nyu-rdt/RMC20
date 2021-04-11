@@ -206,7 +206,7 @@ def decoder_arm(d):
     if d[0] & 0b1000: pass
     elif d[0] & 0b0010: pass
 
-limb_topic = "server/limb_manual"
+limb_topic = "server/manual_limb"
 limb_sendHandler = rospy.Publisher(manual_drive_topic, String, queue_size=10)
 
 def encoder_limb(keyboard_data): 
