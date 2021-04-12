@@ -1,11 +1,11 @@
 #include<Servo.h>
-
+#include "PID.h"
 const int LEFT_PIN = 16;
 const int RIGHT_PIN  = 20;
 const int LEFT_SENSOR = 6;
 const int RIGHT_SENSOR = 5;
 int val =  50; //0 - 100
-int left_interval= 5000;
+int left_interval = 5000;
 int right_interval = 5000;
 int left_pastread = 0;
 int right_pastread = 0;
@@ -16,8 +16,12 @@ int magnum = 4; // magnets at 0, 90, 180, 270
 int adjustmenttime = 300; // in milliseconds
 float weightdiff = 0.7;
 float weightinterval = 0.3;
-float circum = 15.75*3.141592653;
+float circum = 15.75 * 3.141592653;
 
+float Kp = 1;
+float Ki = 0.01;
+float Kd = 0.01;
+PID drum_pid(1,0.1,0.1,0.7,0.3);
 Servo left_wheel;
 Servo right_wheel;
 void setup() {
@@ -32,11 +36,11 @@ void setup() {
 // mapping values for actually turning the wheel
 int getForward(int val)
 {
-  return map(val,-100,100,1000,2000);
+  return map(val, -100, 100, 1000, 2000);
 }
 int getBackward(int val)
 {
-  return map(-val,-100,100,1000,2000);
+  return map(-val, -100, 100, 1000, 2000);
 }
 
 // lag of the magnets
@@ -92,11 +96,11 @@ void setspeeds() {
 
   // adjust based on difference in speed
   if (left_interval > right_interval) {
-    float adjustmentval = (right_interval/left_interval) * weightinterval;
+    float adjustmentval = (right_interval / left_interval) * weightinterval;
     right_speed = right_speed * adjustmentval;
   }
   else {
-    float adjustmentval = (left_interval/right_interval) * weightinterval;
+    float adjustmentval = (left_interval / right_interval) * weightinterval;
     left_speed = left_speed * adjustmentval;
   }
 }
@@ -121,7 +125,7 @@ void run_ccw(int val)
 // looping function
 void loop()
 {
-  if(Serial1.available() > 0) {
+  if (Serial1.available() > 0) {
     val = Serial1.read();
     if (val != 0) {
       left_interval = val * 100; // this is baseline guess for first interval that will be adjusted later
