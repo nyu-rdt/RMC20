@@ -1,4 +1,5 @@
 import  rospy 
+from std_msgs.msg import String
 keyboard = ['W','A','S','D', ' '] # this will be taken from the keyboard class  
 keyboard_move_status = [False for _ in range(0,4)] 
 
@@ -207,7 +208,7 @@ def decoder_arm(d):
     elif d[0] & 0b0010: pass
 
 limb_topic = "server/manual_limb"
-limb_sendHandler = rospy.Publisher(manual_drive_topic, String, queue_size=10)
+limb_sendHandler = rospy.Publisher(limb_topic, String, queue_size=10)
 
 def encoder_limb(keyboard_data): 
     """
@@ -250,7 +251,7 @@ def decoder_limb(encode_data):
         vector += "-1"
     else: 
         vector += "0"
-    vector " "
+    vector += " "
     #Linear Actuator 
     if(keyboard_limb_status[2]): 
         vector += "1"
@@ -258,7 +259,7 @@ def decoder_limb(encode_data):
         vector += "-1"
     else:
         vector += "0"
-    vector " "
+    vector +=" "
     #Arms
     if(keyboard_limb_status[4]): 
         vector += "1"
@@ -266,7 +267,7 @@ def decoder_limb(encode_data):
         vector += "-1"
     else:
         vector += "0"
-    vector " "
+    vector += " "
     #Door 
     if(keyboard_limb_status[6]): 
         vector += "1"

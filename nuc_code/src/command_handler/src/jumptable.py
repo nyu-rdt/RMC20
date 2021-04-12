@@ -5,7 +5,7 @@ from std_msgs.msg import String
 
 class Functions:
     # constructor
-    def __init__(self, keyboard, encoder, decoder, setup, cleanup, topic, return_type, num_bytes=0):
+    def __init__(self, keyboard, encoder, decoder, setup, cleanup, num_bytes=0):
         self.num_bytes = num_bytes
         self.keyboard = keyboard
         
