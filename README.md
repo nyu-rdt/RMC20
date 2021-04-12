@@ -74,30 +74,28 @@ byte offset_driveMode }
 
 - `byte robotSpeed` can take on a value from **0 to 200**, representing a percentage of the robot's potential speed to write to the motor controllers (**0** means 100% speed backward, **100** means 0% speed, **200** means 100% speed forward).
 - `byte offset_driveMode` can take on a value from **0 to 255**. The robot has four separate "drive modes" it can be in, depending on what relation the wheels need to turn in relation to one another. The following values of this byte mean that the robot is in a specific drive mode:
-  -  **Value: 0 to 200**, the robot is assumed to be in "forward-driving" mode. In this mode, the bot is attempting to drive normally such as in **ConOps states 6 and 16**. The left-side and right-side wheels are treated as two independent units in this mode, each being written `robotSpeed` with a "turning offset" specified by the value of this byte.
-
-​        This "turning offset" represents the difference between the value that will be written to the left/right-side wheels. This is used for turning the bot while it is driving. For an example, given a `robotSpeed` of *80*, an "offset" value of *0* means that the left-side wheels and right-side wheels will receive the same value (80%), so the robot will go straight. Alternatively, an "offset" of *30* means that the left-side wheels will get a speed of *80%* while the right-side wheels will receive a speed of 80 - 30 = *50%*. This will cause the robot to veer right. 
-
-- **Value: 253** is the "changing digging drum elevation" mode of the robot, such as in **ConOps states 8 and 11**. In this mode, the robot's arms are attempting to raise or lower the digging drum, and the wheels must concurrently turn at a speed to match. The front-side and back-side wheels are treated as two independent units, each being written `robotSpeed`. No offset is necessary for this mode, since at no point in the ConOps are the arms rotating at different speeds.
-- **Value: 254** is the "turning in place" mode of the robot, where it is rotating in-place around its own center axis such as in **ConOps states 15 and 17**. Like the forward-driving mode, the left- and right-side wheels are treated as two independent units, being written `robotSpeed` and `-1*robotSpeed`, respectively. No offset is necessary for this mode.
-- **Value: 255** is reserved for ESTOP. In this mode, `robotSpeed` is ignored and a speed of 0 is written to all controllers.
-- **Value: 201 to 252** are unused values and can be ignored.
+  
+| Value          | Description |
+| -------------- | ----------- |
+| 0 to 200       | The robot is in "forward-driving" mode. In this mode, the bot is attempting to drive normally such as in **ConOps states 6 and 16**. The left-side and right-side wheels are treated as two independent units in this mode, each being written `robotSpeed` with a "turning offset" specified by the value of this byte. <p><p> This "turning offset" represents the difference between the value that will be written to the left/right-side wheels. This is used for turning the bot while it is driving. For an example, given a `robotSpeed` of *180*, an "offset" value of *0* means that the left-side wheels and right-side wheels will receive the same power (80%), so the robot will go straight. Alternatively, an "offset" of *30* means that the left-side wheels will get a power of *80%* while the right-side wheels will receive a power of 80 - 30 = *50%*. This will cause the robot to veer right. |
+| 201 to 251    | Unused values, can be ignored. |
+| 252         | A "ping" value. When a command with 252 as the offset is sent to the robot, the drive subsystem will perform a diagnostic and respond through `robotState/drivePing` to let the server know it is live. |
+| 253         | The "changing digging drum elevation" mode of the robot, such as in **ConOps states 8 and 11**. In this mode, the robot's arms are attempting to raise or lower the digging drum, and the wheels must concurrently turn at a speed to match. The front-side and back-side wheels are treated as two independent units, each being written `robotSpeed` in opposite directions. No offset is necessary for this mode. |
+| 254         | The "turning in place" mode of the robot, where it is rotating in-place around its own center axis such as in **ConOps states 15 and 17**. Like the forward-driving mode, the left- and right-side wheels are treated as two independent units, being written `robotSpeed` and `-1*robotSpeed`, respectively. No offset is necessary for this mode. |
+| 255         | Reserved for ESTOP. In this mode, `robotSpeed` is ignored and a speed of 0 is written to all controllers. |
 
 ___
 #### `robotCmds/limbs`
 Used to send limb-controlling commands from the server, specifically from the `send_limb_controls` node on the server, to the Limb ESP. These commands control ALL of the robot's limbs, except the drivetrain. The data is sent in the following format: 
 
 ```
-{ int drum
-int arms
-int linActs
-bool door }
+{ byte limbCmds }
 ```
 
-- `int drum` can take on a value from **-100 to 100**, representing a percentage of the digging drum's potential speed to write to its motor controller.
-- `int arms` can take on a value from **-100 to 100**, representing a percentage of the arms' potential speed to write to their motor controllers. During the lowering and lifting drum autonomy states, such as **ConOps states 8 and 11**, the arms need to synchronize their speed with the front and back wheels for a smooth digging motion; **this calculation is performed in the** `state_controller` **node on the server, NOT on the Limb ESP!**
-- `int linActs` can take on a value from **-100 to 100**, representing a percentage of the linear actuators' potential speed to write to their motor controllers.
-- `bool door` can have the value **True or False** since the deposition door only has 2 potential states, "open" or "closed." In this case, True means an open door and False means a closed door.
+- `byte limbCmds` is split into four sections, as shown in the diagram below (with MSB to the left side). The byte is split into 2 bits representing 4 drum speeds, 2 bits represeting 4 arms speeds, 2 bits representing 4 linear actuator speeds, and 1 bit representing the state of the door (open or closed).
+<p align="center">
+  <img src="/docs/limb_cmd.png?raw=true" alt="Limb Command Diag"/>
+</p>
 
 ___
 #### `robotState/sensorData`
@@ -110,13 +108,13 @@ Used to send sensor data, specifically LIDAR data, from the robot's LIDAR ESP to
 There are 4 LIDARs mounted in an array on the front of the robot, angled downwards to scan for obstacles. The data is sent in the following format: 
 
 ```
-{ float lidar1
-float lidar2
-float lidar3
-float lidar4 }
+{ byte lidar1
+byte lidar2
+byte lidar3
+byte lidar4 }
 ```
 
-- `float lidar1` , `float lidar2` , `float lidar3` , `float lidar4`  are the distances that the 4 LIDARs read, from left to right. The distances are in centimeters.
+- `byte lidar1` , `byte lidar2` , `byte lidar3` , `byte lidar4`  are the distances that the 4 LIDARs read, from left to right. The distances are in centimeters.
 
 ___
 <br />
