@@ -4,13 +4,15 @@ const int LEFT_PIN = 16;
 const int RIGHT_PIN  = 20;
 const int LEFT_SENSOR = 6;
 const int RIGHT_SENSOR = 5;
-int val =  50; //0 - 100
+int val =  10; //0 - 100
 int left_interval = 5000;
 int right_interval = 5000;
 int left_pastread = 0;
 int right_pastread = 0;
-int left_speed = 0;
-int right_speed = 0;
+int left_speed = val;
+int right_speed = val;
+bool setleft = false;
+bool setright = false;
 int difference = 0; // positive if left is ahead.
 int magnum = 4; // magnets at 0, 90, 180, 270
 int adjustmenttime = 300; // in milliseconds
@@ -50,14 +52,13 @@ void set_difference() {
 
 void set_intervals() {
   int current = millis();
-  bool setleft = false;
-  bool setright = false;
+
   // Only set past_read and interval if larger than .8 of previous interval - don't set during streak of LOW or false LOW in the middle
   if (digitalRead(LEFT_SENSOR) == HIGH && (((float) (current - left_pastread) / left_interval ) > (0.8 / magnum)))  {
     // Only set interval when it's below 1.7x of the previous interval - i.e we didn't miss an interval
     if (((float) (current - left_pastread) / left_interval ) < (1.7 / magnum)) {
       left_interval = (current - left_pastread) * magnum;
-      // Serial.print("Left Update: ");
+      Serial.print("Left Update: ");
       // Serial.println(((float) left_interval) / 100);
     }
     // Record the past_read anyway to set the next interval
@@ -68,14 +69,17 @@ void set_intervals() {
   if (digitalRead(RIGHT_SENSOR) == HIGH && (((float) (current - right_pastread) / right_interval ) > (0.8 / magnum))) {
     if (((float) (current - right_pastread) / right_interval ) < (1.7 / magnum)) {
       right_interval = (current - right_pastread) * magnum;
-      // Serial.print("Right Update: ");
+      Serial.print("Right Update: ");
       // Serial.println(((float) right_interval / 100));
     }
     right_pastread = current;
     setright = true;
   }
   if (setright && setleft) {
+    Serial.println("Updated");
     set_difference();
+    setleft = false;
+    setright = false;
   }
 }
 
@@ -91,10 +95,15 @@ void setspeeds() {
   else {
     right_speed += (int) speed_decrease;
   }
+  /*
+  Serial.print("speed_decrease: ");
   Serial.println(speed_decrease);
+  Serial.print("pos_difference: ");
+  Serial.println(difference);
+  Serial.println("speed_difference ");
+  Serial.println(right_interval - left_interval);
+  */
 }
-
-
 
 // wheels running function
 void run_cw(int val)
@@ -121,6 +130,8 @@ void loop()
       right_interval = val * 100; // this is baseline guess for first interval that will be adjusted later
     }
   }
-  set_intervals(); // uncomment to start adjusting motor speeds dynamically
+   //set_intervals(); // uncomment to start adjusting motor speeds dynamically
   run_cw(val);
+  Serial.println(digitalRead(RIGHT_SENSOR));
+  Serial.println(digitalRead(LEFT_SENSOR));
 }
