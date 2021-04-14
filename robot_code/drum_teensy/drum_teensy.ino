@@ -57,8 +57,8 @@ void set_intervals() {
     // Only set interval when it's below 1.7x of the previous interval - i.e we didn't miss an interval
     if (((float) (current - left_pastread) / left_interval ) < (1.7 / magnum)) {
       left_interval = (current - left_pastread) * magnum;
-      Serial.print("Left Update: ");
-      Serial.println(((float) left_interval) / 100);
+      // Serial.print("Left Update: ");
+      // Serial.println(((float) left_interval) / 100);
     }
     // Record the past_read anyway to set the next interval
     left_pastread = current;
@@ -68,8 +68,8 @@ void set_intervals() {
   if (digitalRead(RIGHT_SENSOR) == HIGH && (((float) (current - right_pastread) / right_interval ) > (0.8 / magnum))) {
     if (((float) (current - right_pastread) / right_interval ) < (1.7 / magnum)) {
       right_interval = (current - right_pastread) * magnum;
-      Serial.print("Right Update: ");
-      Serial.println(((float) right_interval / 100));
+      // Serial.print("Right Update: ");
+      // Serial.println(((float) right_interval / 100));
     }
     right_pastread = current;
     setright = true;
@@ -84,25 +84,14 @@ void set_intervals() {
 // it would be nice to make a switching pid controller based on both of these errors
 void setspeeds() {
   // adjust based on difference in magnet positioning
-  int avg_interval = (left_interval + right_interval) / 2;
-  float angle = difference / avg_interval;
-  float speed_decrease = (adjustmenttime * angle) * weightdiff;
-  if (speed_decrease < 0) {
-    right_speed = right_speed + speed_decrease;
+  float speed_decrease = drum_pid.update(difference, (right_interval - left_interval));
+  if (speed_decrease > 0) {
+    left_speed -= (int) speed_decrease;
   }
   else {
-    left_speed = left_speed - speed_decrease;
+    right_speed += (int) speed_decrease;
   }
-
-  // adjust based on difference in speed
-  if (left_interval > right_interval) {
-    float adjustmentval = (right_interval / left_interval) * weightinterval;
-    right_speed = right_speed * adjustmentval;
-  }
-  else {
-    float adjustmentval = (left_interval / right_interval) * weightinterval;
-    left_speed = left_speed * adjustmentval;
-  }
+  Serial.println(speed_decrease);
 }
 
 
