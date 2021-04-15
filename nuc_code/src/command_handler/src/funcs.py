@@ -1,4 +1,4 @@
-import  rospy 
+import rospy 
 from std_msgs.msg import String
 keyboard = ['W','A','S','D', ' '] # this will be taken from the keyboard class  
 keyboard_move_status = [False for _ in range(0,4)] 
@@ -237,13 +237,14 @@ def decoder_limb(encode_data):
     U J I K O  L  P  NULL 
     """
     data = encode_data[0]
-    currnet = data 
+    current = data 
     vector = ""
     for i in range(7): 
         #takes the first bit 
         status = current%2
-        if(status == 1): keyboard_limb_status[i] = not keyboard_limb_status[i]
+        keyboard_limb_status[i] = (status == 1)
         current /= 2 
+    print(keyboard_limb_status)
     #Drum
     if(keyboard_limb_status[0]): 
         vector += "1"
@@ -283,21 +284,21 @@ def print_test_limb(data, vector):
     #takes the first 2 bits
     current = data % 4 
     #deletes the first 2 bits 
-    data/4 
+    data/=4 
     if(current == 1): 
         print("Drum Foward")
     elif(current == 2):
         print("Drum Backward")
     #Linear Actuator 
     current = data % 4 
-    data/4 
+    data/=4 
     if(current == 1): 
         print("Linear Actuator Up")
     elif(current == 2): 
         print("Linear Actuator Down")
     #Arms
     current = data % 4 
-    data/4 
+    data/=4 
     if(current == 1): 
         print("Arm Up")
     elif(current == 2): 

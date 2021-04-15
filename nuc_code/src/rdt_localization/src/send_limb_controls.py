@@ -11,6 +11,9 @@ TODO:
 """
 
 from std_msgs.msg import String
+from std_msgs.msg import Bool
+from rdt_localization.msg import *
+
 
 import paho.mqtt.client as mqtt
 import rospy
@@ -37,6 +40,7 @@ def publish_limb_vector(data):
     client.publish("robotCmds/limbs", rdt_data)
 
 def main():
+    global client
 	# Setup ROS node
     rospy.init_node("send_limb_vector")
     

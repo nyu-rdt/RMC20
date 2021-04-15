@@ -15,5 +15,7 @@
    "ORIENTATION_VECTOR"
    "<POSE>"
    "POSE"
+   "<SENSOR_DATA>"
+   "SENSOR_DATA"
   ))
 

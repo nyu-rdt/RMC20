@@ -1,0 +1,8 @@
+prefix=/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install
+
+Name: command_handler
+Description: Description of command_handler
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

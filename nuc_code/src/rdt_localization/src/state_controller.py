@@ -54,7 +54,7 @@ TOPIC_FROM_LIMB_DRIVE = "server/manual_limb"
 # i.e. instead of if (robot_cannot_move), we might use something like if (motor_speed == 0)
 
 # Robot variables
-robot_state = 4
+robot_state = 0
 robot_pose = None
 robot_localized = False
 robot_cannot_move = False             # If the robot cannot move
@@ -257,12 +257,13 @@ def process_manual_cmd(drive_vec):
 
     return drive_vec
 
-def process_limb_cmd(limb_vec): 
+def process_limb_cmd(): 
     global last_limb_keys
     vector = last_limb_keys.split(" ")
     speeds = [100,50,10,1]
     for i in range(4): 
         speeds[i] *= int(vector[i])
+    print(vector)
 
     outvec = Limb_Vector(door = (speeds[3] == 1), linActs_speed = speeds[1],arm_speed = speeds[2], drum_speed = speeds[0])
     return outvec
@@ -293,6 +294,7 @@ def main():
     rospy.Subscriber(TOPIC_FROM_SENSOR_NODE, String, get_sensor_data)
     rospy.Subscriber(TOPIC_FROM_OBSTACLE_NODE, Obstacle, get_obstacle_data)
     rospy.Subscriber(TOPIC_FROM_HEARTBEAT_NODE, String, parse_manual_commands)
+    rospy.Subscriber(TOPIC_FROM_LIMB_DRIVE, String, manualLimbRecieve)
     rospy.Subscriber(TOPIC_TO_MANUAL_DRIVE, String, manualDriveRecieve)
 
     # Publishers
@@ -307,6 +309,7 @@ def main():
     while not rospy.is_shutdown():
         # STATE 0: Manual state
         if robot_state == 0:
+	    print("Matthew is stupid ")
             global last_limb_keys
             global last_keys 
 
@@ -315,7 +318,7 @@ def main():
             process_manual_cmd(drive_vec)
             pub_drive_cmd.publish(drive_vec)
             limb_vec = process_limb_cmd()
-            pub_limb_cmd.publsh(limb_vec)
+            pub_limb_cmd.publish(limb_vec)
             
         # STATE 1: Competition starts
         elif robot_state == 1:

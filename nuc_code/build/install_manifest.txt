@@ -1,0 +1,90 @@
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/_setup_util.py
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/env.sh
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/setup.bash
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/local_setup.bash
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/setup.sh
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/local_setup.sh
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/setup.zsh
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/local_setup.zsh
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/.rosinstall
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/lib/pkgconfig/command_handler.pc
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/command_handler/cmake/command_handlerConfig.cmake
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/command_handler/cmake/command_handlerConfig-version.cmake
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/command_handler/package.xml
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/rdt_localization/msg/Pose.msg
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/rdt_localization/msg/Location.msg
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/rdt_localization/msg/Orientation_Vector.msg
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/rdt_localization/msg/Drive_Vector.msg
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/rdt_localization/msg/Obstacle.msg
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/rdt_localization/msg/Limb_Vector.msg
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/rdt_localization/cmake/rdt_localization-msg-paths.cmake
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/include/rdt_localization/Pose.h
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/include/rdt_localization/Drive_Vector.h
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/include/rdt_localization/Pose 3.h
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/include/rdt_localization/Orientation_Vector.h
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/include/rdt_localization/Obstacle.h
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/include/rdt_localization/Limb_Vector.h
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/include/rdt_localization/Location.h
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/roseus/ros/rdt_localization/msg/Location.l
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/roseus/ros/rdt_localization/msg/Drive_Vector.l
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/roseus/ros/rdt_localization/msg/Pose.l
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/roseus/ros/rdt_localization/msg/Obstacle.l
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/roseus/ros/rdt_localization/msg/Pose 3.l
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/roseus/ros/rdt_localization/msg/Orientation_Vector.l
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/roseus/ros/rdt_localization/msg/Limb_Vector.l
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/roseus/ros/rdt_localization/manifest.l
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/roseus/ros/rdt_localization/manifest 3.l
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/common-lisp/ros/rdt_localization/msg/Obstacle.lisp
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/common-lisp/ros/rdt_localization/msg/_package_Orientation_Vector.lisp
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/common-lisp/ros/rdt_localization/msg/Orientation_Vector.lisp
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/common-lisp/ros/rdt_localization/msg/Drive_Vector.lisp
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/common-lisp/ros/rdt_localization/msg/rdt_localization-msg 3.asd
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/common-lisp/ros/rdt_localization/msg/Pose.lisp
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/common-lisp/ros/rdt_localization/msg/_package 3.lisp
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/common-lisp/ros/rdt_localization/msg/_package_Drive_Vector.lisp
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/common-lisp/ros/rdt_localization/msg/rdt_localization-msg.asd
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/common-lisp/ros/rdt_localization/msg/_package_Pose.lisp
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/common-lisp/ros/rdt_localization/msg/_package.lisp
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/common-lisp/ros/rdt_localization/msg/_package_Limb_Vector.lisp
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/common-lisp/ros/rdt_localization/msg/Location.lisp
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/common-lisp/ros/rdt_localization/msg/Pose 3.lisp
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/common-lisp/ros/rdt_localization/msg/_package_Location.lisp
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/common-lisp/ros/rdt_localization/msg/_package_Pose 3.lisp
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/common-lisp/ros/rdt_localization/msg/Limb_Vector.lisp
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/common-lisp/ros/rdt_localization/msg/_package_Obstacle.lisp
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/gennodejs/ros/rdt_localization/msg/Limb_Vector.js
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/gennodejs/ros/rdt_localization/msg/Pose 3.js
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/gennodejs/ros/rdt_localization/msg/Location.js
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/gennodejs/ros/rdt_localization/msg/Pose.js
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/gennodejs/ros/rdt_localization/msg/Obstacle.js
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/gennodejs/ros/rdt_localization/msg/Orientation_Vector.js
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/gennodejs/ros/rdt_localization/msg/_index 3.js
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/gennodejs/ros/rdt_localization/msg/_index.js
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/gennodejs/ros/rdt_localization/msg/Drive_Vector.js
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/gennodejs/ros/rdt_localization/_index 3.js
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/gennodejs/ros/rdt_localization/_index.js
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/lib/python2.7/dist-packages/rdt_localization/msg/_Pose.py
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/lib/python2.7/dist-packages/rdt_localization/msg/_Pose.pyc
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/lib/python2.7/dist-packages/rdt_localization/msg/_Drive_Vector.py
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/lib/python2.7/dist-packages/rdt_localization/msg/_Limb_Vector.pyc
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/lib/python2.7/dist-packages/rdt_localization/msg/_Location.py
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/lib/python2.7/dist-packages/rdt_localization/msg/_Limb_Vector.py
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/lib/python2.7/dist-packages/rdt_localization/msg/_Obstacle.pyc
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/lib/python2.7/dist-packages/rdt_localization/msg/_Orientation_Vector.py
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/lib/python2.7/dist-packages/rdt_localization/msg/_Orientation_Vector.pyc
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/lib/python2.7/dist-packages/rdt_localization/msg/__init__.py
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/lib/python2.7/dist-packages/rdt_localization/msg/_Obstacle.py
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/lib/python2.7/dist-packages/rdt_localization/msg/_Drive_Vector.pyc
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/lib/python2.7/dist-packages/rdt_localization/msg/_Location.pyc
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/lib/python2.7/dist-packages/rdt_localization/msg/__init__.pyc
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/lib/python2.7/dist-packages/rdt_localization/__init__.py
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/lib/python2.7/dist-packages/rdt_localization/__init__.pyc
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/lib/pkgconfig/rdt_localization.pc
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/rdt_localization/cmake/rdt_localization-msg-extras.cmake
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/rdt_localization/cmake/rdt_localizationConfig.cmake
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/rdt_localization/cmake/rdt_localizationConfig-version.cmake
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/rdt_localization/package.xml
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/lib/pkgconfig/socket.pc
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/socket/cmake/socketConfig.cmake
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/socket/cmake/socketConfig-version.cmake
+/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install/share/socket/package.xml

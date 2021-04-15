@@ -1,0 +1,8 @@
+prefix=/home/rdt/Desktop/RMC20-nucnodes/nuc_code/install
+
+Name: socket
+Description: Description of socket
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

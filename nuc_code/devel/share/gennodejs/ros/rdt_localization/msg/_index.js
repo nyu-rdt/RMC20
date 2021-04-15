@@ -1,20 +1,22 @@
 
 "use strict";
 
-let Pose = require('./Pose.js');
+let Obstacle = require('./Obstacle.js');
 let Location = require('./Location.js');
 let Orientation_Vector = require('./Orientation_Vector.js');
-let Keyboard = require('./Keyboard.js');
 let Limb_Vector = require('./Limb_Vector.js');
-let Obstacle = require('./Obstacle.js');
+let Keyboard = require('./Keyboard.js');
+let Pose = require('./Pose.js');
 let Drive_Vector = require('./Drive_Vector.js');
+let Sensor_Data = require('./Sensor_Data.js');
 
 module.exports = {
-  Pose: Pose,
+  Obstacle: Obstacle,
   Location: Location,
   Orientation_Vector: Orientation_Vector,
-  Keyboard: Keyboard,
   Limb_Vector: Limb_Vector,
-  Obstacle: Obstacle,
+  Keyboard: Keyboard,
+  Pose: Pose,
   Drive_Vector: Drive_Vector,
+  Sensor_Data: Sensor_Data,
 };

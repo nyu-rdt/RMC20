@@ -91,10 +91,10 @@
   "32c0233ad09fff327409092d7163201c")
 (cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql '<Orientation_Vector>)))
   "Returns full string definition for message of type '<Orientation_Vector>"
-  (cl:format cl:nil "Pose robot_pose~%Location target_zone~%int64 robot_speed~%================================================================================~%MSG: rdt_localization/Pose~%float32 x~%float32 y~%float32 orientation~%================================================================================~%MSG: rdt_localization/Location~%float32 x~%float32 y~%~%"))
+  (cl:format cl:nil "Pose robot_pose~%Location target_zone~%int64 robot_speed~%================================================================================~%MSG: rdt_localization/Pose~%float32 x~%float32 y~%float32 orientation~%================================================================================~%MSG: rdt_localization/Location~%float32 x~%float32 y~%~%"))
 (cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql 'Orientation_Vector)))
   "Returns full string definition for message of type 'Orientation_Vector"
-  (cl:format cl:nil "Pose robot_pose~%Location target_zone~%int64 robot_speed~%================================================================================~%MSG: rdt_localization/Pose~%float32 x~%float32 y~%float32 orientation~%================================================================================~%MSG: rdt_localization/Location~%float32 x~%float32 y~%~%"))
+  (cl:format cl:nil "Pose robot_pose~%Location target_zone~%int64 robot_speed~%================================================================================~%MSG: rdt_localization/Pose~%float32 x~%float32 y~%float32 orientation~%================================================================================~%MSG: rdt_localization/Location~%float32 x~%float32 y~%~%"))
 (cl:defmethod roslisp-msg-protocol:serialization-length ((msg <Orientation_Vector>))
   (cl:+ 0
      (roslisp-msg-protocol:serialization-length (cl:slot-value msg 'robot_pose))
