@@ -6,10 +6,10 @@
 #define WIFI_PASS "lunabots"
 #define WIFI_CHANNEL 1
 
-#define SERVER_ADDR "192.168.43.201"
+#define SERVER_ADDR "192.168.1.10"
 #define SERVER_PORT 1883
 
-#define TOPIC_NAME_IN "robotCmds/limb"
+#define TOPIC_NAME_IN "robotCmds/limbs"
 #define MQTT_RECONNECT_TIMEOUT 200
 #define MQTT_READ_TIMEOUT 50
 
@@ -48,15 +48,16 @@ void checkConnection(){
 }
 void scanAndWrite(){
   Adafruit_MQTT_Subscribe* subPtr;
-  
+  //Serial.println("Waiting for command");
   while ((subPtr = mqtt.readSubscription(MQTT_READ_TIMEOUT))){
     if (subPtr == &inTopic){
+      Serial.println("Received data");
       // Read and translate the last incoming string of bytes
       // Incoming bytes currently come in the following format:
       //      door linAct arm drum
       char* command = (char*) inTopic.lastread; 
       char drum = command[3];
-      Serial.write(drum);
+      Serial.write((int)drum);
     }
   }
 }
