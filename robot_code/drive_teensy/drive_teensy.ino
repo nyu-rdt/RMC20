@@ -69,14 +69,11 @@ void forward(int val, int offset) {
   float valForward = map(val,0,200,1000,2000);
  // float offset = map(turn,0,200,1000,2000);
   float valBackward = map(val,0,200,2000,1000);
-  int i;
   Serial.println("test");
   Serial.println(valForward);
   Serial.println(valBackward);
-  if(offset < 100) {
   float leftRatio = (offset/200);
-  float rightRatio = (offset)/200;
-
+  if(offset < 100) {
   Brown.writeMicroseconds(valForward);
   Pink.writeMicroseconds(valForward);
   Blue.writeMicroseconds(valBackward*leftRatio);
@@ -84,19 +81,12 @@ void forward(int val, int offset) {
   }
 
   if(offset > 100) {
-  float leftRatio = (offset/200);
-  float rightRatio = (offset)/200;
-
   Brown.writeMicroseconds(valForward*leftRatio);
   Pink.writeMicroseconds(valForward*leftRatio);
   Blue.writeMicroseconds(valBackward);
   Orange.writeMicroseconds(valBackward);
   }
   if (offset == 100){
-
-  float leftRatio = (offset/200);
-  float rightRatio = (offset)/200;
-
   Brown.writeMicroseconds(valForward);
   Pink.writeMicroseconds(valForward);
   Blue.writeMicroseconds(valBackward);
@@ -109,8 +99,8 @@ void forward(int val, int offset) {
  *   This function spins all motors so robot moves in the backward direction
  */
 void backward(int val) {
-  float valForward = map(val,0,200,1000,2000);
-  float valBackward = map(val,0,200,2000,1000);
+  int valForward = map(val,0,200,1000,2000);
+  int valBackward = map(val,0,200,2000,1000);
   Serial.println("test");
   Serial.println(valForward);
   Serial.println(valBackward);
@@ -123,7 +113,7 @@ void backward(int val) {
  *   This function spins all motors so robot turns Left
  */
 void turnLeft(int val) {
-  int valForward = map(val,0,200,1000,2000);
+  //int valForward = map(val,0,200,1000,2000);
   int valBackward = map(val,0,200,2000,1000);
   Brown.writeMicroseconds(valBackward);
   Pink.writeMicroseconds(valBackward);
@@ -135,7 +125,7 @@ void turnLeft(int val) {
  */
 void turnRight(int val) {
   int valForward = map(val,0,200,1000,2000);
-  int valBackward = map(val,0,200,2000,1000);
+  //int valBackward = map(val,0,200,2000,1000);
   Brown.writeMicroseconds(valForward);
   Pink.writeMicroseconds(valForward);
   Blue.writeMicroseconds(valForward);

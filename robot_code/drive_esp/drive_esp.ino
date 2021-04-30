@@ -16,11 +16,11 @@
 #include "Adafruit_MQTT.h"
 #include "Adafruit_MQTT_Client.h"
 
-#define WIFI_SSID "Team_15"
+#define WIFI_SSID "Team_16"
 #define WIFI_PASS "lunabots"
 #define WIFI_CHANNEL 1
 
-#define SERVER_ADDR "192.168.43.201"
+#define SERVER_ADDR "192.168.1.10"
 #define SERVER_PORT 1883
 
 #define TOPIC_NAME_IN "robotCmds/drive"
@@ -51,6 +51,7 @@ void setup() {
 
   //  Wait until ESP is connected to wifi to proceed
   while (WiFi.status() != WL_CONNECTED) {
+    Serial.write("Connecting\n");
     delay(500);
   }
   
@@ -125,21 +126,11 @@ void scanForCmd(){
       // If the message is not the ping packet, process the offset and the robot speed and 
       // send the command to the controller. The header byte 255 is used for synchronizing 
       // Tx and Rx.
-      else {
-        while(!(Serial.available()) && (millis() - lastAckTime < CMD_SEND_TIMEOUT)) {
-          Serial.write(255); // synchro byte
-          Serial.write(robotSpeed);
-          Serial.write(offsetNum);
-        }
-        if (Serial.available()) {
-          serialFlush();
-          lastAckTime = millis();
-        }
-        else {
-          Serial.write(255); // synchro byte
-          Serial.write(100); // 100 is neutral, so basically estop
-          Serial.write(100);
-        }
+      else
+      {
+        Serial.write(255); // synchro byte
+        Serial.write(robotSpeed);
+        Serial.write(offsetNum);
       }
     }
   }
