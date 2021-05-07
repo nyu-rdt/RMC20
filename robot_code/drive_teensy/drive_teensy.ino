@@ -1,12 +1,12 @@
 /*
  * drive_teensy.ino
- * 
+ *
  * Code for the controller in the locomotion subsystem, particularly the Teensyduino. Takes in
  * a robot speed and offset byte and writes the command to the motors. Also handles special
  * drive modes such as turning in place and changing the digging drum elevation.
- * 
+ *
  * See README for descriptions on the format of the command messages.
- * 
+ *
  * TODO:
  * - Implement handlers for drive modes
  */
@@ -16,7 +16,7 @@
 #define TEST_MOTOR_SPEED 70
 #define CMD_RECV_TIMEOUT 100
 
-// Wheels 
+// Wheels
 Servo Brown;
 Servo Pink;
 Servo Blue;
@@ -34,12 +34,12 @@ void setup(){
   Serial.begin(115200);   // Serial Monitor
 
   // Attach motors and arms
-  Brown.attach(3);
-  Pink.attach(4);
-  Blue.attach(6);
+  Brown.attach(10);
+  Pink.attach(6);
+  Blue.attach(9);
   Orange.attach(5);
-  FrontArm.attach(9);
-  BackArm.attach(10);
+  FrontArm.attach(14);
+  BackArm.attach(15);
   // Hardcode function calling
   /*  forward();
    *  backward();
@@ -92,7 +92,7 @@ void forward(int val, int offset) {
   Blue.writeMicroseconds(valBackward);
   Orange.writeMicroseconds(valBackward);
     }
-  
+
 
 }
 /*  backward()
@@ -210,7 +210,7 @@ void loop() {
     }
     else if (millis() - lastCmdTime >= CMD_RECV_TIMEOUT) {
       forward(100, 100);
-    }      
+    }
   }
 
 }
