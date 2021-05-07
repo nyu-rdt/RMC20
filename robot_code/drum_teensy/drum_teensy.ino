@@ -1,9 +1,9 @@
 #include<Servo.h>
 
-const int LEFT_PIN = 16;
-const int RIGHT_PIN  = 20;
-const int LEFT_SENSOR = 6;
-const int RIGHT_SENSOR = 5;
+const int LEFT_PIN = 5;
+const int RIGHT_PIN  = 6;
+const int LEFT_SENSOR = 16;
+const int RIGHT_SENSOR = 2;
 int val =  50; //0 - 100
 int left_interval= 5000;
 int right_interval = 5000;

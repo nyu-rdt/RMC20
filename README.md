@@ -13,3 +13,6 @@ arms - 14/15
 drum:
     right - 6
     left - 5
+reed: 
+    right - 2
+    left - 16
