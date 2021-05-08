@@ -14,5 +14,5 @@ drum:
     right - 6
     left - 5
 reed: 
-    right - 2
+    right - 20
     left - 21
