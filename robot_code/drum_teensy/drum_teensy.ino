@@ -17,6 +17,8 @@ int adjustmenttime = 300; // in milliseconds
 float weightdiff = 0.7;
 float weightinterval = 0.3;
 float circum = 15.75*3.141592653;
+bool setleft = false;
+bool setright = false;
 
 Servo left_wheel;
 Servo right_wheel;
@@ -42,8 +44,8 @@ int getBackward(int val)
 // lag of the magnets
 void set_difference() {
   difference = left_pastread - right_pastread;
-  bool setleft = false;
-  bool setright = false;
+  setleft = false;
+	setright = false;
 }
 
 void set_intervals() {
