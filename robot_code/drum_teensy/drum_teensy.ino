@@ -42,12 +42,12 @@ int getBackward(int val)
 // lag of the magnets
 void set_difference() {
   difference = left_pastread - right_pastread;
+  bool setleft = false;
+  bool setright = false;
 }
 
 void set_intervals() {
   int current = millis();
-  bool setleft = false;
-  bool setright = false;
   // Only set past_read and interval if larger than .8 of previous interval - don't set during streak of LOW or false LOW in the middle
   if (digitalRead(LEFT_SENSOR) == HIGH && (((float) (current - left_pastread) / left_interval ) > (0.8 / magnum)))  {
     // Only set interval when it's below 1.7x of the previous interval - i.e we didn't miss an interval
@@ -92,12 +92,12 @@ void setspeeds() {
 
   // adjust based on difference in speed
   if (left_interval > right_interval) {
-    float adjustmentval = (right_interval/left_interval) * weightinterval;
-    right_speed = right_speed * adjustmentval;
+    float adjustmentval = (right_interval - left_interval) * weightinterval;
+    right_speed = right_speed + adjustmentval;
   }
   else {
-    float adjustmentval = (left_interval/right_interval) * weightinterval;
-    left_speed = left_speed * adjustmentval;
+    float adjustmentval = (left_interval - right_interval) * weightinterval;
+    left_speed = left_speed + adjustmentval;
   }
 }
 
