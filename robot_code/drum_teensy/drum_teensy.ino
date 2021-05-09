@@ -1,10 +1,34 @@
 #include<Servo.h>
 
+
+// arm pins
+const int arm_front_pin = 14;
+const int arm_back_pin = 15;
+Servo arm_front;
+Servo arm_back;
+
+
+// door pin
+const int door_pin_1; // NEED TO FILL IN
+const int door_pin_2; // NEED TO FILL IN
+Servo door1;
+Servo door2;
+
+
+// drum pins
 const int LEFT_PIN = 5;
 const int RIGHT_PIN  = 6;
 const int LEFT_SENSOR = 16;
 const int RIGHT_SENSOR = 2;
-int val =  20; //0 - 100
+// drum variables
+const float weightdiff = 0.7;
+const float weightinterval = 0.3;
+const float circum = 15.75*3.141592653;
+const int adjustmenttime = 300; // in milliseconds
+const int magnum = 4; // magnets at 0, 90, 180, 270
+const int recv_timeout = 100;
+long lastcmd = 0;
+int val =  0; //0 - 100
 int left_interval= 5000;
 int right_interval = 5000;
 int left_pastread = 0;
@@ -12,13 +36,9 @@ int right_pastread = 0;
 int left_speed = val;
 int right_speed = val;
 int difference = 0; // positive if left is ahead.
-int magnum = 4; // magnets at 0, 90, 180, 270
-int adjustmenttime = 300; // in milliseconds
-float weightdiff = 0.7;
-float weightinterval = 0.3;
-float circum = 15.75*3.141592653;
 bool setleft = false;
 bool setright = false;
+bool direction = true; //true for clockwise (digging)
 
 Servo left_wheel;
 Servo right_wheel;
@@ -27,8 +47,12 @@ void setup() {
   Serial.begin(115200);
   left_wheel.attach(LEFT_PIN);
   right_wheel.attach(RIGHT_PIN);
-  pinMode(LEFT_SENSOR, INPUT_PULLUP);
-  pinMode(RIGHT_SENSOR, INPUT_PULLUP);
+  arm_front.attach(arm_front_pin);
+  arm_back.attach(arm_back_pin);
+  door1.attach(door_pin_1);
+  door2.attach(door_pin_2);
+  pinMode(LEFT_SENSOR, INPUT_PULLDOWN);
+  pinMode(RIGHT_SENSOR, INPUT_PULLDOWN);
 }
 
 // mapping values for actually turning the wheel
@@ -119,17 +143,73 @@ void run_ccw(int val)
   right_wheel.writeMicroseconds(getForward(right_speed));
 }
 
+void run_arms(int armval) {
+  int forward = map(armval,-100,100,1000,2000);
+  int backward = map(-armval,-100,100,1000,2000);
+  arm_front.writeMicroseconds(forward);
+  arm_back.writeMicroseconds(backward);
+}
+
+void run_drum(int drumval) {
+  if (val > 0) {
+    direction = true;
+  }
+  else {
+    direction = false;
+  }
+  val = drumval;
+  left_interval = val * 100; // baseline guess for the first interval
+  right_interval = val * 100; // baseline guess for the first interval
+}
+
+void run_door(int doorval) {
+  if (doorval < 1) {
+    door1.writeMicroseconds(1000); //close
+    door2.writeMicroseconds(1000);
+  }
+  else {
+    door1.writeMicroseconds(2000); //open
+    door2.writeMicroseconds(2000);
+  }
+}
+
+void run_linear(int linval) {
+  linval = linval * 10; // make values readable
+  Serial2.println(String(linval));
+}
 
 // looping function
 void loop()
 {
   if(Serial1.available() > 0) {
-    val = Serial1.read();
-    if (val != 0) {
-      left_interval = val * 100; // this is baseline guess for first interval that will be adjusted later
-      right_interval = val * 100; // this is baseline guess for first interval that will be adjusted later
+    int first = Serial1.read();
+    if (first == 255) {
+      while (!(Serial1.available())) {}
+      int second = Serial1.read(); // door
+      run_door(second);
+      while (!(Serial1.available())) {}
+      int third = Serial1.read(); // linear actuator
+      run_linear(third);
+      while (!(Serial1.available())) {}
+      int fourth = Serial1.read(); // arm
+      run_arms(fourth);
+      while (!(Serial1.available())) {}
+      int fifth = Serial1.read(); // drum
+      run_drum(fifth);
+      Serial1.write(255);
+    }
+    else if (millis() - lastcmd >= recv_timeout) {
+      run_linear(100);
+      run_arms(100);
+      run_drum(100);
     }
   }
-  set_intervals(); // uncomment to start adjusting motor speeds dynamically
-  run_cw(val);
+  if (direction) {
+    set_intervals(); // uncomment to start adjusting motor speeds dynamically
+    run_cw(val);
+  }
+  else {
+    set_intervals();
+    run_ccw(val);
+  }
 }
