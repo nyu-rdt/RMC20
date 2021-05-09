@@ -17,6 +17,7 @@ const int door_pin_1; // NEED TO FILL IN
 const int door_pin_2; // NEED TO FILL IN
 Servo door1;
 Servo door2;
+int olddoorval = 0;
 
 
 // drum pins
@@ -87,27 +88,29 @@ void run_drum(int drumval) {
 }
 
 void run_door(int doorval) {
-  if (doorval < 1) {
-    door1.writeMicroseconds(1000); //close
-    door2.writeMicroseconds(1000);
-  }
-  else {
+	if (doorval != olddoorval) {
+		if (doorval < 1) {
+			door1.writeMicroseconds(1000); //close
+			door2.writeMicroseconds(1000);
+		}
+		else {
     door1.writeMicroseconds(2000); //open
     door2.writeMicroseconds(2000);
   }
+	}
 }
 
-void run_linear(int linval) {
-  linval = linval * 10; // make values readable
-  Serial2.println(String(linval));
-}
+	void run_linear(int linval) {
+		linval = linval * 10; // make values readable
+		Serial2.println(String(linval));
+	}
 
-// looping function
-void loop()
-{
-  if(Serial1.available() > 0) {
-    int first = Serial1.read();
-    if (first == 255) {
+	// looping function
+	void loop()
+	{
+		if(Serial1.available() > 0) {
+			int first = Serial1.read();
+			if (first == 255) {
       while (!(Serial1.available())) {}
       int second = Serial1.read(); // door
       run_door(second);
