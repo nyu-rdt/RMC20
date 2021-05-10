@@ -1,3 +1,4 @@
+//Drum and actuators teensy code
 #include<Servo.h>
 
 
@@ -9,20 +10,23 @@ Servo arm_back;
 
 
 // door pin
-const int door_pin_1; // NEED TO FILL IN
-const int door_pin_2; // NEED TO FILL IN
+const int door_pin_1 = 4; // NEED TO FILL IN
+const int door_pin_2 = 3; // NEED TO FILL IN
 Servo door1;
 Servo door2;
-int olddoorval = 0;
+
+//hard coded value
+int olddoorval = 0; 
 
 
-// drum pins
-const int LEFT_PIN = 5;
+// drum pins digging wheel
+const int LEFT_PIN = 5; 
 const int RIGHT_PIN  = 6;
-const int LEFT_SENSOR = 16;
-const int RIGHT_SENSOR = 2;
+const int LEFT_SENSOR = 20;
+const int RIGHT_SENSOR = 21;
+
 // drum variables
-const float weightdiff = 0.7;
+const float weightdiff = 0.7; 
 const float weightinterval = 0.3;
 const float circum = 15.75*3.141592653;
 const int adjustmenttime = 300; // in milliseconds
@@ -43,6 +47,7 @@ bool direction = true; //true for clockwise (digging)
 
 Servo left_wheel;
 Servo right_wheel;
+
 void setup() {
   Serial1.begin(115200);
   Serial.begin(115200);
@@ -78,7 +83,7 @@ void set_intervals() {
   // Only set past_read and interval if larger than .8 of previous interval - don't set during streak of LOW or false LOW in the middle
   if (digitalRead(LEFT_SENSOR) == HIGH && (((float) (current - left_pastread) / left_interval ) > (0.8 / magnum)))  {
     // Only set interval when it's below 1.7x of the previous interval - i.e we didn't miss an interval
-    if (((float) (current - left_pastread) / left_interval ) < (1.7 / magnum)) {
+    if (((float) (current - left_pastread) / left_interval ) < (1.7 / magnum)) { // Magnum is failsafe for intervals
       left_interval = (current - left_pastread) * magnum;
       Serial.print("Left Update: ");
       Serial.println(((float) left_interval) / 100);
@@ -89,14 +94,15 @@ void set_intervals() {
   }
 
   if (digitalRead(RIGHT_SENSOR) == HIGH && (((float) (current - right_pastread) / right_interval ) > (0.8 / magnum))) {
-    if (((float) (current - right_pastread) / right_interval ) < (1.7 / magnum)) {
-      right_interval = (current - right_pastread) * magnum;
+    if (((float) (current - right_pastread) / right_interval ) < (1.7 / magnum)) { 
+      right_interval = (current - right_pastread) * magnum; 
       Serial.print("Right Update: ");
       Serial.println(((float) right_interval / 100));
     }
     right_pastread = current;
     setright = true;
   }
+  // Left and right difference after pastread value updated
   if (setright && setleft) {
     set_difference();
   }
@@ -144,12 +150,13 @@ void run_ccw()
   right_wheel.writeMicroseconds(getForward(right_speed));
 }
 
-void run_arms(int armval) {
-  int forward = map(armval,-100,100,1000,2000);
-  int backward = map(-armval,-100,100,1000,2000);
-  arm_front.writeMicroseconds(forward);
-  arm_back.writeMicroseconds(backward);
-}
+// //Move the arms of the robot
+// void run_arms(int armval) {
+//   int forward = map(armval,-100,100,1000,2000);
+//   int backward = map(-armval,-100,100,1000,2000);
+//   arm_front.writeMicroseconds(forward);
+//   arm_back.writeMicroseconds(backward);
+// }
 
 void run_drum(int drumval) {
   if (val > 0) {
@@ -180,6 +187,7 @@ void run_door(int doorval) {
 	}
 }
 
+  //Run linear actuators
 	void run_linear(int linval) {
 		linval = linval * 10; // make values readable
 		Serial2.println(String(linval));
@@ -193,21 +201,21 @@ void run_door(int doorval) {
 			if (first == 255) {
 				while (!(Serial1.available())) {}
 				int second = Serial1.read(); // door
-run_door(second);
-      while (!(Serial1.available())) {}
-      int third = Serial1.read(); // linear actuator
-      run_linear(third);
-      while (!(Serial1.available())) {}
-      int fourth = Serial1.read(); // arm
-      run_arms(fourth);
-      while (!(Serial1.available())) {}
-      int fifth = Serial1.read(); // drum
-      run_drum(fifth);
-      Serial1.write(255);
+        run_door(second);
+        while (!(Serial1.available())) {}
+        int third = Serial1.read(); // linear actuator
+        run_linear(third);
+        while (!(Serial1.available())) {}
+        int fourth = Serial1.read(); // arm
+        //run_arms(fourth);
+        while (!(Serial1.available())) {}
+        int fifth = Serial1.read(); // drum
+        run_drum(fifth);
+        Serial1.write(255);
     }
     else if (millis() - lastcmd >= recv_timeout) {
       run_linear(0);
-      run_arms(100);
+      //run_arms(100);
       run_drum(0);
     }
   }
