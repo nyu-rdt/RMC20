@@ -171,12 +171,12 @@ void run_drum(int drumval) {
 void run_door(int doorval) {
 	if (doorval != olddoorval) {
 		if (doorval < 1) {
-			door1.writeMicroseconds(1000); //close
-			door2.writeMicroseconds(1000);
+			door1.writeMicroseconds(0); //close
+			door2.writeMicroseconds(0);
 		}
 		else {
-    door1.writeMicroseconds(2000); //open
-    door2.writeMicroseconds(2000);
+			door1.writeMicroseconds(50); //open
+			door2.writeMicroseconds(90);
 		}
 	}
 }
