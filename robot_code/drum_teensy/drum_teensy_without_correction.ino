@@ -72,7 +72,7 @@ void run_arms(int armval) {
   int forward = map(armval,-100,100,1000,2000);
   int backward = map(-armval,-100,100,1000,2000);
   arm_front.writeMicroseconds(forward);
-  arm_back.writeMicroseconds(backward);
+  arm_back.writeMicroseconds(forward);
 }
 
 void run_drum(int drumval) {
@@ -127,7 +127,7 @@ void run_door(int doorval) {
     }
     else if (millis() - lastcmd >= recv_timeout) {
       run_linear(0);
-      run_arms(100);
+      run_arms(0);
       run_drum(0);
     }
   }
