@@ -13,8 +13,8 @@ Servo arm_back;
 
 
 // door pin
-const int door_pin_1; // NEED TO FILL IN
-const int door_pin_2; // NEED TO FILL IN
+const int door_pin_1 = 4;
+const int door_pin_2 = 3;
 Servo door1;
 Servo door2;
 int olddoorval = 0;
