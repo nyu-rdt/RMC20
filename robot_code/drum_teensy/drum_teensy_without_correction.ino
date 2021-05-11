@@ -34,7 +34,8 @@ Servo right_wheel;
 
 
 void setup() {
-  Serial1.begin(115200);
+	Serial2.begin(9600);
+	Serial1.begin(115200);
   Serial.begin(115200);
   left_wheel.attach(LEFT_PIN);
   right_wheel.attach(RIGHT_PIN);
