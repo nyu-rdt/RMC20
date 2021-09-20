@@ -23,7 +23,7 @@ class KeyManager:
             elif event.type == pygame.QUIT: return # escape key
             elif event.type == pygame.KEYDOWN: # key pressed
                 press = chr(event.key)
-                if press == 'w': self.w = 1
+                if press == 'w': 
                 elif press == 'a': self.a = 1
                 elif press == 's': self.s = 1
                 elif press == 'd': self.d = 1 

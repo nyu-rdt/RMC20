@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import paho.mqtt.client as mqtt
-import KeyManager
+from KeyManager import KeyManager
 
 #TODO: Establish dummy vars for testing e.g. forward movement
 
@@ -34,7 +34,7 @@ def main():
     client.on_connect = on_connect
     client.connect("localhost", 1883)
 
-    while(""" !quit condition AKA Client is still running somehow """):
+    while(True):
         key_man.iter()
 
         # TODO: Determine appropriate values for each command
