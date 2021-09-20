@@ -4,8 +4,11 @@
  * controller.
 */
 
-//Calling speicifc Wifi routine to connect to the network
+//Calling specific Wifi routine to connect to the network
+
 #include <ESP8266WiFi.h>
+#include "Adafruit_MQTT.h"
+#include "Adafruit_MQTT_Client.h"
 
 // WiFi & Server Constants
 #define WIFI_SSID "Team_16"
@@ -15,6 +18,7 @@
 #define SERVER_PORT 1883
 #define TOPIC_NAME_IN "robotCmds/motors"
 #define TOPIC_NAME_OUT "robotState/motorPing"
+#define MQTT_READ_TIMEOUT 5000 //temporary value
 
 // Create MQTT client on the ESP
 WiFiClient client;
@@ -63,7 +67,7 @@ void setup()
 
 void loop() {
   //rdt_data = bytes([motor1, motor2, motor3, motor4])
-  analogWrite(motor1Pin)
+  analogWrite(motor1Pin, 0); //temporary set output to 0 & want motorpower 
 }
 
 // Scan for any incoming data on any topic. The `subPtr` object will have to be compared in
@@ -79,7 +83,9 @@ void subscribe_to_motor_vals(){
   //while subPtr isn't null I think
   while ((subPtr = mqtt.readSubscription(MQTT_READ_TIMEOUT))){
     if (subPtr == &inTopic){ 
+      bool cmdRecv; //Never used anywhere else but ok
       cmdRecv = true;
+      unsigned long timeLastRecv; //Never used anywhere either
       timeLastRecv = millis();
 
       // Read and transmit bytes
