@@ -90,17 +90,41 @@ void subscribe_to_motor_vals(){
 
       // Read and transmit bytes
       // Incoming bytes currently come in the following format:
-      // byte byte byte byte
-      // motor1 motor2 motor3 motor4
+      // byte
       char* command = (char*) inTopic.lastread; 
       
       //Grabbing the motor values from the byte array
-      char motor1 = command[0];
-      char motor2 = command[1];
-      char motor3 = command[2];
-      char motor4 = command[3];
+      char motorData = command[0];
+      char leftData = motor_data >> 4;
+      char rightData = motor_data & 15; // 15 == 4'b1111
+
+      // Motor powers 
+      int rightPower = 1500;
+      int leftPower = 1500; 
+
+      // TODO: Determine proper direction
+      // Determining power of the left motors
+      int powerData = leftData & 7;
+      if(leftData >> 3) { // First bit set
+        leftPower = (powerData == 4) ? 400 : (powerData == 2) ? 1000 : 1500;
+      }
+      else { // Otherwise
+        leftPower = (powerData == 4) ? 2600 : powerData == 2) ? 2000 : 1500;
+      }
+
+      // Determining the power of the right motors
+      powerData = rightData & 7;
+      if(rightData >> 3) { // First bit set
+        rightPower = (powerData == 4) ? 400 : (powerData == 2) ? 1000 : 1500;
+      }
+      else { // Otherwise
+        rightPower = (powerData == 4) ? 2600 : powerData == 2) ? 2000 : 1500;
+      }
+
+
+      Serial.println("Left power = " + leftPower);
+      Serial.println("Right power = " + rightPower);
       
-      //
     }
   }
 }
