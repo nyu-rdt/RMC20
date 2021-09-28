@@ -66,7 +66,7 @@ def main():
 	prev_s = key_man.s;
 	prev_a = key_man.a;
 	prev_d = key_man.d;
-	#Testing push
+	#Testing push 2
 
     client.loop_stop(force=False)
 
