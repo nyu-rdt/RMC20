@@ -19,7 +19,7 @@ def main():
 	client = mqtt.Client()
 	client.on_connect = on_connect
 	client.on_message = on_message
-	client.connect("192.168.1.10", 1883) # Change localhost to IP of nuc
+	client.connect("192.168.1.10", 1883)
 
 	client.subscribe("robotCmds/motors")
 

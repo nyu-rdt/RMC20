@@ -14,7 +14,7 @@
 #define WIFI_SSID "Team_16"
 #define WIFI_PASS "lunabots"
 #define WIFI_CHANNEL 1
-#define SERVER_ADDR "192.168.1.10"
+#define SERVER_ADDR "localhost"
 #define SERVER_PORT 1883
 #define TOPIC_NAME_IN "robotCmds/motors"
 //#define TOPIC_NAME_OUT "robotState/motorPing"
