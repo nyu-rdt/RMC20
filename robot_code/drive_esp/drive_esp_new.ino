@@ -17,14 +17,14 @@
 #define SERVER_ADDR "192.168.1.10"
 #define SERVER_PORT 1883
 #define TOPIC_NAME_IN "robotCmds/motors"
-#define TOPIC_NAME_OUT "robotState/motorPing"
+//#define TOPIC_NAME_OUT "robotState/motorPing"
 #define MQTT_READ_TIMEOUT 5000 //temporary value
 
 // Create MQTT client on the ESP
 WiFiClient client;
-Adafruit_MQTT_Client mqtt(&client, SERVER_ADDR, SERVER_PORT, "motorTopic", "");
-Adafruit_MQTT_Subscribe inTopic = Adafruit_MQTT_Subscribe(&mqtt, TOPIC_NAME_IN);
-Adafruit_MQTT_Publish pingTopic = Adafruit_MQTT_Publish(&mqtt, TOPIC_NAME_OUT);
+Adafruit_MQTT_Client mqtt(&client, SERVER_ADDR, SERVER_PORT, "motorsTopic", "");
+Adafruit_MQTT_Subscribe inTopic(&mqtt, TOPIC_NAME_IN);
+//Adafruit_MQTT_Publish pingTopic = Adafruit_MQTT_Publish(&mqtt, TOPIC_NAME_OUT);
 
 //Motor pins
 int motor1Pin = 1;
@@ -35,17 +35,24 @@ int motor4Pin = 4;
 void setup()
 {
   Serial.begin(115200);
-  Serial.println();
+  delay(10);
+  
+  Serial.println(F("MQTT Testing wooo!"));
 
   //Setting pinModes for the motor Pins
-  pinMode(motor1Pin, OUTPUT);
-  pinMode(motor2Pin, OUTPUT);
-  pinMode(motor3Pin, OUTPUT);
-  pinMode(motor4Pin, OUTPUT);
+//  pinMode(motor1Pin, OUTPUT);
+//  pinMode(motor2Pin, OUTPUT);
+//  pinMode(motor3Pin, OUTPUT);
+//  pinMode(motor4Pin, OUTPUT);
 
   //MQTT STUFF
   //Connecting to Wifi network
-  WiFi.begin(WIFI_SSID, WIFI_PASS, WIFI_CHANNEL);
+  Serial.println(); Serial.println();
+  Serial.print("Connecting to ");
+  Serial.println(WIFI_SSID);
+
+  
+  WiFi.begin(WIFI_SSID, WIFI_PASS);
 
   Serial.print("Connecting");
 
@@ -95,8 +102,8 @@ void subscribe_to_motor_vals(){
       
       //Grabbing the motor values from the byte array
       char motorData = command[0];
-      char leftData = motor_data >> 4;
-      char rightData = motor_data & 15; // 15 == 4'b1111
+      char leftData = motorData >> 4;
+      char rightData = motorData & 15; // 15 == 4'b1111
 
       // Motor powers 
       int rightPower = 1500;
@@ -109,7 +116,7 @@ void subscribe_to_motor_vals(){
         leftPower = (powerData == 4) ? 400 : (powerData == 2) ? 1000 : 1500;
       }
       else { // Otherwise
-        leftPower = (powerData == 4) ? 2600 : powerData == 2) ? 2000 : 1500;
+        leftPower = (powerData == 4) ? 2600 : (powerData == 2) ? 2000 : 1500;
       }
 
       // Determining the power of the right motors
@@ -118,7 +125,7 @@ void subscribe_to_motor_vals(){
         rightPower = (powerData == 4) ? 400 : (powerData == 2) ? 1000 : 1500;
       }
       else { // Otherwise
-        rightPower = (powerData == 4) ? 2600 : powerData == 2) ? 2000 : 1500;
+        rightPower = (powerData == 4) ? 2600 : (powerData == 2) ? 2000 : 1500;
       }
 
 
