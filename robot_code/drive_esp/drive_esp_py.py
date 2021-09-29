@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import paho.mqtt.client as mqtt
+import struct
 from KeyManager import KeyManager
 
 #TODO: Establish dummy vars for testing e.g. forward movement
@@ -18,8 +19,9 @@ def publish_motors_vector(motors):
 
     # Encoding data as 1 byte
     motor_byte = (motors[0] << 4) | motors[1]
-    rdt_data = bytes([motor_byte])
-    client.publish("robotCmds/motors", rdt_data)
+    # rdt_data = bytes([motor_byte])
+    # client.publish("robotCmds/motors", rdt_data)
+    client.publish("robotCmds/motors", struct.pack("I", motor_byte))
 
 def main():
     global client
