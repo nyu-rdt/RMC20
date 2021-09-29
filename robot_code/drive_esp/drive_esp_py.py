@@ -17,9 +17,7 @@ def publish_motors_vector(motors):
     # First bit determines direction, last 3 bits determine power
 
     # Encoding data as 1 byte
-    # prolly will combine parameter into 1 element list im just lazy rn
     motor_byte = (motors[0] << 4) | motors[1]
-    # motor_byte = 170
     rdt_data = bytes([motor_byte])
     client.publish("robotCmds/motors", rdt_data)
 
@@ -39,11 +37,11 @@ def main():
     prev_a = 0;
     prev_d = 0;
 
-    while(not key_man.q):
+    while(not key_man.p):
 	key_man.iter()
 
 	# TODO: Determine appropriate values for each command	
-	# can definitely be cleaned but someone else can do it
+	# can definitely be cleaned 
 	update = key_man.w ^ prev_w or key_man.a ^ prev_a or key_man.s ^ prev_s or key_man.d ^ prev_d
 	if update:
 		motors = [0,0]
@@ -64,7 +62,6 @@ def main():
 	prev_s = key_man.s;
 	prev_a = key_man.a;
 	prev_d = key_man.d;
-	#Testing push 2
 
     client.loop_stop(force=False)
 
