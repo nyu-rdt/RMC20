@@ -1,114 +1,128 @@
-/*
- * Code for the radio in the locomotion subsystem, particularly for a NodeMCU with an ESP8266 
- * module. Reads commands from the MQTT network and relays them to the locomotion subsystem
- * controller.
-*/
+/***************************************************
+  Adafruit MQTT Library ESP8266 Example
 
-//Calling specific Wifi routine to connect to the network
+  Must use ESP8266 Arduino from:
+    https://github.com/esp8266/Arduino
 
+  Works great with Adafruit's Huzzah ESP board & Feather
+  ----> https://www.adafruit.com/product/2471
+  ----> https://www.adafruit.com/products/2821
+
+  Adafruit invests time and resources providing this open source code,
+  please support Adafruit and open-source hardware by purchasing
+  products from Adafruit!
+
+  Written by Tony DiCola for Adafruit Industries.
+  MIT license, all text above must be included in any redistribution
+ ****************************************************/
 #include <ESP8266WiFi.h>
 #include "Adafruit_MQTT.h"
 #include "Adafruit_MQTT_Client.h"
 
-// WiFi & Server Constants
-#define WIFI_SSID "Team_16"
-#define WIFI_PASS "lunabots"
-#define WIFI_CHANNEL 1
-#define SERVER_ADDR "localhost"
-#define SERVER_PORT 1883
-#define TOPIC_NAME_IN "robotCmds/motors"
-//#define TOPIC_NAME_OUT "robotState/motorPing"
-#define MQTT_READ_TIMEOUT 5000 //temporary value
+/************************* WiFi Access Point *********************************/
 
-// Create MQTT client on the ESP
+#define WLAN_SSID       "Team_16"
+#define WLAN_PASS       "lunabots"
+
+/************************* Adafruit.io Setup *********************************/
+
+#define AIO_SERVER      "io.adafruit.com"
+#define AIO_SERVERPORT  1883                   // use 8883 for SSL
+#define AIO_USERNAME    "...your AIO username (see https://accounts.adafruit.com)..."
+#define AIO_KEY         "...your AIO key..."
+
+/************ Global State (you don't need to change this!) ******************/
+
+// Create an ESP8266 WiFiClient class to connect to the MQTT server.
 WiFiClient client;
-Adafruit_MQTT_Client mqtt(&client, SERVER_ADDR, SERVER_PORT, "motorsTopic", "");
-Adafruit_MQTT_Subscribe inTopic(&mqtt, TOPIC_NAME_IN);
-//Adafruit_MQTT_Publish pingTopic = Adafruit_MQTT_Publish(&mqtt, TOPIC_NAME_OUT);
+// or... use WiFiClientSecure for SSL
+//WiFiClientSecure client;
 
-//Motor pins
-int motor1Pin = 1;
-int motor2Pin = 2;
-int motor3Pin = 3;
-int motor4Pin = 4;
+// Setup the MQTT client class by passing in the WiFi client and MQTT server and login details.
+//Adafruit_MQTT_Client mqtt(&client, AIO_SERVER, AIO_SERVERPORT, AIO_USERNAME, AIO_KEY);
 
-void setup()
-{
+//This is an old line from drive_esp
+Adafruit_MQTT_Client mqtt(&client, "192.168.1.10", 1883, "motorsTopic", ""); 
+
+/****************************** Feeds ***************************************/
+
+// Setup a feed called 'photocell' for publishing.
+// Notice MQTT paths for AIO follow the form: <username>/feeds/<feedname>
+//Adafruit_MQTT_Publish photocell = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "/feeds/photocell");
+
+// Setup a feed called 'onoff' for subscribing to changes.
+Adafruit_MQTT_Subscribe onoffbutton(&mqtt, "robotCmds/motors");
+
+/*************************** Sketch Code ************************************/
+
+// Bug workaround for Arduino 1.6.6, it seems to need a function declaration
+// for some reason (only affects ESP8266, likely an arduino-builder bug).
+void MQTT_connect();
+
+void setup() {
   Serial.begin(115200);
   delay(10);
-  
-  Serial.println(F("MQTT Testing wooo!"));
 
-  //Setting pinModes for the motor Pins
-//  pinMode(motor1Pin, OUTPUT);
-//  pinMode(motor2Pin, OUTPUT);
-//  pinMode(motor3Pin, OUTPUT);
-//  pinMode(motor4Pin, OUTPUT);
+  Serial.println(F("Adafruit MQTT demo"));
 
-  //MQTT STUFF
-  //Connecting to Wifi network
+  // Connect to WiFi access point.
   Serial.println(); Serial.println();
   Serial.print("Connecting to ");
-  Serial.println(WIFI_SSID);
+  Serial.println(WLAN_SSID);
 
-  
-  WiFi.begin(WIFI_SSID, WIFI_PASS);
-
-  Serial.print("Connecting");
-
-  //Checks if the connection was successful or not
-  while (WiFi.status() != WL_CONNECTED)
-  {
+  WiFi.begin(WLAN_SSID, WLAN_PASS);
+  while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
   Serial.println();
 
-  //Prints IP address assigned to ESP module
-  Serial.print("Connected, IP address: ");
+  Serial.println("WiFi connected");
+  Serial.println("IP address: "); 
   Serial.println(WiFi.localIP());
 
-  //Setting up MQTT to subscribe
-  mqtt.subscribe(&inTopic);
+  // Setup MQTT subscription for onoff feed.
+  mqtt.subscribe(&onoffbutton);
 }
 
+uint32_t x=0;
+
+//w: 
+//a: 
+//s: 
+//d: 
 void loop() {
-  //rdt_data = bytes([motor1, motor2, motor3, motor4])
-  analogWrite(motor1Pin, 0); //temporary set output to 0 & want motorpower 
-}
+  // Ensure the connection to the MQTT server is alive (this will make the first
+  // connection and automatically reconnect when disconnected).  See the MQTT_connect
+  // function definition further below.
+  MQTT_connect();
 
-// Scan for any incoming data on any topic. The `subPtr` object will have to be compared in
-// a switch case to determine the topic name.
-void subscribe_to_motor_vals(){
-  //Creating a string name to the feed name
-  
-  //Creating MQTT subscription object
-  // Adafruit_MQTT_Subscribe* subPtr = Adafruit_MQTT_Subscribe(&mqtt, "robotCmds/motors"); //possibly redundant
-  Adafruit_MQTT_Subscribe* subPtr;
-  
+  // this is our 'wait for incoming subscription packets' busy subloop
+  // try to spend your time here
 
-  //while subPtr isn't null I think
-  while ((subPtr = mqtt.readSubscription(MQTT_READ_TIMEOUT))){
-    if (subPtr == &inTopic){ 
-      bool cmdRecv; //Never used anywhere else but ok
-      cmdRecv = true;
-      unsigned long timeLastRecv; //Never used anywhere either
-      timeLastRecv = millis();
+  Adafruit_MQTT_Subscribe *subscription;
+  while ((subscription = mqtt.readSubscription(5000))) {
+    if (subscription == &onoffbutton) {
+      Serial.print(F("Got: ")); //F means format -maybe Justin
+      Serial.println((char *)onoffbutton.lastread); //Dereferencing
 
       // Read and transmit bytes
       // Incoming bytes currently come in the following format:
       // byte
-      char* command = (char*) inTopic.lastread; 
+      char* command = (char*) onoffbutton.lastread; 
       
       //Grabbing the motor values from the byte array
       char motorData = command[0];
       char leftData = motorData >> 4;
       char rightData = motorData & 15; // 15 == 4'b1111
 
+      //Why it b left bracket doe
+      Serial.println((int)motorData);
+      
       // Motor powers 
       int rightPower = 1500;
       int leftPower = 1500; 
-
+    
       // TODO: Determine proper direction
       // Determining power of the left motors
       int powerData = leftData & 7;
@@ -118,7 +132,7 @@ void subscribe_to_motor_vals(){
       else { // Otherwise
         leftPower = (powerData == 4) ? 2600 : (powerData == 2) ? 2000 : 1500;
       }
-
+    
       // Determining the power of the right motors
       powerData = rightData & 7;
       if(rightData >> 3) { // First bit set
@@ -127,11 +141,57 @@ void subscribe_to_motor_vals(){
       else { // Otherwise
         rightPower = (powerData == 4) ? 2600 : (powerData == 2) ? 2000 : 1500;
       }
-
-
+    
+    
       Serial.println("Left power = " + leftPower);
       Serial.println("Right power = " + rightPower);
-      
     }
   }
+
+  /* Doesn't pertain to us this sprint
+  // Now we can publish stuff!
+  Serial.print(F("\nSending photocell val "));
+  Serial.print(x);
+  Serial.print("...");
+  if (! photocell.publish(x++)) {
+    Serial.println(F("Failed"));
+  } else {
+    Serial.println(F("OK!"));
+  }
+  */
+
+  // ping the server to keep the mqtt connection alive
+  // NOT required if you are publishing once every KEEPALIVE seconds
+  //We need this cause we're only subscribing so we'd lose the connection
+  //otherwise
+  if(! mqtt.ping()) {
+    mqtt.disconnect();
+  }
+}
+
+// Function to connect and reconnect as necessary to the MQTT server.
+// Should be called in the loop function and it will take care if connecting.
+void MQTT_connect() {
+  int8_t ret;
+
+  // Stop if already connected.
+  if (mqtt.connected()) {
+    return;
+  }
+
+  Serial.print("Connecting to MQTT... ");
+
+  uint8_t retries = 3;
+  while ((ret = mqtt.connect()) != 0) { // connect will return 0 for connected
+       Serial.println(mqtt.connectErrorString(ret));
+       Serial.println("Retrying MQTT connection in 5 seconds...");
+       mqtt.disconnect();
+       delay(5000);  // wait 5 seconds
+       retries--;
+       if (retries == 0) {
+         // basically die and wait for WDT to reset me
+         while (1);
+       }
+  }
+  Serial.println("MQTT Connected!");
 }
