@@ -42,26 +42,24 @@ def main():
     while(not key_man.q):
 	key_man.iter()
 
-	# TODO: Determine appropriate values for each command
-	# TODO: Fix issue with update not registering key releases
-	motors = [0,0]
+	# TODO: Determine appropriate values for each command	
 	# can definitely be cleaned but someone else can do it
 	update = key_man.w ^ prev_w or key_man.a ^ prev_a or key_man.s ^ prev_s or key_man.d ^ prev_d
 	if update:
+		motors = [0,0]
 		if key_man.w: 
-			motors[0] = 10 # 4'b1010
-			motors[1] = 10 # 4'b1010
+			motors[0] = 0b1010
+			motors[1] = 0b1010 
 		elif key_man.a: 
-			motors[0] = 2 # 4'b0010
-			motors[1] = 10 # 4'b1010
+			motors[0] = 0b0010 
+			motors[1] = 0b1010 
 		elif key_man.s: 
-			motors[0] = 2 # 4'b0010
-			motors[1] = 2 # 4'b0010
+			motors[0] = 0b0010 
+			motors[1] = 0b0010 
 		elif key_man.d: 
-			motors[0] = 10 # 4'b1010
-			motors[1] = 2 # 4'b0010
-		if update:
-			publish_motors_vector(motors)
+			motors[0] = 0b1010 
+			motors[1] = 0b0010
+		publish_motors_vector(motors)
 	prev_w = key_man.w;
 	prev_s = key_man.s;
 	prev_a = key_man.a;
