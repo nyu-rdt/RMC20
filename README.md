@@ -1,7 +1,7 @@
-# NASA Lunabotics 2020
+## NASA Lunabotics 2020
 # NYU Robotic Design Team robot code
 
-# PINS
+### PINS
 
 Front Left: D5
 Front Right: D4
