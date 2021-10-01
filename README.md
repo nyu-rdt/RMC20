@@ -1,7 +1,7 @@
-## NASA Lunabotics 2020
-# NYU Robotic Design Team robot code
+## NASA Lunabotics 2021-2022
+# NYU Robotic Design Team Excavation Test Robot Code
 
-### NEO Motors Locomotion Pins for Excavation's Test Bot
+### NEO Motors Locomotion Pins
 
 Front Left: D5
 
@@ -11,6 +11,6 @@ Back Right: D6
 
 Back Left: D7
 
-### NEO Motor for Digging Screw
+### NEO Motor Digging Screw Pin
 
 Digging Screw: D8
