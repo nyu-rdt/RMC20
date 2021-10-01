@@ -1,5 +1,4 @@
 ## NASA Lunabotics 2020
-
 # NYU Robotic Design Team robot code
 
 ### NEO Motors Pins for Excavation's Test Bot
