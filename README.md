@@ -11,6 +11,6 @@ Back Right: D6
 
 Back Left: D7
 
-# NEO Motor for Digging Screw
+### NEO Motor for Digging Screw
 
 Digging Screw: D8
