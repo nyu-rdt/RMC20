@@ -3,17 +3,7 @@
 
 # PINS
 
-brown - 10
-pink - 6
-blue - 9
-orange - 5
-
-arms - 14/15
-
-drum:
-    right - 6
-    left - 5
-reed: 
-    right - 20
-    left - 21
-
+Front Left: D5
+Front Right: D4
+Back Right: D6
+Back Left: D7
