@@ -1,19 +1,16 @@
-# NASA Lunabotics 2020
-# NYU Robotic Design Team robot code
+## NASA Lunabotics 2021-2022
+# NYU Robotic Design Team Excavation Test Robot Code
 
-# PINS
+### NEO Motors Locomotion Pins
 
-brown - 10
-pink - 6
-blue - 9
-orange - 5
+Front Left: D5
 
-arms - 14/15
+Front Right: D4
 
-drum:
-    right - 6
-    left - 5
-reed: 
-    right - 20
-    left - 21
+Back Right: D6
 
+Back Left: D7
+
+### NEO Motor Digging Screw Pin
+
+Digging Screw: D8

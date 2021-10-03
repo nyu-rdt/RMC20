@@ -110,16 +110,35 @@ void loop() {
       // Read and transmit bytes
       // Incoming bytes currently come in the following format:
       // byte
-      char* command = (char*) onoffbutton.lastread; 
+      Serial.print("Byte message ");
+      Serial.println(*onoffbutton.lastread);
+      char* command = (char*) onoffbutton.lastread;
+
+      //Comparing the incoming string to a direction
+//      if (strcmp((char*)onoffbutton.lastread, "[170]") == 0) {
+//        Serial.println("FORWARD");
+//      }
+
+      //Testing incoming struct.pack data 
       
       //Grabbing the motor values from the byte array
+      //TODO: THIS WORKS CAUSE STRUCT.PACK
       char motorData = command[0];
+
+      // Ripping the REPRESENTED INT IN DECIMAL into its body parts
+      // Cause it be in BYTES yo just look like DECIMAL cause comp trying be
+      // annd FANCY and SH*T
       char leftData = motorData >> 4;
       char rightData = motorData & 15; // 15 == 4'b1111
 
-      //Why it b left bracket doe
-      Serial.println((int)motorData);
-      
+      Serial.println(motorData);
+
+      Serial.print("leftData ");
+      Serial.println((int)leftData);
+      Serial.print("rightData ");
+      Serial.println((int)rightData);
+
+      //TODO: Byte stuff to remove the sign thing 
       // Motor powers 
       int rightPower = 1500;
       int leftPower = 1500; 
@@ -143,9 +162,9 @@ void loop() {
         rightPower = (powerData == 4) ? 2600 : (powerData == 2) ? 2000 : 1500;
       }
     
-    
       Serial.println("Left power = " + leftPower);
-      Serial.println("Right power = " + rightPower);
+      Serial.print("Right power = ");
+      Serial.println(rightPower);
     }
   }
 
