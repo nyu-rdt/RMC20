@@ -19,8 +19,6 @@ def publish_motors_vector(motors):
 
     # Encoding data as 1 byte
     motor_byte = (motors[0] << 4) | motors[1]
-    # rdt_data = bytes([motor_byte])
-    # client.publish("robotCmds/motors", rdt_data)
     client.publish("robotCmds/motors", struct.pack("I", motor_byte))
 
 def main():

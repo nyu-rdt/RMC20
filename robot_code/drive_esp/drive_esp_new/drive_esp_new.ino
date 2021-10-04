@@ -1,20 +1,3 @@
-/***************************************************
-  Adafruit MQTT Library ESP8266 Example
-
-  Must use ESP8266 Arduino from:
-    https://github.com/esp8266/Arduino
-
-  Works great with Adafruit's Huzzah ESP board & Feather
-  ----> https://www.adafruit.com/product/2471
-  ----> https://www.adafruit.com/products/2821
-
-  Adafruit invests time and resources providing this open source code,
-  please support Adafruit and open-source hardware by purchasing
-  products from Adafruit!
-
-  Written by Tony DiCola for Adafruit Industries.
-  MIT license, all text above must be included in any redistribution
- ****************************************************/
 #include <ESP8266WiFi.h>
 #include "Adafruit_MQTT.h"
 #include "Adafruit_MQTT_Client.h"
@@ -31,13 +14,6 @@ int turnLeft = 4;
 #define WLAN_SSID       "Team_16"
 #define WLAN_PASS       "lunabots"
 
-/************************* Adafruit.io Setup *********************************/
-
-#define AIO_SERVER      "io.adafruit.com"
-#define AIO_SERVERPORT  1883                   // use 8883 for SSL
-#define AIO_USERNAME    "...your AIO username (see https://accounts.adafruit.com)..."
-#define AIO_KEY         "...your AIO key..."
-
 /************ Global State (you don't need to change this!) ******************/
 
 // Create an ESP8266 WiFiClient class to connect to the MQTT server.
@@ -45,20 +21,13 @@ WiFiClient client;
 // or... use WiFiClientSecure for SSL
 //WiFiClientSecure client;
 
-// Setup the MQTT client class by passing in the WiFi client and MQTT server and login details.
-//Adafruit_MQTT_Client mqtt(&client, AIO_SERVER, AIO_SERVERPORT, AIO_USERNAME, AIO_KEY);
-
-//This is an old line from drive_esp
+// Set up MQTT client with nuc address and topic name
 Adafruit_MQTT_Client mqtt(&client, "192.168.1.10", 1883, "motorsTopic", ""); 
 
 /****************************** Feeds ***************************************/
 
-// Setup a feed called 'photocell' for publishing.
-// Notice MQTT paths for AIO follow the form: <username>/feeds/<feedname>
-//Adafruit_MQTT_Publish photocell = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "/feeds/photocell");
-
-// Setup a feed called 'onoff' for subscribing to changes.
-Adafruit_MQTT_Subscribe onoffbutton(&mqtt, "robotCmds/motors");
+// Setup a feed called 'inTopic' for subscribing to changes.
+Adafruit_MQTT_Subscribe inTopic(&mqtt, "robotCmds/motors");
 
 /*************************** Sketch Code ************************************/
 
@@ -89,15 +58,11 @@ void setup() {
   Serial.println(WiFi.localIP());
 
   // Setup MQTT subscription for onoff feed.
-  mqtt.subscribe(&onoffbutton);
+  mqtt.subscribe(&inTopic);
 }
 
 uint32_t x=0;
 
-//w: 
-//a: 
-//s: 
-//d: 
 void loop() {
   // Ensure the connection to the MQTT server is alive (this will make the first
   // connection and automatically reconnect when disconnected).  See the MQTT_connect
@@ -109,31 +74,22 @@ void loop() {
 
   Adafruit_MQTT_Subscribe *subscription;
   while ((subscription = mqtt.readSubscription(5000))) {
-    if (subscription == &onoffbutton) {
+    if (subscription == &inTopic) {
       Serial.print(F("Got: ")); //F means format -maybe Justin
-      Serial.println((char *)onoffbutton.lastread); //Dereferencing
+      Serial.println((char *)inTopic.lastread); //Dereferencing
 
       // Read and transmit bytes
       // Incoming bytes currently come in the following format:
       // byte
       Serial.print("Byte message ");
-      Serial.println(*onoffbutton.lastread);
-      char* command = (char*) onoffbutton.lastread;
-
-      //Comparing the incoming string to a direction
-//      if (strcmp((char*)onoffbutton.lastread, "[170]") == 0) {
-//        Serial.println("FORWARD");
-//      }
-
-      //Testing incoming struct.pack data 
+      Serial.println(*inTopic.lastread);
+      char* command = (char*) inTopic.lastread;
       
       //Grabbing the motor values from the byte array
       //TODO: THIS WORKS CAUSE STRUCT.PACK
       char motorData = command[0];
 
-      // Ripping the REPRESENTED INT IN DECIMAL into its body parts
-      // Cause it be in BYTES yo just look like DECIMAL cause comp trying be
-      // annd FANCY and SH*T
+      // Splitting data into left and right halves
       char leftData = motorData >> 4;
       char rightData = motorData & 15; // 15 == 4'b1111
 
@@ -151,7 +107,7 @@ void loop() {
     
       // TODO: Determine proper direction
       // Determining power of the left motors
-      int powerData = leftData & 7;
+      int powerData = leftData & 7; // 7 == 4'b0111
       int leftDirection = leftData >> 3;
       int rightDirection = rightData >> 3;
 
@@ -170,41 +126,8 @@ void loop() {
       else{
         Serial.write(backward);
       }
-      /*
-      if(leftData >> 3) { // First bit set
-        leftPower = (powerData == 4) ? 400 : (powerData == 2) ? 1000 : 1500;
-      }
-      else { // Otherwise
-        leftPower = (powerData == 4) ? 2600 : (powerData == 2) ? 2000 : 1500;
-      }
-    
-      // Determining the power of the right motors
-      powerData = rightData & 7;
-      if(rightData >> 3) { // First bit set
-        rightPower = (powerData == 4) ? 400 : (powerData == 2) ? 1000 : 1500;
-      }
-      else { // Otherwise
-        rightPower = (powerData == 4) ? 2600 : (powerData == 2) ? 2000 : 1500;
-      }
-    
-      Serial.println("Left power = " + leftPower);
-      Serial.print("Right power = ");
-      Serial.println(rightPower);
-      */
     }
   }
-
-  /* Doesn't pertain to us this sprint
-  // Now we can publish stuff!
-  Serial.print(F("\nSending photocell val "));
-  Serial.print(x);
-  Serial.print("...");
-  if (! photocell.publish(x++)) {
-    Serial.println(F("Failed"));
-  } else {
-    Serial.println(F("OK!"));
-  }
-  */
 
   // ping the server to keep the mqtt connection alive
   // NOT required if you are publishing once every KEEPALIVE seconds
