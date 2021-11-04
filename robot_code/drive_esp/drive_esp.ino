@@ -1,15 +1,17 @@
 /*
  * drive_esp.ino
- * 
- * Code for the radio in the locomotion subsystem, particularly for a NodeMCU with an ESP8266 
- * module. Reads commands from the MQTT network and relays them to the locomotion subsystem
- * controller. Also provides ping functionality so the state controller can check that its
- * connection to the subsystem is established.
- * 
- * See README for descriptions on the format of the command messages.
- * 
- * TODO:
- * - Implement handlers for special drive modes (>252)
+ *
+ * Code for the radio in the locomotion subsystem. Establishes a connection with a NodeMCU
+ * with an ESP8266 and an Arduino microcontroller. Reads commands (descriptions in
+ * README) from the MQTT server and relays them to the locomotion subsystem.
+ *
+ * Subscribes to topic robotCmds/drive declared as inTopic and publishes to topic
+ * robotState/drivePing declared as pingTopic.
+ *
+ * Current File State: Incomplete
+ *
+ * TODOs
+ * Implement handlers for special drive modes (>252)
  */
 
 #include <ESP8266WiFi.h>
@@ -38,8 +40,8 @@ Adafruit_MQTT_Client mqtt(&client, SERVER_ADDR, SERVER_PORT, "driveTopic", "");
 Adafruit_MQTT_Subscribe inTopic = Adafruit_MQTT_Subscribe(&mqtt, TOPIC_NAME_IN);
 Adafruit_MQTT_Publish pingTopic = Adafruit_MQTT_Publish(&mqtt, TOPIC_NAME_OUT);
 
-unsigned long timeLastRecv;   // Last time in milliseconds command was received
-bool cmdRecv;                 // Has a command been received this cycle
+unsigned long timeLastRecv;   // The last time in milliseconds a command was received
+bool cmdRecv;                 // If a command has been received this cycle
 long lastAckTime;
 
 void setup() {
@@ -76,7 +78,11 @@ void loop() {
 }
 
 
-// Constantly check the connection and reconnect if it is dropped
+/*
+ *Constantly checks connection and reconnects if it is dropped
+ *Params: none
+ *Returns: none
+ */
 void checkConnection(){
   if (mqtt.connected()) return;
 
@@ -90,7 +96,12 @@ void checkConnection(){
   }
 }
 
-// read() only "gets rid of" 1 byte, so flush gets rid of all of them
+
+/*
+ *Reads all bytes using read()
+ *Params: none
+ *Returns: none
+ */
 void serialFlush(){
   while(Serial.available() > 0) {
     Serial.read();
@@ -98,8 +109,12 @@ void serialFlush(){
 }
     
 
-// Scan for any incoming data on any topic. The `subPtr` object will have to be compared in
-// a switch case to determine the topic name.
+/*
+ * Scan for any incoming data on any topic. The `subPtr` object will have to be compared in
+ * a switch case to determine the topic name.
+ * Params: none
+ * Returns: none
+ */
 void scanForCmd(){
   Adafruit_MQTT_Subscribe* subPtr;
   
@@ -110,7 +125,7 @@ void scanForCmd(){
 
       // Read and translate the last incoming string of bytes
       // Incoming bytes currently come in the following format:
-      //      0x00  0x00  robotSpeed  offsetNum
+      // 0x00  0x00  robotSpeed  offsetNum
       char* command = (char*) inTopic.lastread; 
       char offsetNum = command[2];
       char robotSpeed = command[3];
@@ -118,11 +133,13 @@ void scanForCmd(){
       //ESTOP. Speed limit of 0 mph.
       if(offsetNum == 255)
         robotSpeed = 100;
+      
       // Check if last message was 'ping' byte; if it was, forward
       // response to ping channel
       if (offsetNum == 252) {
         pingTopic.publish(1);
       }
+      
       // If the message is not the ping packet, process the offset and the robot speed and 
       // send the command to the controller. The header byte 255 is used for synchronizing 
       // Tx and Rx.
